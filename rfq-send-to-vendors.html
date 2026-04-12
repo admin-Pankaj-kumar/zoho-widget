@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,48 +199,38 @@ async function loadData() {
     else rfqName = rfqId;
   } catch(e) { rfqName = rfqId; }
 
-  // 2. Get line items — Line_Items array is inside the RFQ getRecord response
+  // 2. Get line items using getRelatedRecords
   try {
-    var rawItems = (r && r.data && r.data[0] && r.data[0].Line_Items) ? r.data[0].Line_Items : [];
-    console.log("Line_Items from getRecord:", JSON.stringify(rawItems));
-    lineItems = [];
-    for (var i = 0; i < rawItems.length; i++) {
-      var p = rawItems[i].Line_Items || {};
-      if (!p.id) continue;
-      var unitPrice = 0;
-      try {
-        var pr = await ZOHO.CRM.API.getRecord({ Entity: "Products", RecordID: p.id });
-        if (pr && pr.data && pr.data[0]) unitPrice = pr.data[0].Unit_Price || 0;
-      } catch(pe) {}
-      lineItems.push({ productId: p.id, productName: p.name || 'Product', unitPrice: unitPrice });
-    }
-    // If more than 10 items exist ($has_more), fetch via getRelatedRecords
-    if (r && r.data && r.data[0] && r.data[0].$has_more && r.data[0].$has_more.Line_Items) {
-      try {
-        var more = await ZOHO.CRM.API.getRelatedRecords({
-          Entity: "RFQs", RecordID: rfqId, RelatedList: "RFQ_List", page: 1, per_page: 200
-        });
-        var moreData = (more && more.data) ? more.data : [];
-        var existingIds = {};
-        lineItems.forEach(function(x) { existingIds[x.productId] = true; });
-        for (var j = 0; j < moreData.length; j++) {
-          var mp = moreData[j].Line_Items || {};
-          if (!mp.id || existingIds[mp.id]) continue;
-          var mPrice = 0;
-          try {
-            var mpr = await ZOHO.CRM.API.getRecord({ Entity: "Products", RecordID: mp.id });
-            if (mpr && mpr.data && mpr.data[0]) mPrice = mpr.data[0].Unit_Price || 0;
-          } catch(me) {}
-          lineItems.push({ productId: mp.id, productName: mp.name || 'Product', unitPrice: mPrice });
-        }
-      } catch(re) { console.warn("getRelatedRecords error:", re); }
+    var li = await ZOHO.CRM.API.getRelatedRecords({
+      Entity: "RFQs",
+      RecordID: rfqId,
+      RelatedList: "RFQ_List",
+      page: 1,
+      per_page: 200
+    });
+    console.log("Line items:", JSON.stringify(li));
+    if (li && li.data) {
+      var tempItems = li.data.map(function(row) {
+        var p = row.Line_Items || {};
+        return { productId: p.id || '', productName: p.name || 'Product', unitPrice: 0 };
+      }).filter(function(x) { return x.productId; });
+
+      // Fetch Unit_Price for each product
+      for (var i = 0; i < tempItems.length; i++) {
+        try {
+          var pr = await ZOHO.CRM.API.getRecord({ Entity: "Products", RecordID: tempItems[i].productId });
+          if (pr && pr.data && pr.data[0]) tempItems[i].unitPrice = pr.data[0].Unit_Price || 0;
+        } catch(pe) {}
+      }
+      lineItems = tempItems;
     }
   } catch(e) {
-    console.warn("Line items error:", e);
+    console.warn("getRelatedRecords failed:", e);
     lineItems = [];
   }
 
-  // 3. Get vendors — directly query the Vendors module
+  // 3. Get vendors using getRecord on each known vendor
+  // Use a direct search via getAllRecords equivalent
   try {
     var vRes = await ZOHO.CRM.API.getRecords({
       Entity: "Vendors",
@@ -251,9 +240,20 @@ async function loadData() {
     });
     console.log("Vendors:", JSON.stringify(vRes));
     allVendors = (vRes && vRes.data) ? vRes.data : [];
-  } catch(e) {
-    console.warn("getRecords failed for Vendors:", e);
-    allVendors = [];
+  } catch(e1) {
+    console.warn("getRecords failed:", e1);
+    // Try searchRecord as fallback
+    try {
+      var vRes2 = await ZOHO.CRM.API.searchRecord({
+        Entity: "Vendors",
+        Type: "word",
+        Query: "vendor"
+      });
+      allVendors = (vRes2 && vRes2.data) ? vRes2.data : [];
+    } catch(e2) {
+      console.warn("searchRecord also failed:", e2);
+      allVendors = [];
+    }
   }
 
   renderVendors();
