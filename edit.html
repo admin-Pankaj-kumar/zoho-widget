@@ -31,8 +31,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .row input::placeholder{color:#94a3b8}
 .row-acts{display:flex;gap:3px;justify-content:flex-end}
 .icon-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid transparent;border-radius:6px;cursor:pointer;color:#94a3b8;transition:all .15s}
-.icon-btn:hover.undo{background:#fff7ed;color:#d97706;border-color:#fde68a}
-.icon-btn:hover.open-btn{background:#eff6ff;color:#3b82f6;border-color:#bfdbfe}
+.icon-btn.undo:hover{background:#fff7ed;color:#d97706;border-color:#fde68a}
+.icon-btn.open-btn:hover{background:#eff6ff;color:#3b82f6;border-color:#bfdbfe}
 .loading-wrap{padding:40px 20px;text-align:center;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:12px}
 .loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
 .empty-wrap{padding:36px 20px;text-align:center;color:#94a3b8}
@@ -91,9 +91,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="loader"></div>
     <span>Loading contacts...</span>
   </div>
-
   <div class="rows" id="rows" style="display:none"></div>
-
   <div class="empty-wrap" id="emptyWrap" style="display:none">
     <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="15" cy="11" r="6" stroke="#cbd5e1" stroke-width="1.5"/><path d="M3 32c0-6.6 5.4-10.5 12-10.5S27 25.4 27 32" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg>
     <p>No contacts linked to this account yet.</p>
@@ -124,19 +122,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <p id="successSub"></p>
   <button class="btn btn-primary" style="margin:0 auto" onclick="reload()">Back to Edit</button>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
 <script>
-var accountId = null;
-var contacts  = [];
-var rowIdx    = 0;
+var accountId   = null;
+var accountName = null;
+var contacts    = [];
+var rowIdx      = 0;
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
   var raw = data.EntityId;
-  accountId = String(Array.isArray(raw) ? raw[0] : raw);
-  console.log("Account ID:", accountId);
+  accountId   = String(Array.isArray(raw) ? raw[0] : raw);
+  accountName = data.EntityName || null;
+  console.log("AccountId:", accountId, "AccountName:", accountName);
   loadContacts();
 });
 ZOHO.embeddedApp.init();
@@ -144,83 +143,83 @@ ZOHO.embeddedApp.init();
 function loadContacts() {
   showState('loading');
   contacts = [];
-  rowIdx = 0;
+  rowIdx   = 0;
 
-  // Use searchRecords with criteria to get contacts linked to this account
-  ZOHO.CRM.API.searchRecord({
+  // First get the account record to get its name
+  ZOHO.CRM.API.getRecord({ Entity: "Accounts", RecordID: accountId })
+    .then(function(res) {
+      var acct = res && res.data && res.data[0];
+      if (acct) {
+        accountName = acct.Account_Name || acct.Name || accountName;
+        console.log("Account Name resolved:", accountName);
+      }
+      return fetchContactsByAccountId();
+    })
+    .catch(function() {
+      return fetchContactsByAccountId();
+    });
+}
+
+function fetchContactsByAccountId() {
+  // Use ZOHO.CRM.API.searchRecord with Account_Name criteria
+  return ZOHO.CRM.API.searchRecord({
     Entity: "Contacts",
     Type: "criteria",
-    Query: "(Account_Name:equals:" + accountId + ")"
+    Query: "(Account_Name.id:equals:" + accountId + ")"
   }).then(function(res) {
-    console.log("Search response:", JSON.stringify(res));
-    var data = [];
-    if (res && res.data) {
-      data = res.data;
-    }
-
-    data.forEach(function(c) {
-      var orig = {
-        fn: c.First_Name || '',
-        ln: c.Last_Name || '',
-        em: c.Email || '',
-        ph: c.Phone || ''
-      };
-      contacts.push({
-        id: c.id,
-        fn: orig.fn, ln: orig.ln, em: orig.em, ph: orig.ph,
-        orig: orig,
-        rid: null
-      });
-    });
-
-    renderAll();
-    showState(contacts.length ? 'rows' : 'empty');
-    document.getElementById('totalBadge').textContent = contacts.length + ' contact' + (contacts.length !== 1 ? 's' : '');
+    console.log("Search by account ID response:", JSON.stringify(res));
+    processContacts(res);
   }).catch(function(err) {
-    console.error("Search error:", err);
-    // Try fallback with getAllRecords + filter
-    loadFallback();
+    console.log("Criteria search failed, trying word search:", err);
+    // Fallback: get all and filter
+    fetchAllAndFilter();
   });
 }
 
-function loadFallback() {
+function fetchAllAndFilter() {
   ZOHO.CRM.API.getAllRecords({
     Entity: "Contacts",
     sort_order: "asc",
     per_page: 200,
     page: 1
   }).then(function(res) {
-    console.log("Fallback response, total:", res && res.data ? res.data.length : 0);
-    var all = (res && res.data) ? res.data : [];
-    var linked = all.filter(function(c) {
-      return c.Account_Name && String(c.Account_Name.id) === String(accountId);
-    });
-
-    linked.forEach(function(c) {
-      var orig = { fn: c.First_Name||'', ln: c.Last_Name||'', em: c.Email||'', ph: c.Phone||'' };
-      contacts.push({ id:c.id, fn:orig.fn, ln:orig.ln, em:orig.em, ph:orig.ph, orig:orig, rid:null });
-    });
-
-    renderAll();
-    showState(contacts.length ? 'rows' : 'empty');
-    document.getElementById('totalBadge').textContent = contacts.length + ' contact' + (contacts.length !== 1 ? 's' : '');
+    console.log("getAllRecords total:", res && res.data ? res.data.length : 0);
+    if (res && res.data) {
+      var filtered = { data: res.data.filter(function(c) {
+        return c.Account_Name && String(c.Account_Name.id) === String(accountId);
+      })};
+      console.log("Filtered contacts:", filtered.data.length);
+      processContacts(filtered);
+    } else {
+      processContacts(null);
+    }
   }).catch(function(err) {
-    console.error("Fallback error:", err);
+    console.error("getAllRecords failed:", err);
     showState('empty');
     showToast('Failed to load contacts', 'er');
   });
+}
+
+function processContacts(res) {
+  var data = (res && res.data) ? res.data : [];
+  data.forEach(function(c) {
+    var orig = { fn: c.First_Name||'', ln: c.Last_Name||'', em: c.Email||'', ph: c.Phone||'' };
+    contacts.push({ id: c.id, fn: orig.fn, ln: orig.ln, em: orig.em, ph: orig.ph, orig: orig, rid: null });
+  });
+
+  renderAll();
+  showState(contacts.length ? 'rows' : 'empty');
+  document.getElementById('totalBadge').textContent = contacts.length + ' contact' + (contacts.length !== 1 ? 's' : '');
 }
 
 function renderAll() {
   var container = document.getElementById('rows');
   container.innerHTML = '';
   rowIdx = 0;
-
   contacts.forEach(function(c, idx) {
     rowIdx++;
     var rid = rowIdx;
     c.rid = rid;
-
     var div = document.createElement('div');
     div.className = 'row';
     div.id = 'row-' + rid;
@@ -232,7 +231,7 @@ function renderAll() {
       '<input type="email" placeholder="email@example.com" id="em-'+rid+'" value="'+esc(c.em)+'" oninput="onChange('+rid+','+idx+')">' +
       '<input type="tel"   placeholder="+91 98765 43210"   id="ph-'+rid+'" value="'+esc(c.ph)+'" oninput="onChange('+rid+','+idx+')">' +
       '<div class="row-acts">' +
-        '<button class="icon-btn undo" onclick="undoRow('+rid+','+idx+')" title="Undo this row">' +
+        '<button class="icon-btn undo" onclick="undoRow('+rid+','+idx+')" title="Undo">' +
           '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4H7a3 3 0 010 6H3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M4 2L2 4l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
         '</button>' +
         '<button class="icon-btn open-btn" onclick="openRecord(\''+c.id+'\')" title="Open contact">' +
@@ -245,34 +244,26 @@ function renderAll() {
 
 function onChange(rid, idx) {
   var c = contacts[idx];
-  c.fn = val('fn-'+rid);
-  c.ln = val('ln-'+rid);
-  c.em = val('em-'+rid);
-  c.ph = val('ph-'+rid);
-
+  c.fn = val('fn-'+rid); c.ln = val('ln-'+rid);
+  c.em = val('em-'+rid); c.ph = val('ph-'+rid);
   var mod = isModified(c);
   document.getElementById('dot-'+rid).className = 'dot ' + (mod ? 'dot-modified' : 'dot-clean');
-
   ['fn','ln','em','ph'].forEach(function(f) {
     var el = document.getElementById(f+'-'+rid);
     if (el) el.classList.toggle('modified', c[f] !== c.orig[f]);
   });
   document.getElementById('ln-'+rid).classList.remove('err');
-  updateBadges();
-  updateFooter();
+  updateBadges(); updateFooter();
 }
 
 function undoRow(rid, idx) {
   var c = contacts[idx];
-  c.fn = c.orig.fn; c.ln = c.orig.ln; c.em = c.orig.em; c.ph = c.orig.ph;
-  set('fn-'+rid, c.fn); set('ln-'+rid, c.ln); set('em-'+rid, c.em); set('ph-'+rid, c.ph);
-  ['fn','ln','em','ph'].forEach(function(f) {
-    var el = document.getElementById(f+'-'+rid);
-    if (el) el.classList.remove('modified','err');
-  });
+  c.fn=c.orig.fn; c.ln=c.orig.ln; c.em=c.orig.em; c.ph=c.orig.ph;
+  set('fn-'+rid,c.fn); set('ln-'+rid,c.ln); set('em-'+rid,c.em); set('ph-'+rid,c.ph);
+  ['fn','ln','em','ph'].forEach(function(f){ var el=document.getElementById(f+'-'+rid); if(el) el.classList.remove('modified','err'); });
   document.getElementById('dot-'+rid).className = 'dot dot-clean';
   updateBadges(); updateFooter();
-  showToast('Row reset to original', 'info');
+  showToast('Row reset', 'info');
 }
 
 function undoAll() {
@@ -283,30 +274,18 @@ function undoAll() {
 function saveChanges() {
   var toSave = contacts.filter(isModified);
   if (!toSave.length) { showToast('No changes to save', 'info'); return; }
-
   var hasErr = false;
   toSave.forEach(function(c) {
-    if (!c.ln) {
-      var el = document.getElementById('ln-'+c.rid);
-      if (el) el.classList.add('err');
-      hasErr = true;
-    }
+    if (!c.ln) { var el=document.getElementById('ln-'+c.rid); if(el) el.classList.add('err'); hasErr=true; }
   });
   if (hasErr) { showToast('Last Name is required', 'er'); return; }
 
   var btn = document.getElementById('saveBtn');
   btn.classList.add('loading'); btn.disabled = true;
-
-  var done = 0, ok = 0, total = toSave.length;
+  var done=0, ok=0, total=toSave.length;
 
   toSave.forEach(function(c) {
-    var payload = {
-      id: c.id,
-      Last_Name: c.ln,
-      First_Name: c.fn,
-      Email: c.em,
-      Phone: c.ph
-    };
+    var payload = { id: c.id, Last_Name: c.ln, First_Name: c.fn, Email: c.em, Phone: c.ph };
     ZOHO.CRM.API.updateRecord({ Entity: 'Contacts', APIData: payload })
       .then(function(res) {
         done++;
@@ -315,11 +294,10 @@ function saveChanges() {
           ok++;
           c.orig = { fn:c.fn, ln:c.ln, em:c.em, ph:c.ph };
         }
-        if (done === total) finish(ok, total - ok);
-      })
-      .catch(function(err) {
+        if (done === total) finish(ok, total-ok);
+      }).catch(function(err) {
         done++; console.error(err);
-        if (done === total) finish(ok, total - ok);
+        if (done === total) finish(ok, total-ok);
       });
   });
 }
@@ -327,7 +305,6 @@ function saveChanges() {
 function finish(ok, fail) {
   var btn = document.getElementById('saveBtn');
   btn.classList.remove('loading'); btn.disabled = false;
-
   if (ok > 0 && fail === 0) {
     document.getElementById('mainCard').style.display = 'none';
     document.getElementById('successMsg').textContent = ok + ' contact' + (ok>1?'s':'') + ' updated successfully!';
@@ -343,24 +320,21 @@ function finish(ok, fail) {
 }
 
 function openRecord(id) {
-  try { ZOHO.CRM.UI.Record.open({ Entity: 'Contacts', RecordID: id }); } catch(e) {}
+  try { ZOHO.CRM.UI.Record.open({ Entity:'Contacts', RecordID:id }); } catch(e) {}
 }
 
-function isModified(c) {
-  return c.fn!==c.orig.fn || c.ln!==c.orig.ln || c.em!==c.orig.em || c.ph!==c.orig.ph;
-}
+function isModified(c) { return c.fn!==c.orig.fn||c.ln!==c.orig.ln||c.em!==c.orig.em||c.ph!==c.orig.ph; }
 
 function updateBadges() {
   var n = contacts.filter(isModified).length;
   var mb = document.getElementById('modBadge');
-  mb.textContent = n + ' modified';
-  mb.style.display = n ? '' : 'none';
+  mb.textContent = n + ' modified'; mb.style.display = n ? '' : 'none';
 }
 
 function updateFooter() {
   var n = contacts.filter(isModified).length;
   document.getElementById('footInfo').innerHTML = n
-    ? '<b>' + n + '</b> contact' + (n>1?'s':'') + ' modified — click Save to apply'
+    ? '<b>'+n+'</b> contact'+(n>1?'s':'')+' modified — click Save to apply'
     : 'No pending changes';
 }
 
@@ -374,9 +348,8 @@ function showState(s) {
 
 function showToast(msg, type) {
   var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + (type||'ok') + ' show';
-  setTimeout(function() { t.className='toast'; }, 3000);
+  t.textContent = msg; t.className = 'toast '+(type||'ok')+' show';
+  setTimeout(function(){ t.className='toast'; }, 3000);
 }
 
 function reload() {
@@ -385,7 +358,7 @@ function reload() {
   loadContacts();
 }
 
-function val(id) { var e=document.getElementById(id); return e?e.value.trim():''; }
+function val(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
 function set(id,v){ var e=document.getElementById(id); if(e) e.value=v; }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 </script>
