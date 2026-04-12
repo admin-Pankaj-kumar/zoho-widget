@@ -21,7 +21,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .rows::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:3px}
 .row{display:grid;grid-template-columns:20px 1fr 1fr 1.5fr 1.2fr 56px;gap:6px;align-items:center;padding:2px 0;border-radius:6px}
 .row:hover{background:#fafbfc}
-.dot{width:8px;height:8px;border-radius:50%;margin:auto;transition:background .2s;flex-shrink:0}
+.dot{width:8px;height:8px;border-radius:50%;margin:auto;transition:background .2s}
 .dot-clean{background:#22c55e}
 .dot-modified{background:#f59e0b}
 .row input{width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s,box-shadow .15s,background .15s}
@@ -41,7 +41,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .leg{display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b}
 .leg-dot{width:7px;height:7px;border-radius:50%}
 .card-foot{padding:12px 20px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;gap:12px;flex-wrap:wrap}
-.foot-left{font-size:11px;color:#64748b;line-height:1.6}
+.foot-left{font-size:11px;color:#64748b}
 .foot-left b{color:#f59e0b}
 .foot-right{display:flex;gap:8px}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
@@ -62,6 +62,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
 .success h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:6px}
 .success p{font-size:12px;color:#64748b;margin-bottom:18px}
+.debug-bar{background:#1e293b;color:#94a3b8;font-family:monospace;font-size:10px;padding:6px 20px;word-break:break-all}
 </style>
 </head>
 <body>
@@ -77,6 +78,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="loadContacts()">↺ Refresh</button>
     </div>
   </div>
+
+  <div class="debug-bar" id="debugBar">Initializing...</div>
 
   <div class="col-heads">
     <span></span>
@@ -126,87 +129,142 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
 <script>
-var accountId   = null;
-var accountName = null;
-var contacts    = [];
-var rowIdx      = 0;
+var accountId = null;
+var contacts  = [];
+var rowIdx    = 0;
+
+function debug(msg) {
+  document.getElementById('debugBar').textContent = msg;
+  console.log(msg);
+}
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
-  var raw = data.EntityId;
-  accountId   = String(Array.isArray(raw) ? raw[0] : raw);
-  accountName = data.EntityName || null;
-  console.log("AccountId:", accountId, "AccountName:", accountName);
+  console.log("Full PageLoad data:", JSON.stringify(data));
+
+  // Try to get Account ID from the parent window URL first
+  var urlAccountId = getAccountIdFromParentUrl();
+
+  // data.EntityId could be the account or something else
+  var rawId = data.EntityId;
+  var sdkId = String(Array.isArray(rawId) ? rawId[0] : rawId);
+
+  debug("SDK EntityId: " + sdkId + " | URL AccountId: " + urlAccountId + " | Entity: " + data.Entity);
+
+  // Use URL account ID if available and different from SDK ID
+  // For Accounts module button widget, Entity should be "Accounts"
+  if (data.Entity === "Accounts") {
+    accountId = sdkId;
+    debug("Using SDK ID (Accounts entity): " + accountId);
+  } else if (urlAccountId) {
+    accountId = urlAccountId;
+    debug("Using URL Account ID: " + accountId);
+  } else {
+    accountId = sdkId;
+    debug("Fallback to SDK ID: " + accountId);
+  }
+
   loadContacts();
 });
 ZOHO.embeddedApp.init();
 
+function getAccountIdFromParentUrl() {
+  try {
+    // Try to get the parent page URL which contains the Account ID
+    var url = window.parent.location.href;
+    var match = url.match(/\/Accounts\/(\d+)/);
+    if (match) return match[1];
+  } catch(e) {
+    // Cross-origin, can't access parent URL
+    try {
+      // Try referrer
+      var ref = document.referrer;
+      var match2 = ref.match(/\/Accounts\/(\d+)/);
+      if (match2) return match2[1];
+    } catch(e2) {}
+  }
+  return null;
+}
+
 function loadContacts() {
   showState('loading');
   contacts = [];
-  rowIdx   = 0;
+  rowIdx = 0;
+  debug("Loading contacts for Account ID: " + accountId);
 
-  // First get the account record to get its name
-  ZOHO.CRM.API.getRecord({ Entity: "Accounts", RecordID: accountId })
-    .then(function(res) {
-      var acct = res && res.data && res.data[0];
-      if (acct) {
-        accountName = acct.Account_Name || acct.Name || accountName;
-        console.log("Account Name resolved:", accountName);
-      }
-      return fetchContactsByAccountId();
-    })
-    .catch(function() {
-      return fetchContactsByAccountId();
-    });
-}
-
-function fetchContactsByAccountId() {
-  // Use ZOHO.CRM.API.searchRecord with Account_Name criteria
-  return ZOHO.CRM.API.searchRecord({
+  // Use COQL via the SDK to get contacts linked to this account
+  ZOHO.CRM.API.searchRecord({
     Entity: "Contacts",
     Type: "criteria",
-    Query: "(Account_Name.id:equals:" + accountId + ")"
+    Query: "(Account_Name:equals:" + accountId + ")"
   }).then(function(res) {
-    console.log("Search by account ID response:", JSON.stringify(res));
-    processContacts(res);
+    console.log("Search result:", JSON.stringify(res));
+    debug("Search result: " + (res && res.data ? res.data.length + " records" : "no data, status: " + (res && res.status)));
+
+    if (res && res.data && res.data.length > 0) {
+      processContacts(res.data);
+    } else {
+      // Try alternative search by account name
+      ZOHO.CRM.API.getRecord({ Entity: "Accounts", RecordID: accountId })
+        .then(function(acctRes) {
+          var acct = acctRes && acctRes.data && acctRes.data[0];
+          var acctName = acct ? (acct.Account_Name || acct.Name) : null;
+          debug("Account name: " + acctName + " — searching contacts by name");
+          if (acctName) {
+            searchByAccountName(acctName);
+          } else {
+            fetchAllAndFilter();
+          }
+        }).catch(function() { fetchAllAndFilter(); });
+    }
   }).catch(function(err) {
-    console.log("Criteria search failed, trying word search:", err);
-    // Fallback: get all and filter
+    console.error("Search error:", err);
+    debug("Search failed, trying fallback");
     fetchAllAndFilter();
   });
 }
 
+function searchByAccountName(acctName) {
+  ZOHO.CRM.API.searchRecord({
+    Entity: "Contacts",
+    Type: "criteria",
+    Query: "(Account_Name:equals:" + acctName + ")"
+  }).then(function(res) {
+    debug("Name search result: " + (res && res.data ? res.data.length + " records" : "no data"));
+    if (res && res.data && res.data.length > 0) {
+      processContacts(res.data);
+    } else {
+      fetchAllAndFilter();
+    }
+  }).catch(function() { fetchAllAndFilter(); });
+}
+
 function fetchAllAndFilter() {
+  debug("Fetching all contacts and filtering...");
   ZOHO.CRM.API.getAllRecords({
     Entity: "Contacts",
     sort_order: "asc",
     per_page: 200,
     page: 1
   }).then(function(res) {
-    console.log("getAllRecords total:", res && res.data ? res.data.length : 0);
-    if (res && res.data) {
-      var filtered = { data: res.data.filter(function(c) {
-        return c.Account_Name && String(c.Account_Name.id) === String(accountId);
-      })};
-      console.log("Filtered contacts:", filtered.data.length);
-      processContacts(filtered);
-    } else {
-      processContacts(null);
-    }
+    var all = (res && res.data) ? res.data : [];
+    debug("Total contacts fetched: " + all.length + " | Filtering for account: " + accountId);
+    var linked = all.filter(function(c) {
+      return c.Account_Name && String(c.Account_Name.id) === String(accountId);
+    });
+    debug("Matched contacts: " + linked.length);
+    processContacts(linked);
   }).catch(function(err) {
-    console.error("getAllRecords failed:", err);
+    debug("All methods failed: " + err);
     showState('empty');
     showToast('Failed to load contacts', 'er');
   });
 }
 
-function processContacts(res) {
-  var data = (res && res.data) ? res.data : [];
+function processContacts(data) {
   data.forEach(function(c) {
     var orig = { fn: c.First_Name||'', ln: c.Last_Name||'', em: c.Email||'', ph: c.Phone||'' };
     contacts.push({ id: c.id, fn: orig.fn, ln: orig.ln, em: orig.em, ph: orig.ph, orig: orig, rid: null });
   });
-
   renderAll();
   showState(contacts.length ? 'rows' : 'empty');
   document.getElementById('totalBadge').textContent = contacts.length + ' contact' + (contacts.length !== 1 ? 's' : '');
@@ -289,7 +347,6 @@ function saveChanges() {
     ZOHO.CRM.API.updateRecord({ Entity: 'Contacts', APIData: payload })
       .then(function(res) {
         done++;
-        console.log("Update response:", JSON.stringify(res));
         if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
           ok++;
           c.orig = { fn:c.fn, ln:c.ln, em:c.em, ph:c.ph };
@@ -315,7 +372,7 @@ function finish(ok, fail) {
     showToast(ok + ' saved, ' + fail + ' failed', 'er');
     updateBadges(); updateFooter();
   } else {
-    showToast('Save failed. Please try again.', 'er');
+    showToast('Save failed. Try again.', 'er');
   }
 }
 
