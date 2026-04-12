@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RFQ Price Comparison</title>
+<script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;padding:16px;font-size:13px;color:#1a202c}
+
+  /* Header */
+  .header{background:#fff;border-radius:10px;border:1px solid #e2e8f0;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .header-icon{width:38px;height:38px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+  .header-title{font-size:15px;font-weight:700;color:#1a202c}
+  .header-sub{font-size:11px;color:#718096;margin-top:2px}
+  .header-badge{margin-left:auto;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+
+  /* Summary cards */
+  .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .sum-card{background:#fff;border-radius:8px;border:1px solid #e2e8f0;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .sum-label{font-size:10px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .sum-val{font-size:18px;font-weight:700;color:#1a202c}
+  .sum-val.green{color:#059669}
+  .sum-val.blue{color:#2563eb}
+
+  /* Table */
+  .table-wrap{background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .table-header-row{padding:10px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between}
+  .table-title{font-size:12px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.5px}
+  .legend{display:flex;gap:12px;align-items:center}
+  .leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#718096}
+  .leg-dot{width:8px;height:8px;border-radius:50%}
+
+  table{width:100%;border-collapse:collapse}
+  thead tr{background:#f8fafc}
+  th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+  th.right{text-align:right}
+  td{padding:10px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#fafbff}
+  td.right{text-align:right}
+
+  /* Item name */
+  .item-name{font-weight:600;color:#1a202c;font-size:13px}
+  .item-sub{font-size:10px;color:#9ca3af;margin-top:1px}
+
+  /* Vendor cell */
+  .vendor-cell{display:flex;flex-direction:column;gap:6px}
+  .vendor-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px;border-radius:6px;background:#f8fafc;border:1px solid #e2e8f0}
+  .vendor-price-row.best{background:#ecfdf5;border-color:#6ee7b7}
+  .vendor-price-row.no-quote{background:#fff;border-color:#e5e7eb;opacity:.65}
+  .vp-name{font-size:11px;font-weight:500;color:#374151;flex:1}
+  .vp-price{font-size:12px;font-weight:700;color:#374151;font-family:monospace}
+  .vp-price.best-price{color:#059669}
+  .vp-price.no-price{color:#9ca3af;font-weight:400;font-size:11px}
+  .best-badge{background:#059669;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;white-space:nowrap}
+  .savings-badge{background:#eff6ff;color:#1d4ed8;font-size:9px;font-weight:600;padding:1px 5px;border-radius:10px;white-space:nowrap}
+
+  /* Expected price col */
+  .exp-price{font-size:12px;color:#6b7280;font-family:monospace}
+
+  /* Best saving col */
+  .best-col{text-align:center}
+  .saving-val{font-size:12px;font-weight:700;color:#059669}
+  .saving-neg{color:#dc2626}
+
+  /* Loading / empty */
+  .center-msg{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;color:#9ca3af;font-size:13px}
+  .spinner{width:22px;height:22px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .empty-icon{font-size:36px}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-icon">📊</div>
+  <div>
+    <div class="header-title">RFQ Price Comparison</div>
+    <div class="header-sub" id="headerSub">Loading...</div>
+  </div>
+  <div class="header-badge" id="headerBadge">—</div>
+</div>
+
+<!-- Summary Cards -->
+<div class="summary" id="summaryCards" style="display:none">
+  <div class="sum-card">
+    <div class="sum-label">Total Items</div>
+    <div class="sum-val blue" id="sumItems">0</div>
+  </div>
+  <div class="sum-card">
+    <div class="sum-label">Vendors Quoted</div>
+    <div class="sum-val blue" id="sumVendors">0</div>
+  </div>
+  <div class="sum-card">
+    <div class="sum-label">Potential Savings</div>
+    <div class="sum-val green" id="sumSavings">—</div>
+  </div>
+</div>
+
+<!-- Comparison Table -->
+<div class="table-wrap">
+  <div class="table-header-row">
+    <div class="table-title">📦 Price Comparison by Item</div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#059669"></div>Best Price</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#9ca3af"></div>No Quote</div>
+    </div>
+  </div>
+  <div id="tableContent">
+    <div class="center-msg"><div class="spinner"></div>Loading comparison data...</div>
+  </div>
+</div>
+
+<script>
+var rfqId = null;
+
+ZOHO.embeddedApp.on("PageLoad", function(data) {
+  rfqId = String(Array.isArray(data.EntityId) ? data.EntityId[0] : data.EntityId);
+  loadComparison();
+});
+ZOHO.embeddedApp.init();
+
+async function loadComparison() {
+  try {
+    // 1. Get RFQ name
+    var rfqRes = await ZOHO.CRM.API.getRecord({ Entity: "RFQs", RecordID: rfqId });
+    var rfqName = (rfqRes && rfqRes.data && rfqRes.data[0] && rfqRes.data[0].Name) || rfqId;
+    document.getElementById('headerSub').textContent = rfqName;
+    document.getElementById('headerBadge').textContent = rfqId.slice(-6);
+
+    // 2. Get all Requested_For_Quotations for this RFQ using coqlQuery
+    var rfqsRes = await ZOHO.CRM.API.coqlQuery({
+      select_query: "SELECT id, Name, Vendor FROM Requested_For_Quotations WHERE Related_RFQ = '" + rfqId + "' LIMIT 50"
+    });
+    var rfqs = (rfqsRes && rfqsRes.data) ? rfqsRes.data : [];
+    console.log("RFQs:", JSON.stringify(rfqs));
+
+    if (!rfqs.length) {
+      document.getElementById('tableContent').innerHTML =
+        '<div class="center-msg"><div class="empty-icon">📭</div>No vendor quotations found for this RFQ</div>';
+      return;
+    }
+
+    // 3. For each RFQ record, get its Requested_Items via getRelatedRecords
+    // vendors map: id -> name
+    var vendors = rfqs.map(function(r) { return { id: r.id, name: (r.Vendor && r.Vendor.name) || r.Name }; });
+
+    // items map: productId -> { name, expectedPrice, vendorPrices: {vendorName: price} }
+    var itemsMap = {};
+
+    for (var i = 0; i < rfqs.length; i++) {
+      var rfqRecord = rfqs[i];
+      var vendorName = (rfqRecord.Vendor && rfqRecord.Vendor.name) || rfqRecord.Name;
+
+      try {
+        var itemsRes = await ZOHO.CRM.API.getRelatedRecords({
+          Entity: "Requested_For_Quotations",
+          RecordID: rfqRecord.id,
+          RelatedList: "Requested_Items",
+          page: 1,
+          per_page: 200
+        });
+        console.log("Items for", vendorName, JSON.stringify(itemsRes));
+
+        var items = (itemsRes && itemsRes.data) ? itemsRes.data : [];
+        items.forEach(function(item) {
+          var product = item.Item || {};
+          var pid = product.id;
+          var pname = product.name || 'Product';
+          if (!pid) return;
+
+          if (!itemsMap[pid]) {
+            itemsMap[pid] = {
+              productId: pid,
+              productName: pname,
+              expectedPrice: item.Expected_Price || 0,
+              vendorPrices: {}
+            };
+          }
+          itemsMap[pid].vendorPrices[vendorName] = item.Received_Price;
+        });
+      } catch(e) {
+        console.warn("Items error for", vendorName, e);
+      }
+    }
+
+    renderTable(itemsMap, vendors);
+
+  } catch(e) {
+    console.error("loadComparison error:", e);
+    document.getElementById('tableContent').innerHTML =
+      '<div class="center-msg"><div class="empty-icon">⚠️</div>' + esc(String(e.message || e)) + '</div>';
+  }
+}
+
+function renderTable(itemsMap, vendors) {
+  var items = Object.values(itemsMap);
+
+  if (!items.length) {
+    document.getElementById('tableContent').innerHTML =
+      '<div class="center-msg"><div class="empty-icon">📭</div>No items found in quotations</div>';
+    return;
+  }
+
+  // Calculate summary
+  var totalSavings = 0;
+  var vendorsWithQuotes = new Set();
+
+  items.forEach(function(item) {
+    var prices = [];
+    Object.keys(item.vendorPrices).forEach(function(v) {
+      var p = item.vendorPrices[v];
+      if (p != null && p > 0) {
+        prices.push(p);
+        vendorsWithQuotes.add(v);
+      }
+    });
+    if (prices.length > 0 && item.expectedPrice > 0) {
+      var bestPrice = Math.min.apply(null, prices);
+      totalSavings += (item.expectedPrice - bestPrice);
+    }
+  });
+
+  // Show summary
+  document.getElementById('summaryCards').style.display = 'grid';
+  document.getElementById('sumItems').textContent = items.length;
+  document.getElementById('sumVendors').textContent = vendorsWithQuotes.size + ' / ' + vendors.length;
+  document.getElementById('sumSavings').textContent = totalSavings > 0
+    ? '&#8377;' + totalSavings.toLocaleString('en-IN')
+    : totalSavings < 0 ? '-&#8377;' + Math.abs(totalSavings).toLocaleString('en-IN') : '&#8377;0';
+
+  // Build table
+  var vendorNames = vendors.map(function(v) { return v.name; });
+
+  var thead = '<thead><tr>' +
+    '<th style="min-width:140px">Item</th>' +
+    '<th class="right" style="min-width:100px">Expected</th>' +
+    vendorNames.map(function(n) {
+      return '<th class="right" style="min-width:120px">' + esc(n) + '</th>';
+    }).join('') +
+    '<th class="right" style="min-width:100px">Best Price</th>' +
+    '<th class="right" style="min-width:90px">Savings</th>' +
+    '</tr></thead>';
+
+  var tbody = '<tbody>' + items.map(function(item) {
+    // Find best price
+    var prices = [];
+    vendorNames.forEach(function(vn) {
+      var p = item.vendorPrices[vn];
+      if (p != null && p > 0) prices.push({ vendor: vn, price: p });
+    });
+    var bestPrice = prices.length ? Math.min.apply(null, prices.map(function(x){return x.price;})) : null;
+    var bestVendor = bestPrice != null ? prices.find(function(x){return x.price === bestPrice;}).vendor : null;
+    var savings = (bestPrice != null && item.expectedPrice > 0) ? (item.expectedPrice - bestPrice) : null;
+
+    var vendorCols = vendorNames.map(function(vn) {
+      var p = item.vendorPrices[vn];
+      var isBest = (p != null && p === bestPrice && bestVendor === vn);
+      var hasPrice = (p != null && p > 0);
+      if (hasPrice) {
+        return '<td class="right">' +
+          '<span style="font-size:12px;font-weight:' + (isBest ? '700' : '500') + ';color:' + (isBest ? '#059669' : '#374151') + ';font-family:monospace">&#8377;' + fmt(p) + '</span>' +
+          (isBest ? ' <span style="background:#059669;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px">BEST</span>' : '') +
+          '</td>';
+      } else {
+        return '<td class="right"><span style="color:#9ca3af;font-size:11px">No quote</span></td>';
+      }
+    }).join('');
+
+    return '<tr>' +
+      '<td><div class="item-name">' + esc(item.productName) + '</div></td>' +
+      '<td class="right"><span class="exp-price">' + (item.expectedPrice ? '&#8377;' + fmt(item.expectedPrice) : '&mdash;') + '</span></td>' +
+      vendorCols +
+      '<td class="right"><span style="font-size:13px;font-weight:700;color:' + (bestPrice ? '#059669' : '#9ca3af') + '">' +
+        (bestPrice ? '&#8377;' + fmt(bestPrice) : '&mdash;') + '</span></td>' +
+      '<td class="right"><span style="font-size:12px;font-weight:600;color:' +
+        (savings == null ? '#9ca3af' : savings > 0 ? '#059669' : savings < 0 ? '#dc2626' : '#6b7280') + '">' +
+        (savings == null ? '&mdash;' : (savings > 0 ? '&#8595; &#8377;' + fmt(Math.abs(savings)) : savings < 0 ? '&#8593; &#8377;' + fmt(Math.abs(savings)) : '&#8377;0')) +
+      '</span></td>' +
+    '</tr>';
+  }).join('') + '</tbody>';
+
+  document.getElementById('tableContent').innerHTML =
+    '<div style="overflow-x:auto"><table>' + thead + tbody + '</table></div>';
+}
+
+function fmt(n) { return Number(n).toLocaleString('en-IN'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
