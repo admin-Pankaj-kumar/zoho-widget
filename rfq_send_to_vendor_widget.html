@@ -9,185 +9,195 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0f1117;
-    --surface: #181c27;
-    --surface2: #1e2336;
-    --border: #2a2f45;
-    --accent: #4f8ef7;
-    --accent2: #38d9a9;
-    --text: #e8eaf6;
-    --text2: #8b92b3;
-    --danger: #f4756a;
-    --success: #38d9a9;
+    --bg: #f0f2f7;
+    --surface: #ffffff;
+    --surface2: #f5f7fc;
+    --border: #e0e4f0;
+    --accent: #3b6ef0;
+    --accent2: #12b886;
+    --text: #1a1f36;
+    --text2: #6b7280;
+    --danger: #e53e3e;
+    --success: #12b886;
     --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
   }
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 16px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
   .header {
     display: flex; align-items: center; gap: 12px;
-    padding: 16px 20px;
+    padding: 14px 18px;
     background: var(--surface);
     border-radius: var(--radius);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow);
   }
   .header-icon {
-    width: 40px; height: 40px;
+    width: 38px; height: 38px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px; flex-shrink: 0;
+    font-size: 17px; flex-shrink: 0;
   }
-  .header-info h2 { font-size: 15px; font-weight: 600; }
-  .header-info p { font-size: 12px; color: var(--text2); margin-top: 2px; font-family: 'DM Mono', monospace; }
+  .header-info h2 { font-size: 14px; font-weight: 600; color: var(--text); }
+  .header-info p { font-size: 11px; color: var(--text2); margin-top: 2px; font-family: 'DM Mono', monospace; }
   .rfq-badge {
     margin-left: auto;
-    background: rgba(79,142,247,0.15);
-    border: 1px solid rgba(79,142,247,0.3);
+    background: rgba(59,110,240,0.1);
+    border: 1px solid rgba(59,110,240,0.25);
     color: var(--accent);
-    padding: 4px 10px; border-radius: 20px;
-    font-size: 11px; font-family: 'DM Mono', monospace;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500;
   }
   .section {
     background: var(--surface);
     border-radius: var(--radius);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow);
     overflow: hidden;
   }
   .section-header {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 8px;
-    font-size: 12px; font-weight: 600; color: var(--text2);
+    font-size: 11px; font-weight: 600; color: var(--text2);
     text-transform: uppercase; letter-spacing: 0.8px;
+    background: var(--surface2);
   }
-  .section-header span {
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); font-family: 'DM Mono', monospace;
-    font-size: 11px; padding: 1px 7px; border-radius: 20px; margin-left: auto;
+  .section-header .badge {
+    background: var(--border); color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    padding: 1px 7px; border-radius: 20px; margin-left: auto;
   }
   .products-list {
-    padding: 8px; display: flex; flex-direction: column; gap: 4px;
-    max-height: 140px; overflow-y: auto;
+    padding: 8px; display: flex; flex-direction: column; gap: 3px;
+    max-height: 130px; overflow-y: auto;
   }
   .product-chip {
     display: flex; align-items: center; gap: 8px;
-    padding: 8px 10px;
-    background: var(--surface2); border-radius: 8px; border: 1px solid var(--border);
+    padding: 7px 10px;
+    background: var(--surface2); border-radius: 7px;
+    border: 1px solid var(--border);
   }
   .product-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); flex-shrink: 0; }
-  .product-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+  .product-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; }
   .product-id { font-size: 10px; color: var(--text2); font-family: 'DM Mono', monospace; }
-  .search-wrap {
-    padding: 10px; border-bottom: 1px solid var(--border);
-  }
+  .search-wrap { padding: 8px 10px; border-bottom: 1px solid var(--border); }
   .search-input {
     width: 100%;
     background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 12px;
-    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
+    border-radius: 7px; padding: 7px 12px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 12px;
     outline: none; transition: border-color 0.2s;
   }
   .search-input::placeholder { color: var(--text2); }
   .search-input:focus { border-color: var(--accent); }
   .select-all-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 10px; border-bottom: 1px solid var(--border);
+    padding: 5px 10px; border-bottom: 1px solid var(--border);
+    background: var(--surface2);
   }
   .select-all-btn {
     background: none; border: none; color: var(--accent);
-    font-size: 12px; font-family: 'DM Sans', sans-serif;
-    cursor: pointer; padding: 2px 6px; border-radius: 4px;
+    font-size: 11px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; padding: 2px 6px; border-radius: 4px; font-weight: 600;
   }
-  .select-all-btn:hover { background: rgba(79,142,247,0.1); }
+  .select-all-btn:hover { background: rgba(59,110,240,0.08); }
   .selected-count { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; }
   .vendors-list {
-    padding: 8px; display: flex; flex-direction: column; gap: 4px;
-    max-height: 220px; overflow-y: auto;
+    padding: 8px; display: flex; flex-direction: column; gap: 3px;
+    max-height: 210px; overflow-y: auto;
   }
   .vendor-item {
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px;
+    padding: 9px 12px;
     background: var(--surface2); border-radius: 8px; border: 1px solid var(--border);
     cursor: pointer; transition: all 0.15s; user-select: none;
   }
-  .vendor-item:hover { border-color: var(--accent); background: rgba(79,142,247,0.05); }
-  .vendor-item.selected { border-color: var(--accent); background: rgba(79,142,247,0.1); }
+  .vendor-item:hover { border-color: var(--accent); background: rgba(59,110,240,0.04); }
+  .vendor-item.selected { border-color: var(--accent); background: rgba(59,110,240,0.07); }
   .vendor-checkbox {
-    width: 18px; height: 18px; border-radius: 5px;
+    width: 17px; height: 17px; border-radius: 4px;
     border: 2px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: all 0.15s; font-size: 11px;
+    flex-shrink: 0; transition: all 0.15s; font-size: 10px;
   }
   .vendor-item.selected .vendor-checkbox { background: var(--accent); border-color: var(--accent); color: white; }
   .vendor-avatar {
-    width: 32px; height: 32px; border-radius: 8px;
-    background: linear-gradient(135deg, #2a3560, #1e2845);
+    width: 30px; height: 30px; border-radius: 7px;
+    background: linear-gradient(135deg, #dbeafe, #ede9fe);
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 600; color: var(--accent);
+    font-size: 11px; font-weight: 700; color: var(--accent);
     flex-shrink: 0; border: 1px solid var(--border);
   }
   .vendor-info { flex: 1; min-width: 0; }
-  .vendor-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .vendor-email { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .state-msg { padding: 24px; text-align: center; color: var(--text2); font-size: 13px; }
+  .vendor-name { font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vendor-email { font-size: 10px; color: var(--text2); font-family: 'DM Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .state-msg { padding: 20px; text-align: center; color: var(--text2); font-size: 12px; line-height: 1.6; }
   .spinner {
-    width: 20px; height: 20px; border: 2px solid var(--border);
+    width: 18px; height: 18px; border: 2px solid var(--border);
     border-top-color: var(--accent); border-radius: 50%;
     animation: spin 0.8s linear infinite; margin: 0 auto 8px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .footer {
-    display: flex; gap: 10px; padding: 14px 16px;
-    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+    display: flex; gap: 10px; padding: 12px 14px;
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); box-shadow: var(--shadow);
   }
   .btn {
-    flex: 1; padding: 11px 16px; border-radius: 9px;
+    flex: 1; padding: 10px 16px; border-radius: 8px;
     font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
     cursor: pointer; border: none; transition: all 0.15s;
     display: flex; align-items: center; justify-content: center; gap: 6px;
   }
   .btn-secondary { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
-  .btn-secondary:hover { color: var(--text); border-color: var(--text2); }
-  .btn-primary { background: linear-gradient(135deg, var(--accent), #3a7de0); color: white; box-shadow: 0 4px 16px rgba(79,142,247,0.3); }
-  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,142,247,0.4); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary:hover { color: var(--text); border-color: #aab; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #2554d0); color: white; box-shadow: 0 3px 12px rgba(59,110,240,0.3); }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(59,110,240,0.4); }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+  /* Progress */
   .progress-overlay {
     display: none; position: fixed; inset: 0;
-    background: rgba(15,17,23,0.95); z-index: 100;
+    background: rgba(240,242,247,0.96); z-index: 100;
     flex-direction: column; align-items: center; justify-content: center;
     gap: 16px; padding: 32px;
   }
   .progress-overlay.show { display: flex; }
-  .progress-title { font-size: 16px; font-weight: 600; }
+  .progress-title { font-size: 15px; font-weight: 600; color: var(--text); }
   .progress-bar-wrap { width: 100%; max-width: 300px; height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
   .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.4s ease; width: 0%; }
-  .progress-steps { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
+  .progress-steps { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
   .progress-step {
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 14px; background: var(--surface); border-radius: 8px;
-    border: 1px solid var(--border); font-size: 13px; color: var(--text2); transition: all 0.2s;
+    padding: 9px 14px; background: var(--surface); border-radius: 8px;
+    border: 1px solid var(--border); font-size: 12px; color: var(--text2); transition: all 0.2s;
+    box-shadow: var(--shadow);
   }
   .progress-step.active { border-color: var(--accent); color: var(--text); }
-  .progress-step.done { border-color: var(--success); color: var(--success); }
-  .progress-step.error { border-color: var(--danger); color: var(--danger); }
-  .result-box { display: none; flex-direction: column; align-items: center; gap: 12px; padding: 24px; text-align: center; }
+  .progress-step.done { border-color: var(--success); color: var(--success); background: rgba(18,184,134,0.05); }
+  .progress-step.error { border-color: var(--danger); color: var(--danger); background: rgba(229,62,62,0.05); }
+  .result-box { display: none; flex-direction: column; align-items: center; gap: 10px; padding: 24px; text-align: center; }
   .result-box.show { display: flex; }
-  .result-icon { font-size: 40px; }
-  .result-title { font-size: 16px; font-weight: 600; }
-  .result-sub { font-size: 13px; color: var(--text2); line-height: 1.6; }
-  .result-list { width: 100%; display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto; }
-  .result-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--surface2); border-radius: 6px; font-size: 12px; color: var(--text2); text-align: left; }
-  .result-item.ok { border-left: 2px solid var(--success); }
-  .result-item.fail { border-left: 2px solid var(--danger); }
-  .debug-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; margin: 4px 8px; display: none; }
+  .result-icon { font-size: 38px; }
+  .result-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .result-sub { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .result-list { width: 100%; display: flex; flex-direction: column; gap: 4px; max-height: 130px; overflow-y: auto; }
+  .result-item {
+    display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+    background: var(--surface2); border-radius: 6px; font-size: 11px;
+    color: var(--text2); text-align: left; border: 1px solid var(--border);
+  }
+  .result-item.ok { border-left: 3px solid var(--success); }
+  .result-item.fail { border-left: 3px solid var(--danger); }
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -205,16 +215,16 @@
 </div>
 
 <div class="section">
-  <div class="section-header">📦 RFQ Line Items <span id="lineItemCount">0</span></div>
+  <div class="section-header">📦 RFQ Line Items <span class="badge" id="lineItemCount">0</span></div>
   <div class="products-list" id="productsList">
     <div class="state-msg"><div class="spinner"></div>Loading items...</div>
   </div>
 </div>
 
 <div class="section">
-  <div class="section-header">🏭 Select Vendors <span id="vendorCount">0</span></div>
+  <div class="section-header">🏭 Select Vendors <span class="badge" id="vendorCount">0</span></div>
   <div class="search-wrap">
-    <input class="search-input" id="vendorSearch" type="text" placeholder="Search vendors..." oninput="filterVendors()"/>
+    <input class="search-input" id="vendorSearch" type="text" placeholder="🔍  Search vendors..." oninput="filterVendors()"/>
   </div>
   <div class="select-all-row">
     <button class="select-all-btn" onclick="toggleSelectAll()">Select All</button>
@@ -240,14 +250,14 @@
     <div class="result-title" id="resultTitle"></div>
     <div class="result-sub" id="resultSub"></div>
     <div class="result-list" id="resultList"></div>
-    <button class="btn btn-primary" style="max-width:200px;margin-top:8px" onclick="closeWidget()">Done</button>
+    <button class="btn btn-primary" style="max-width:180px;margin-top:8px" onclick="closeWidget()">Done ✓</button>
   </div>
 </div>
 
 <script>
 var rfqId = null;
 var rfqName = '';
-var lineItems = []; // [{productId, productName}]
+var lineItems = [];
 var allVendors = [];
 var filteredVendors = [];
 var selectedVendors = new Set();
@@ -266,52 +276,98 @@ async function loadAll() {
   await Promise.all([loadRFQAndLineItems(), loadVendors()]);
 }
 
-// ── Load RFQ name + line items via COQL ──────────────────
+// ── COQL via ZOHO.CRM.API.searchRecord (correct SDK method) ──
+async function coql(query) {
+  console.log("COQL:", query);
+  var res = await ZOHO.CRM.API.searchRecord({
+    Entity: "coql",
+    Type: "coql",
+    Query: query
+  });
+  console.log("COQL result:", JSON.stringify(res));
+  return res;
+}
+
+// ── Load RFQ + Line Items ─────────────────────────────────
 async function loadRFQAndLineItems() {
+  // Get RFQ name
   try {
-    // Get RFQ name
     var rfqRes = await ZOHO.CRM.API.getRecord({ Entity: "RFQs", RecordID: rfqId });
     if (rfqRes && rfqRes.data && rfqRes.data[0]) {
       rfqName = rfqRes.data[0].Name || ('RFQ-' + rfqId.slice(-6));
-      document.getElementById('rfqName').textContent = rfqName;
+    } else {
+      rfqName = 'RFQ-' + rfqId.slice(-6);
     }
   } catch(e) {
-    console.warn('Could not load RFQ name:', e);
     rfqName = 'RFQ-' + rfqId.slice(-6);
-    document.getElementById('rfqName').textContent = rfqName;
   }
+  document.getElementById('rfqName').textContent = rfqName;
 
+  // Get line items via getRelatedRecords
   try {
-    // Use COQL to get RFQ_List records linked to this RFQ
-    // RFQ_List has: RFQ_List (lookup→RFQs) and Line_Items (lookup→Products)
-    var query = "SELECT id, Line_Items, RFQ_List FROM RFQ_List WHERE RFQ_List = '" + rfqId + "' LIMIT 200";
-    console.log("COQL query:", query);
-
-    var res = await ZOHO.CRM.API.coqlQuery({ select_query: query });
-    console.log("COQL result:", JSON.stringify(res));
+    var res = await ZOHO.CRM.API.getRelatedRecords({
+      Entity: "RFQs",
+      RecordID: rfqId,
+      RelatedList: "RFQ_List",
+      page: 1,
+      per_page: 200
+    });
+    console.log("Line items response:", JSON.stringify(res));
 
     var data = (res && res.data) ? res.data : [];
     lineItems = data.map(function(row) {
+      // Line_Items field is the lookup to Products
       var product = row.Line_Items || {};
       return {
         id: row.id,
         productId: product.id || '',
-        productName: product.name || product.Name || 'Unknown Product'
+        productName: product.name || product.Name || 'Product'
       };
     });
 
-    renderProducts();
     document.getElementById('lineItemCount').textContent = lineItems.length;
+    renderProducts();
 
     if (lineItems.length === 0) {
       document.getElementById('productsList').innerHTML =
-        '<div class="state-msg">⚠️ No line items found on this RFQ.<br/>Please add products to the RFQ List first.</div>';
+        '<div class="state-msg">⚠️ No line items on this RFQ.<br/>Add products to RFQ List first.</div>';
     }
   } catch(e) {
-    console.error('Line items error:', e);
-    document.getElementById('productsList').innerHTML =
-      '<div class="state-msg">⚠️ ' + (e.message || 'Error loading line items') + '</div>';
+    console.error("Line items error:", e);
+    // Fallback: try getRecords with a search
+    try {
+      await loadLineItemsFallback();
+    } catch(e2) {
+      document.getElementById('productsList').innerHTML =
+        '<div class="state-msg">⚠️ Could not load line items.<br/>' + escHtml(String(e.message || e)) + '</div>';
+    }
   }
+}
+
+async function loadLineItemsFallback() {
+  // Try fetching RFQ_List records directly and filter client-side
+  var res = await ZOHO.CRM.API.getRecords({
+    Entity: "RFQ_List",
+    sort_order: "asc",
+    per_page: 200,
+    page: 1
+  });
+  console.log("RFQ_List fallback:", JSON.stringify(res));
+  var data = (res && res.data) ? res.data : [];
+  // Filter by matching RFQ
+  lineItems = data.filter(function(row) {
+    var rq = row.RFQ_List || {};
+    return String(rq.id) === rfqId;
+  }).map(function(row) {
+    var product = row.Line_Items || {};
+    return {
+      id: row.id,
+      productId: product.id || '',
+      productName: product.name || product.Name || 'Product'
+    };
+  });
+  document.getElementById('lineItemCount').textContent = lineItems.length;
+  renderProducts();
 }
 
 function renderProducts() {
@@ -321,40 +377,37 @@ function renderProducts() {
     return '<div class="product-chip">' +
       '<div class="product-dot"></div>' +
       '<span class="product-name">' + escHtml(item.productName) + '</span>' +
-      '<span class="product-id">' + (item.productId ? item.productId.toString().slice(-6) : '—') + '</span>' +
+      '<span class="product-id">' + (item.productId ? String(item.productId).slice(-6) : '—') + '</span>' +
     '</div>';
   }).join('');
 }
 
-// ── Load Vendors via COQL ─────────────────────────────────
+// ── Load Vendors ──────────────────────────────────────────
 async function loadVendors() {
   try {
-    var query = "SELECT id, Vendor_Name, Email FROM Vendors LIMIT 200";
-    var res = await ZOHO.CRM.API.coqlQuery({ select_query: query });
-    console.log("Vendors result:", JSON.stringify(res));
-
+    var res = await ZOHO.CRM.API.getRecords({
+      Entity: "Vendors",
+      sort_order: "asc",
+      per_page: 200,
+      page: 1
+    });
+    console.log("Vendors:", JSON.stringify(res));
     allVendors = (res && res.data) ? res.data : [];
     filteredVendors = allVendors.slice();
     document.getElementById('vendorCount').textContent = allVendors.length;
     renderVendors();
-
-    if (allVendors.length === 0) {
-      document.getElementById('vendorsList').innerHTML =
-        '<div class="state-msg">⚠️ No vendors found in CRM</div>';
+    if (!allVendors.length) {
+      document.getElementById('vendorsList').innerHTML = '<div class="state-msg">No vendors found in CRM</div>';
     }
   } catch(e) {
-    console.error('Vendors error:', e);
-    document.getElementById('vendorsList').innerHTML =
-      '<div class="state-msg">⚠️ ' + (e.message || 'Error loading vendors') + '</div>';
+    console.error("Vendors error:", e);
+    document.getElementById('vendorsList').innerHTML = '<div class="state-msg">⚠️ Error loading vendors</div>';
   }
 }
 
 function renderVendors() {
   var el = document.getElementById('vendorsList');
-  if (!filteredVendors.length) {
-    el.innerHTML = '<div class="state-msg">No vendors found</div>';
-    return;
-  }
+  if (!filteredVendors.length) { el.innerHTML = '<div class="state-msg">No vendors found</div>'; return; }
   el.innerHTML = filteredVendors.map(function(v) {
     var name = v.Vendor_Name || v.Name || 'Vendor';
     var email = v.Email || '';
@@ -366,16 +419,14 @@ function renderVendors() {
       '<div class="vendor-info">' +
         '<div class="vendor-name">' + escHtml(name) + '</div>' +
         '<div class="vendor-email">' + escHtml(email || '—') + '</div>' +
-      '</div>' +
-    '</div>';
+      '</div></div>';
   }).join('');
 }
 
 function filterVendors() {
   var q = document.getElementById('vendorSearch').value.toLowerCase();
   filteredVendors = allVendors.filter(function(v) {
-    return (v.Vendor_Name || '').toLowerCase().includes(q) ||
-           (v.Email || '').toLowerCase().includes(q);
+    return (v.Vendor_Name || '').toLowerCase().includes(q) || (v.Email || '').toLowerCase().includes(q);
   });
   renderVendors();
 }
@@ -383,8 +434,7 @@ function filterVendors() {
 function toggleVendor(id) {
   if (selectedVendors.has(id)) selectedVendors.delete(id);
   else selectedVendors.add(id);
-  updateSelectedCount();
-  renderVendors();
+  updateSelectedCount(); renderVendors();
 }
 
 function toggleSelectAll() {
@@ -393,8 +443,7 @@ function toggleSelectAll() {
   } else {
     filteredVendors.forEach(function(v) { selectedVendors.add(v.id); });
   }
-  updateSelectedCount();
-  renderVendors();
+  updateSelectedCount(); renderVendors();
 }
 
 function updateSelectedCount() {
@@ -416,8 +465,7 @@ async function sendRFQ() {
 
   stepsEl.innerHTML = vendors.map(function(v) {
     var name = v.Vendor_Name || v.Name || 'Vendor';
-    return '<div class="progress-step" id="vstep_' + v.id + '">' +
-      '<span>⏳</span><span>' + escHtml(name) + '</span></div>';
+    return '<div class="progress-step" id="vstep_' + v.id + '"><span>⏳</span><span>' + escHtml(name) + '</span></div>';
   }).join('');
 
   var results = [];
@@ -427,25 +475,28 @@ async function sendRFQ() {
     var vendor = vendors[i];
     var vName = vendor.Vendor_Name || vendor.Name || 'Vendor';
     var stepEl = document.getElementById('vstep_' + vendor.id);
-
     if (stepEl) { stepEl.className = 'progress-step active'; stepEl.querySelector('span').textContent = '🔄'; }
-    titleEl.textContent = 'Creating ' + (i+1) + ' of ' + total + ': ' + vName;
+    titleEl.textContent = 'Creating ' + (i + 1) + ' of ' + total + ': ' + vName;
     bar.style.width = Math.round((i / total) * 100) + '%';
 
     try {
-      // Create Requested_For_Quotations record with subform Requested_Items
-      var subformItems = lineItems.map(function(item) {
+      // Build subform items
+      var subformItems = lineItems.filter(function(item) { return item.productId; }).map(function(item) {
         return { Item: { id: item.productId } };
       });
 
       var recordData = {
         Name: rfqName + ' - ' + vName,
         Vendor: { id: vendor.id },
-        Related_RFQ: { id: rfqId },
-        Requested_Items: subformItems
+        Related_RFQ: { id: rfqId }
       };
 
-      console.log("Creating RFQ record:", JSON.stringify(recordData));
+      // Include subform only if there are items
+      if (subformItems.length > 0) {
+        recordData.Requested_Items = subformItems;
+      }
+
+      console.log("Creating record:", JSON.stringify(recordData));
 
       var createRes = await ZOHO.CRM.API.insertRecord({
         Entity: "Requested_For_Quotations",
@@ -455,24 +506,19 @@ async function sendRFQ() {
 
       console.log("Create result:", JSON.stringify(createRes));
 
-      var newId = null;
-      if (createRes && createRes.data && createRes.data[0]) {
-        newId = createRes.data[0].details && createRes.data[0].details.id;
-        if (!newId && createRes.data[0].status === 'success') {
-          newId = createRes.data[0].details && createRes.data[0].details.id;
-        }
-      }
+      var success = createRes && createRes.data && createRes.data[0] &&
+                    (createRes.data[0].code === 'SUCCESS' || createRes.data[0].status === 'success');
 
-      if (createRes && createRes.data && createRes.data[0] && createRes.data[0].code === 'SUCCESS') {
+      if (success) {
         results.push({ vendor: vName, ok: true });
         if (stepEl) { stepEl.className = 'progress-step done'; stepEl.querySelector('span').textContent = '✅'; }
       } else {
-        throw new Error(JSON.stringify(createRes));
+        var msg = createRes && createRes.data && createRes.data[0] && createRes.data[0].message || 'Failed';
+        throw new Error(msg);
       }
-
     } catch(err) {
       console.error('Error for', vName, err);
-      results.push({ vendor: vName, ok: false, error: String(err.message || err) });
+      results.push({ vendor: vName, ok: false, error: String(err.message || err).substring(0, 80) });
       if (stepEl) { stepEl.className = 'progress-step error'; stepEl.querySelector('span').textContent = '❌'; }
     }
   }
@@ -482,37 +528,28 @@ async function sendRFQ() {
   var ok = results.filter(function(r) { return r.ok; }).length;
   var fail = results.filter(function(r) { return !r.ok; }).length;
 
-  var resultBox = document.getElementById('resultBox');
   document.getElementById('resultIcon').textContent = fail === 0 ? '🎉' : (ok > 0 ? '⚠️' : '❌');
-  document.getElementById('resultTitle').textContent = fail === 0
-    ? 'All RFQs Sent Successfully!'
-    : ok + ' Created, ' + fail + ' Failed';
-  document.getElementById('resultSub').textContent =
-    ok + ' Requested For Quotation record(s) created with items auto-populated.';
+  document.getElementById('resultTitle').textContent = fail === 0 ? 'All Done!' : ok + ' Created, ' + fail + ' Failed';
+  document.getElementById('resultSub').textContent = ok + ' Requested For Quotation record(s) created successfully.';
   document.getElementById('resultList').innerHTML = results.map(function(r) {
     return '<div class="result-item ' + (r.ok ? 'ok' : 'fail') + '">' +
       (r.ok ? '✅' : '❌') + ' ' + escHtml(r.vendor) +
-      (r.ok ? '' : ' — ' + escHtml((r.error || '').substring(0, 60))) +
+      (r.ok ? '' : ' — ' + escHtml(r.error || '')) +
     '</div>';
   }).join('');
 
   titleEl.style.display = 'none';
   document.querySelector('.progress-bar-wrap').style.display = 'none';
   document.querySelector('.spinner').style.display = 'none';
-  resultBox.classList.add('show');
+  document.getElementById('resultBox').classList.add('show');
 
   if (ok > 0) {
     setTimeout(function() { try { ZOHO.CRM.UI.Record.reload(); } catch(e) {} }, 1500);
   }
 }
 
-function closeWidget() {
-  try { ZOHO.CRM.UI.Popup.close(); } catch(e) {}
-}
-
-function escHtml(str) {
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function closeWidget() { try { ZOHO.CRM.UI.Popup.close(); } catch(e) {} }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 </body>
 </html>
