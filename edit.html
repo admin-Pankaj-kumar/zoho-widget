@@ -16,7 +16,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge-orange{background:#fff7ed;color:#ea580c;border:1px solid #fed7aa}
 .col-heads{display:grid;grid-template-columns:20px 1fr 1fr 1.5fr 1.2fr 56px;gap:6px;padding:9px 20px;border-bottom:1px solid #e2e8f0;background:#fafbfc}
 .col-heads span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b}
-.rows{padding:8px 20px;display:flex;flex-direction:column;gap:5px;max-height:450px;overflow-y:auto}
+.rows{padding:8px 20px;display:flex;flex-direction:column;gap:5px;max-height:420px;overflow-y:auto}
 .rows::-webkit-scrollbar{width:5px}
 .rows::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:3px}
 .row{display:grid;grid-template-columns:20px 1fr 1fr 1.5fr 1.2fr 56px;gap:6px;align-items:center;padding:2px 0;border-radius:6px}
@@ -62,7 +62,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
 .success h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:6px}
 .success p{font-size:12px;color:#64748b;margin-bottom:18px}
-.debug{background:#1e293b;color:#7dd3fc;font-family:monospace;font-size:10px;padding:6px 12px;word-break:break-all}
+.dbg{background:#1e293b;color:#7dd3fc;font-family:monospace;font-size:10px;padding:6px 12px;word-break:break-all;line-height:1.6}
 </style>
 </head>
 <body>
@@ -75,11 +75,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="head-right">
       <div class="badge badge-orange" id="modBadge" style="display:none">0 modified</div>
       <div class="badge badge-gray" id="totalBadge">Loading...</div>
-      <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="loadContacts()">↺ Refresh</button>
+      <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="init()">↺ Refresh</button>
     </div>
   </div>
 
-  <div class="debug" id="dbg">Starting...</div>
+  <div class="dbg" id="dbg">Starting...</div>
 
   <div class="col-heads">
     <span></span>
@@ -99,12 +99,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="15" cy="11" r="6" stroke="#cbd5e1" stroke-width="1.5"/><path d="M3 32c0-6.6 5.4-10.5 12-10.5S27 25.4 27 32" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg>
     <p>No contacts linked to this account yet.</p>
   </div>
-
   <div class="legend" id="legend" style="display:none">
     <div class="leg"><div class="leg-dot" style="background:#22c55e"></div> No changes</div>
     <div class="leg"><div class="leg-dot" style="background:#f59e0b"></div> Modified — will be saved</div>
   </div>
-
   <div class="card-foot" id="cardFoot" style="display:none">
     <div class="foot-left" id="footInfo">No pending changes</div>
     <div class="foot-right">
@@ -132,98 +130,126 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 var accountId = null;
 var contacts  = [];
 var rowIdx    = 0;
+var pageLoadData = null;
 
 function dbg(msg) {
-  document.getElementById('dbg').textContent = msg;
+  var el = document.getElementById('dbg');
+  el.textContent = msg;
   console.log('[EditWidget]', msg);
 }
 
-ZOHO.embeddedApp.on("PageLoad", function(data) {
-  dbg("PageLoad: " + JSON.stringify(data));
+function dbgAppend(msg) {
+  var el = document.getElementById('dbg');
+  el.textContent += ' | ' + msg;
+  console.log('[EditWidget]', msg);
+}
 
-  // For a Button widget on Accounts, data.EntityId is the Account ID
-  // But sometimes it's an array — handle both
+/* ═══ STEP 1: SDK Init ═══ */
+ZOHO.embeddedApp.on("PageLoad", function(data) {
+  pageLoadData = data;
+  dbg("PageLoad received. Entity=" + data.Entity + " EntityId=" + JSON.stringify(data.EntityId));
+  init();
+});
+ZOHO.embeddedApp.init();
+
+/* ═══ STEP 2: Resolve correct Account ID ═══ */
+function init() {
+  showState('loading');
+  contacts = [];
+  rowIdx = 0;
+  accountId = null;
+
+  if (!pageLoadData) {
+    dbg("Waiting for PageLoad...");
+    return;
+  }
+
+  var data = pageLoadData;
   var rawId = data.EntityId;
   var sdkId = String(Array.isArray(rawId) ? rawId[0] : rawId);
 
-  dbg("Entity=" + data.Entity + " | EntityId=" + sdkId);
+  dbg("sdkId=" + sdkId + " Entity=" + data.Entity);
 
-  // If Entity is Accounts, use it directly
+  // Method 1: If Entity is directly Accounts, use it
   if (data.Entity === "Accounts") {
     accountId = sdkId;
-    dbg("✓ Got account ID from Entity=Accounts: " + accountId);
+    dbgAppend("✓ Direct Account entity");
     loadContacts();
     return;
   }
 
-  // Otherwise try to get Account ID from the page using getCurrentRecord
-  dbg("Entity is not Accounts, trying getCurrentRecord...");
-  ZOHO.CRM.UI.Record.getCurrentRecord()
-    .then(function(rec) {
-      dbg("getCurrentRecord: " + JSON.stringify(rec));
+  // Method 2: Try to get page URL via SDK getCurrentPageInfo
+  ZOHO.CRM.UI.Popup.closeReload; // just reference to confirm SDK loaded
+  
+  try {
+    ZOHO.CRM.UI.Record.getCurrentRecord().then(function(rec) {
+      dbgAppend("getCurrentRecord=" + JSON.stringify(rec));
       if (rec && rec.id) {
+        // This might be the Account record
         accountId = String(rec.id);
-        dbg("✓ Got account ID from getCurrentRecord: " + accountId);
+        dbgAppend("✓ from getCurrentRecord id=" + accountId);
       } else {
         accountId = sdkId;
-        dbg("Fallback to SDK EntityId: " + accountId);
+        dbgAppend("✓ fallback sdkId");
       }
       loadContacts();
-    })
-    .catch(function(e) {
-      dbg("getCurrentRecord failed, using SDK ID: " + sdkId);
+    }).catch(function() {
       accountId = sdkId;
+      dbgAppend("getCurrentRecord failed, using sdkId=" + sdkId);
       loadContacts();
     });
-});
+  } catch(e) {
+    accountId = sdkId;
+    dbgAppend("exception, using sdkId=" + sdkId);
+    loadContacts();
+  }
+}
 
-ZOHO.embeddedApp.init();
-
+/* ═══ STEP 3: Load contacts by Account ID ═══ */
 function loadContacts() {
-  showState('loading');
-  contacts = [];
-  rowIdx = 0;
-  dbg("Loading contacts for account: " + accountId);
+  dbgAppend("Loading contacts for accountId=" + accountId);
 
-  // Use COQL via Zoho CRM API
+  // Use COQL through the Zoho SDK - this is the most reliable way
   ZOHO.CRM.API.searchRecord({
     Entity: "Contacts",
     Type: "criteria",
     Query: "(Account_Name:equals:" + accountId + ")"
   }).then(function(res) {
-    dbg("Search response status: " + (res ? res.status || 'ok' : 'null') + " | records: " + (res && res.data ? res.data.length : 0));
+    var count = (res && res.data) ? res.data.length : 0;
+    dbgAppend("searchRecord returned " + count + " contacts");
 
-    if (res && res.data && res.data.length > 0) {
+    if (count > 0) {
       processContacts(res.data);
     } else {
-      // Fallback: fetch all contacts and filter
-      dbg("No results, trying getAllRecords fallback...");
-      fetchAllAndFilter();
+      // Fallback: get related records using getRelatedRecords
+      loadViaRelatedRecords();
     }
   }).catch(function(err) {
-    dbg("searchRecord error: " + JSON.stringify(err));
-    fetchAllAndFilter();
+    dbgAppend("searchRecord error, trying related records");
+    loadViaRelatedRecords();
   });
 }
 
-function fetchAllAndFilter() {
-  ZOHO.CRM.API.getAllRecords({
-    Entity: "Contacts",
-    sort_order: "asc",
-    per_page: 200,
-    page: 1
+/* ═══ STEP 4: Fallback - get contacts via related records API ═══ */
+function loadViaRelatedRecords() {
+  ZOHO.CRM.API.getRelatedRecords({
+    Entity: "Accounts",
+    RecordID: accountId,
+    RelatedList: "Contacts",
+    page: 1,
+    per_page: 100
   }).then(function(res) {
-    var all = (res && res.data) ? res.data : [];
-    dbg("getAllRecords: " + all.length + " total contacts");
-    var linked = all.filter(function(c) {
-      return c.Account_Name && String(c.Account_Name.id) === String(accountId);
-    });
-    dbg("Filtered: " + linked.length + " contacts for account " + accountId);
-    processContacts(linked);
+    var count = (res && res.data) ? res.data.length : 0;
+    dbgAppend("getRelatedRecords returned " + count + " contacts");
+    if (count > 0) {
+      processContacts(res.data);
+    } else {
+      dbgAppend("No contacts found via any method");
+      processContacts([]);
+    }
   }).catch(function(err) {
-    dbg("getAllRecords error: " + JSON.stringify(err));
-    showState('empty');
-    showToast('Failed to load contacts', 'er');
+    dbgAppend("getRelatedRecords error: " + JSON.stringify(err));
+    processContacts([]);
   });
 }
 
@@ -235,7 +261,6 @@ function processContacts(data) {
   renderAll();
   showState(contacts.length ? 'rows' : 'empty');
   document.getElementById('totalBadge').textContent = contacts.length + ' contact' + (contacts.length !== 1 ? 's' : '');
-  dbg("Done. Rendered " + contacts.length + " contacts for account " + accountId);
 }
 
 function renderAll() {
@@ -321,8 +346,7 @@ function saveChanges() {
         }
         if (done === total) finish(ok, total-ok);
       }).catch(function(err) {
-        done++; console.error(err);
-        if (done === total) finish(ok, total-ok);
+        done++; if (done === total) finish(ok, total-ok);
       });
   });
 }
@@ -380,7 +404,7 @@ function showToast(msg, type) {
 function reload() {
   document.getElementById('successDiv').classList.remove('show');
   document.getElementById('mainCard').style.display = '';
-  loadContacts();
+  init();
 }
 
 function val(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
