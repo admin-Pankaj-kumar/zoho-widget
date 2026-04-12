@@ -42,8 +42,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .success{display:none;text-align:center;padding:40px 20px}
 .success.show{display:block}
-.success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
-.success h3{font-size:16px;font-weight:600;color:#15803d;margin-bottom:6px}
+.success-icon{width:56px;height:56px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.success h3{font-size:16px;font-weight:600;color:#15803d;margin-bottom:8px}
 .success p{font-size:13px;color:#64748b;margin-bottom:20px}
 </style>
 </head>
@@ -83,10 +83,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <div class="success" id="successDiv">
   <div class="success-icon">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M5 13l6 6L21 7" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   <h3 id="successMsg"></h3>
-  <p>Contacts have been linked to this account.</p>
+  <p>Contacts have been created and linked to this account.</p>
   <button class="save-btn" style="margin:0 auto" onclick="resetAll()">Add More Contacts</button>
 </div>
 
@@ -95,13 +95,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
 <script>
 var accountId = null;
-var accountName = '';
 var rowIdx = 0;
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
-  accountId = data.EntityId;
-  accountName = data.EntityName || '';
-  console.log("Widget loaded. AccountId:", accountId, "AccountName:", accountName);
+  // EntityId can be array or string - handle both
+  if (Array.isArray(data.EntityId)) {
+    accountId = data.EntityId[0];
+  } else {
+    accountId = data.EntityId;
+  }
+  console.log("Widget loaded. Raw EntityId:", data.EntityId, "| Resolved accountId:", accountId);
 });
 
 ZOHO.embeddedApp.init();
@@ -176,96 +179,67 @@ function saveContacts() {
 
   if (hasErr) { showToast('Last Name is required for all rows', 'er'); return; }
   if (!list.length) { showToast('Please enter at least one contact', 'er'); return; }
-  if (!accountId) { showToast('Account not detected. Please close and reopen.', 'er'); return; }
+  if (!accountId) { showToast('Account not detected. Please reopen the widget.', 'er'); return; }
 
   var btn = document.getElementById('saveBtn');
   btn.classList.add('loading');
   btn.disabled = true;
 
-  // Build records array for bulk insert
-  var records = list.map(function(c) {
-    var rec = {
+  var ok = 0;
+  var fail = 0;
+  var total = list.length;
+  var done = 0;
+
+  // Insert one by one to avoid bulk API issues
+  list.forEach(function(c) {
+    var payload = {
       Last_Name: c.Last_Name,
-      Account_Name: accountName
+      Account_Name: { id: accountId }
     };
-    if (c.First_Name) rec.First_Name = c.First_Name;
-    if (c.Email) rec.Email = c.Email;
-    if (c.Phone) rec.Phone = c.Phone;
-    return rec;
-  });
+    if (c.First_Name) payload.First_Name = c.First_Name;
+    if (c.Email) payload.Email = c.Email;
+    if (c.Phone) payload.Phone = c.Phone;
 
-  console.log("Inserting records:", JSON.stringify(records));
-  console.log("AccountId:", accountId, "AccountName:", accountName);
+    console.log("Inserting:", JSON.stringify(payload));
 
-  ZOHO.CRM.API.insertRecord({
-    Entity: "Contacts",
-    APIData: records,
-    Trigger: ["workflow"]
-  }).then(function(res) {
-    console.log("Insert response:", JSON.stringify(res));
-    btn.classList.remove('loading');
-    btn.disabled = false;
-
-    var ok = 0, fail = 0;
-    if (res && res.data) {
-      res.data.forEach(function(r) {
-        if (r.code === 'SUCCESS') ok++;
-        else { fail++; console.error("Failed record:", JSON.stringify(r)); }
-      });
-    } else {
-      fail = list.length;
-    }
-
-    if (ok > 0 && fail === 0) {
-      // Now link each contact to the account by updating Account_Name with ID
-      linkContactsToAccount(res.data, accountId, ok);
-    } else if (ok > 0) {
-      showToast(ok + ' created, ' + fail + ' failed', 'er');
-    } else {
-      showToast('Failed to create contacts. Try again.', 'er');
-    }
-  }).catch(function(err) {
-    console.error("Insert error:", err);
-    btn.classList.remove('loading');
-    btn.disabled = false;
-    showToast('Error: ' + (err.message || 'Unknown error'), 'er');
-  });
-}
-
-function linkContactsToAccount(createdRecords, acctId, count) {
-  // Update each created contact to properly link to account by ID
-  var updates = createdRecords
-    .filter(function(r) { return r.code === 'SUCCESS'; })
-    .map(function(r) {
-      return { id: r.details.id, Account_Name: { id: acctId } };
+    ZOHO.CRM.API.insertRecord({
+      Entity: "Contacts",
+      APIData: payload,
+      Trigger: ["workflow"]
+    }).then(function(res) {
+      console.log("Response:", JSON.stringify(res));
+      done++;
+      if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
+        ok++;
+      } else {
+        fail++;
+        console.error("Failed:", JSON.stringify(res));
+      }
+      if (done === total) { finish(ok, fail); }
+    }).catch(function(err) {
+      console.error("Error:", err);
+      done++;
+      fail++;
+      if (done === total) { finish(ok, fail); }
     });
-
-  if (updates.length === 0) {
-    showSuccess(count);
-    return;
-  }
-
-  ZOHO.CRM.API.updateRecord({
-    Entity: "Contacts",
-    APIData: updates,
-    Trigger: []
-  }).then(function(res) {
-    console.log("Link response:", JSON.stringify(res));
-    showSuccess(count);
-  }).catch(function(err) {
-    console.error("Link error:", err);
-    // Still show success since contacts were created
-    showSuccess(count);
   });
 }
 
-function showSuccess(count) {
-  document.getElementById('mainCard').style.display = 'none';
-  document.getElementById('successMsg').textContent = count + ' contact' + (count > 1 ? 's' : '') + ' created and linked successfully!';
-  document.getElementById('successDiv').classList.add('show');
-  setTimeout(function() {
-    ZOHO.CRM.UI.Popup.closeReload();
-  }, 2500);
+function finish(ok, fail) {
+  var btn = document.getElementById('saveBtn');
+  btn.classList.remove('loading');
+  btn.disabled = false;
+
+  if (ok > 0 && fail === 0) {
+    document.getElementById('mainCard').style.display = 'none';
+    document.getElementById('successMsg').textContent = ok + ' contact' + (ok > 1 ? 's' : '') + ' created and linked successfully!';
+    document.getElementById('successDiv').classList.add('show');
+    setTimeout(function() { ZOHO.CRM.UI.Popup.closeReload(); }, 2500);
+  } else if (ok > 0) {
+    showToast(ok + ' created, ' + fail + ' failed', 'er');
+  } else {
+    showToast('Failed to create contacts. Try again.', 'er');
+  }
 }
 
 function resetAll() {
