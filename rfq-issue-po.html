@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -359,19 +360,27 @@ async function issuePOs() {
         Purchase_Items: purchaseItems
       };
 
-      console.log("Creating PO for", g.vendorName, JSON.stringify(rec));
+      console.log("Creating PO for", g.vendorName, "payload:", JSON.stringify(rec));
       var res = await ZOHO.CRM.API.insertRecord({
         Entity: "Purchase_Orders",
         APIData: rec,
-        Trigger: []
+        Trigger: ["workflow"]
       });
       console.log("Result:", JSON.stringify(res));
 
-      var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
-      var poId = ok ? res.data[0].details.id : null;
-      results.push({ vendor: g.vendorName, items: g.items.length, total: g.items.reduce(function(s,i){return s+i.price;},0), ok: ok, id: poId, msg: ok ? '' : ((res && res.data && res.data[0] && res.data[0].message) || 'Failed') });
+      console.log("Raw response:", JSON.stringify(res));
+      // insertRecord returns array at top level
+      var resData = null;
+      if (res && res.data && res.data[0]) resData = res.data[0];
+      else if (Array.isArray(res) && res[0]) resData = res[0];
+
+      var ok = resData && resData.code === 'SUCCESS';
+      var poId = ok ? (resData.details && resData.details.id) : null;
+      var errMsg = ok ? '' : (resData ? (resData.message || resData.code || JSON.stringify(resData).substring(0,80)) : 'Unknown error');
+      results.push({ vendor: g.vendorName, items: g.items.length, total: g.items.reduce(function(s,i){return s+i.price;},0), ok: ok, id: poId, msg: errMsg });
     } catch(e) {
-      results.push({ vendor: g.vendorName, items: g.items.length, total: 0, ok: false, msg: String(e.message||e).substring(0,60) });
+      console.error("Exception:", e);
+      results.push({ vendor: g.vendorName, items: g.items.length, total: 0, ok: false, msg: e.message ? String(e.message).substring(0,80) : JSON.stringify(e).substring(0,80) });
     }
   }
 
