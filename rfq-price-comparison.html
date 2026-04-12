@@ -7,44 +7,45 @@
 <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;padding:16px;font-size:13px;color:#1a202c}
-  .header{background:#fff;border-radius:10px;border:1px solid #e2e8f0;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-  .hicon{width:38px;height:38px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-  .htitle{font-size:15px;font-weight:700}
-  .hsub{font-size:11px;color:#718096;margin-top:2px}
-  .hbadge{margin-left:auto;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-  .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
-  .scard{background:#fff;border-radius:8px;border:1px solid #e2e8f0;padding:12px 14px}
-  .slabel{font-size:10px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-  .sval{font-size:20px;font-weight:700}
+  html,body{width:100%;height:100%;overflow-x:hidden}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;font-size:13px;color:#1a202c;padding:14px;display:flex;flex-direction:column;gap:10px}
+  .header{background:#fff;border-radius:8px;border:1px solid #e2e8f0;padding:12px 16px;display:flex;align-items:center;gap:10px}
+  .hicon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .htitle{font-size:14px;font-weight:700}
+  .hsub{font-size:11px;color:#718096;margin-top:1px}
+  .hbadge{margin-left:auto;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+  .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .scard{background:#fff;border-radius:8px;border:1px solid #e2e8f0;padding:10px 14px}
+  .slabel{font-size:10px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+  .sval{font-size:18px;font-weight:700}
   .sval.green{color:#059669}
   .sval.blue{color:#2563eb}
-  .table-wrap{background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden}
-  .thead-row{padding:10px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between}
+  .table-wrap{background:#fff;border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;flex:1}
+  .thead-row{padding:9px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between}
   .ttitle{font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px}
   .legend{display:flex;gap:10px}
   .leg{display:flex;align-items:center;gap:4px;font-size:10px;color:#718096}
-  .ldot{width:8px;height:8px;border-radius:50%}
-  .tscroll{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;min-width:500px}
-  thead th{padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0;background:#f8fafc;white-space:nowrap}
+  .ldot{width:7px;height:7px;border-radius:50%}
+  .tscroll{overflow-x:auto;width:100%}
+  table{width:100%;border-collapse:collapse;table-layout:auto}
+  thead th{padding:8px 12px;text-align:left;font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0;background:#f8fafc;white-space:nowrap}
   th.r{text-align:right}
-  tbody td{padding:10px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+  tbody td{padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
   tbody tr:last-child td{border-bottom:none}
   tbody tr:hover td{background:#fafbff}
   td.r{text-align:right}
-  .iname{font-weight:600;font-size:13px}
-  .exp{font-size:12px;color:#6b7280;font-family:monospace}
-  .vp{font-size:12px;font-weight:600;font-family:monospace;color:#374151}
+  .iname{font-weight:600;font-size:12px}
+  .exp{font-size:11px;color:#6b7280;font-family:monospace}
+  .vp{font-size:12px;font-weight:600;font-family:monospace;color:#374151;white-space:nowrap}
   .vp.best{color:#059669;font-weight:700}
   .vp.none{color:#9ca3af;font-size:11px;font-weight:400}
-  .bestbadge{background:#059669;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:4px}
-  .saving{font-size:12px;font-weight:600}
+  .bestbadge{background:#059669;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:6px;margin-left:3px;vertical-align:middle}
+  .saving{font-size:11px;font-weight:600;white-space:nowrap}
   .saving.pos{color:#059669}
   .saving.neg{color:#dc2626}
   .saving.zero{color:#9ca3af}
-  .center{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;gap:10px;color:#9ca3af;font-size:13px;text-align:center}
-  .spinner{width:22px;height:22px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
+  .center{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:10px;color:#9ca3af;font-size:13px;text-align:center}
+  .spinner{width:20px;height:20px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -74,7 +75,7 @@
     </div>
   </div>
   <div id="tableContent">
-    <div class="center"><div class="spinner"></div>Loading comparison data...</div>
+    <div class="center"><div class="spinner"></div>Loading data...</div>
   </div>
 </div>
 
@@ -83,25 +84,28 @@ var rfqId = null;
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
   rfqId = String(Array.isArray(data.EntityId) ? data.EntityId[0] : data.EntityId);
+
+  // Expand popup to max width
+  try { ZOHO.CRM.UI.Popup.resize({ width: "1200px", height: "800px" }); } catch(e) {}
+
   load();
 });
 ZOHO.embeddedApp.init();
 
 async function load() {
   try {
-    // 1. Get RFQ name — same as working widget
+    // 1. Get RFQ name
     var rfqRes = await ZOHO.CRM.API.getRecord({ Entity: "RFQs", RecordID: rfqId });
     var rfqName = (rfqRes && rfqRes.data && rfqRes.data[0] && rfqRes.data[0].Name) || rfqId;
     document.getElementById('hsub').textContent = rfqName;
     document.getElementById('hbadge').textContent = rfqId.slice(-6);
 
-    // 2. Get all Requested_For_Quotations for this RFQ — same as working widget
+    // 2. Get all Requested_For_Quotations for this RFQ
     var rfqsRes = await ZOHO.CRM.API.searchRecord({
       Entity: "Requested_For_Quotations",
       Type: "criteria",
       Query: "(Related_RFQ:equals:" + rfqId + ")"
     });
-    console.log("RFQs:", JSON.stringify(rfqsRes));
     var rfqs = (rfqsRes && rfqsRes.data) ? rfqsRes.data : [];
 
     if (!rfqs.length) {
@@ -110,8 +114,7 @@ async function load() {
       return;
     }
 
-    // 3. For each RFQ record, use getRecord to get the full record
-    // Requested_Items subform is INSIDE the getRecord response — confirmed from MCP test
+    // 3. For each RFQ, use getRecord to get full record including Requested_Items subform
     var itemsMap = {};
     var vendorNames = [];
 
@@ -121,13 +124,10 @@ async function load() {
       if (vendorNames.indexOf(vName) === -1) vendorNames.push(vName);
 
       try {
-        // Use getRecord — Requested_Items array is returned inside the record itself
         var fullRec = await ZOHO.CRM.API.getRecord({
           Entity: "Requested_For_Quotations",
           RecordID: rfqRec.id
         });
-        console.log("Full record for", vName, JSON.stringify(fullRec));
-
         var rec = fullRec && fullRec.data && fullRec.data[0];
         if (!rec) continue;
 
@@ -136,16 +136,12 @@ async function load() {
           var p = item.Item || {};
           if (!p.id) return;
           if (!itemsMap[p.id]) {
-            itemsMap[p.id] = {
-              name: p.name || 'Product',
-              expectedPrice: item.Expected_Price || 0,
-              vendors: {}
-            };
+            itemsMap[p.id] = { name: p.name || 'Product', expectedPrice: item.Expected_Price || 0, vendors: {} };
           }
           itemsMap[p.id].vendors[vName] = item.Received_Price;
         });
       } catch(e) {
-        console.warn("Error getting record for", vName, e);
+        console.warn("Error for", vName, e);
       }
     }
 
@@ -160,10 +156,9 @@ async function load() {
 
 function render(itemsMap, vendorNames) {
   var items = Object.values(itemsMap);
-
   if (!items.length) {
     document.getElementById('tableContent').innerHTML =
-      '<div class="center">📭<br/>No items found.<br/>Ensure vendors have entered prices in Requested Items subform.</div>';
+      '<div class="center">📭<br/>No items found.<br/>Ensure vendors have entered prices in Requested Items.</div>';
     return;
   }
 
@@ -174,32 +169,23 @@ function render(itemsMap, vendorNames) {
     var prices = [];
     vendorNames.forEach(function(vn) {
       var p = item.vendors[vn];
-      if (p != null && p > 0) {
-        prices.push(p);
-        if (vendorsWithQuotes.indexOf(vn) === -1) vendorsWithQuotes.push(vn);
-      }
+      if (p != null && p > 0) { prices.push(p); if (vendorsWithQuotes.indexOf(vn) === -1) vendorsWithQuotes.push(vn); }
     });
-    if (prices.length && item.expectedPrice > 0) {
-      totalSavings += (item.expectedPrice - Math.min.apply(null, prices));
-    }
+    if (prices.length && item.expectedPrice > 0) totalSavings += (item.expectedPrice - Math.min.apply(null, prices));
   });
 
   document.getElementById('summary').style.display = 'grid';
   document.getElementById('sItems').textContent = items.length;
   document.getElementById('sVendors').textContent = vendorsWithQuotes.length + ' / ' + vendorNames.length;
-  document.getElementById('sSavings').innerHTML =
-    (totalSavings >= 0 ? '&#8377;' : '-&#8377;') + fmt(Math.abs(totalSavings));
+  document.getElementById('sSavings').innerHTML = (totalSavings >= 0 ? '&#8377;' : '-&#8377;') + fmt(Math.abs(totalSavings));
   document.getElementById('sSavings').className = 'sval ' + (totalSavings > 0 ? 'green' : 'blue');
 
-  // Table header
   var ths = '<th>Item</th><th class="r">Expected</th>' +
-    vendorNames.map(function(vn) { return '<th class="r">' + esc(vn) + '</th>'; }).join('') +
-    '<th class="r">Best Price</th><th class="r">Savings</th>';
+    vendorNames.map(function(vn) { return '<th class="r" style="min-width:110px">' + esc(vn) + '</th>'; }).join('') +
+    '<th class="r" style="min-width:100px">Best Price</th><th class="r" style="min-width:80px">Savings</th>';
 
-  // Table rows
   var rows = items.map(function(item) {
-    var prices = vendorNames
-      .map(function(vn) { return { vn: vn, p: item.vendors[vn] }; })
+    var prices = vendorNames.map(function(vn) { return { vn: vn, p: item.vendors[vn] }; })
       .filter(function(x) { return x.p != null && x.p > 0; });
     var bestPrice = prices.length ? Math.min.apply(null, prices.map(function(x) { return x.p; })) : null;
     var savings = (bestPrice != null && item.expectedPrice > 0) ? item.expectedPrice - bestPrice : null;
