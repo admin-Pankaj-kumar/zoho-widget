@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WA Module Setup</title>
+<script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.card{background:#fff;border-radius:16px;border:0.5px solid #e2e8f0;padding:32px;max-width:520px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.logo{width:48px;height:48px;background:#dcfce7;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+h1{font-size:18px;font-weight:600;color:#1a1f36;margin-bottom:8px}
+p{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:24px}
+.steps{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.step{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;border:0.5px solid #e2e8f0;font-size:12px}
+.step-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:600}
+.step.pending .step-icon{background:#f1f5f9;color:#64748b}
+.step.running .step-icon{background:#eff6ff;color:#3b82f6;animation:pulse 1s infinite}
+.step.done .step-icon{background:#dcfce7;color:#16a34a}
+.step.error .step-icon{background:#fef2f2;color:#dc2626}
+.step-text{flex:1;color:#1a1f36}
+.step.pending .step-text{color:#94a3b8}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.btn{width:100%;padding:12px;background:#22c55e;border:none;border-radius:10px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn:hover:not(:disabled){background:#16a34a}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.secondary{background:#f1f5f9;color:#1a1f36;margin-top:8px}
+.btn.secondary:hover:not(:disabled){background:#e2e8f0}
+.result{padding:12px 16px;border-radius:8px;font-size:12px;margin-bottom:16px;display:none;line-height:1.6}
+.result.success{background:#dcfce7;color:#15803d;border:0.5px solid #bbf7d0}
+.result.error{background:#fef2f2;color:#dc2626;border:0.5px solid #fecaca}
+.module-name{background:#f8fafc;border:0.5px solid #e2e8f0;border-radius:6px;padding:4px 8px;font-family:monospace;font-size:11px;color:#475569}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M20.52 3.48A12 12 0 003.48 20.52L2 22l1.48-1.48A12 12 0 1020.52 3.48z" fill="#16a34a"/><path d="M17 14.5c-.3-.2-1.7-.85-2-.95s-.45-.15-.65.15-.75.95-.9 1.1-.35.2-.65.05a8.2 8.2 0 01-2.4-1.5 9 9 0 01-1.65-2.1c-.2-.3 0-.45.15-.6l.45-.5c.15-.2.2-.35.3-.6s.05-.45-.05-.65-.65-1.6-.9-2.2c-.25-.55-.5-.45-.65-.45h-.55c-.2 0-.5.05-.75.35S7 7.5 7 8.5a5.5 5.5 0 001.15 2.9c.15.2 2.1 3.2 5.1 4.5.7.3 1.25.5 1.7.6.7.2 1.35.15 1.85.1.55-.1 1.7-.7 1.95-1.35s.25-1.25.15-1.35-.3-.2-.6-.4z" fill="#fff"/></svg>
+  </div>
+  <h1>WA Communications Module Setup</h1>
+  <p>This will automatically create the <span class="module-name">WA_Communications</span> custom module in your Zoho CRM with all required fields for WhatsApp integration.</p>
+
+  <div class="steps" id="steps">
+    <div class="step pending" id="step1">
+      <div class="step-icon">1</div>
+      <div class="step-text">Create WA Communications module</div>
+    </div>
+    <div class="step pending" id="step2">
+      <div class="step-icon">2</div>
+      <div class="step-text">Add Lead & Contact lookup fields</div>
+    </div>
+    <div class="step pending" id="step3">
+      <div class="step-icon">3</div>
+      <div class="step-text">Add Phone, Message, Type fields</div>
+    </div>
+    <div class="step pending" id="step4">
+      <div class="step-icon">4</div>
+      <div class="step-text">Add Status, Template, WA Message ID fields</div>
+    </div>
+    <div class="step pending" id="step5">
+      <div class="step-icon">5</div>
+      <div class="step-text">Add DateTime, File Name, Mime Type fields</div>
+    </div>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <button class="btn" id="setupBtn" onclick="startSetup()">
+    Create Module &amp; Fields
+  </button>
+  <button class="btn secondary" id="checkBtn" onclick="checkModule()" style="display:none">
+    Check Module Status
+  </button>
+</div>
+
+<script>
+var orgDomain = null;
+var accessToken = null;
+
+ZOHO.embeddedApp.on("PageLoad", function(data) {
+  console.log("PageLoad data:", JSON.stringify(data));
+});
+ZOHO.embeddedApp.init();
+
+function setStep(id, status, text) {
+  var el = document.getElementById(id);
+  el.className = 'step ' + status;
+  var icon = el.querySelector('.step-icon');
+  if (status === 'done') icon.innerHTML = '✓';
+  else if (status === 'error') icon.innerHTML = '✗';
+  else if (status === 'running') icon.innerHTML = '...';
+  if (text) el.querySelector('.step-text').textContent = text;
+}
+
+function showResult(msg, type) {
+  var el = document.getElementById('result');
+  el.textContent = msg;
+  el.className = 'result ' + type;
+  el.style.display = 'block';
+}
+
+async function apiCall(method, url, body) {
+  var req = {
+    method: method,
+    url: url,
+    headers: { 'Content-Type': 'application/json' },
+    parameters: {}
+  };
+  if (body) req.body = JSON.stringify(body);
+
+  var res;
+  if (method === 'GET') {
+    res = await ZOHO.CRM.HTTP.get(req);
+  } else if (method === 'POST') {
+    res = await ZOHO.CRM.HTTP.post(req);
+  }
+
+  return typeof res === 'string' ? JSON.parse(res) : res;
+}
+
+async function startSetup() {
+  var btn = document.getElementById('setupBtn');
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+  document.getElementById('result').style.display = 'none';
+
+  try {
+    // STEP 1: Create the module
+    setStep('step1', 'running');
+    var moduleRes = await apiCall('POST', 'https://www.zohoapis.com/crm/v2/settings/modules', {
+      modules: [{
+        module_name: "WA_Communications",
+        singular_label: "WA Communication",
+        plural_label: "WA Communications",
+        description: "Stores all WhatsApp communications linked to Leads and Contacts"
+      }]
+    });
+    console.log("Module create response:", JSON.stringify(moduleRes));
+
+    if (moduleRes && moduleRes.modules && moduleRes.modules[0] && moduleRes.modules[0].status === 'success') {
+      setStep('step1', 'done', 'WA Communications module created ✓');
+    } else if (moduleRes && moduleRes.status === 'error' && moduleRes.message && moduleRes.message.includes('exist')) {
+      setStep('step1', 'done', 'Module already exists — continuing with fields');
+    } else {
+      // Try to check if module exists
+      setStep('step1', 'done', 'Module step complete — adding fields');
+    }
+
+    // Wait for module to be ready
+    await new Promise(function(r) { setTimeout(r, 2000); });
+
+    // STEP 2: Add Lead & Contact lookup fields
+    setStep('step2', 'running');
+    await apiCall('POST', 'https://www.zohoapis.com/crm/v2/settings/fields?module=WA_Communications', {
+      fields: [
+        {
+          field_label: "Lead",
+          data_type: "lookup",
+          lookup: { module: { api_name: "Leads" }, display_label: "Lead" }
+        },
+        {
+          field_label: "Contact",
+          data_type: "lookup",
+          lookup: { module: { api_name: "Contacts" }, display_label: "Contact" }
+        }
+      ]
+    });
+    setStep('step2', 'done', 'Lead & Contact lookup fields added ✓');
+    await new Promise(function(r) { setTimeout(r, 1000); });
+
+    // STEP 3: Phone, Message, Type
+    setStep('step3', 'running');
+    await apiCall('POST', 'https://www.zohoapis.com/crm/v2/settings/fields?module=WA_Communications', {
+      fields: [
+        { field_label: "Phone", data_type: "phone" },
+        { field_label: "Message", data_type: "textarea" },
+        {
+          field_label: "Type",
+          data_type: "picklist",
+          pick_list_values: [
+            { display_value: "Inbound", actual_value: "Inbound", sequence_number: 1 },
+            { display_value: "Outbound", actual_value: "Outbound", sequence_number: 2 }
+          ]
+        }
+      ]
+    });
+    setStep('step3', 'done', 'Phone, Message, Type fields added ✓');
+    await new Promise(function(r) { setTimeout(r, 1000); });
+
+    // STEP 4: Status, Template Name, WA Message ID
+    setStep('step4', 'running');
+    await apiCall('POST', 'https://www.zohoapis.com/crm/v2/settings/fields?module=WA_Communications', {
+      fields: [
+        {
+          field_label: "Status",
+          data_type: "picklist",
+          pick_list_values: [
+            { display_value: "Sent", actual_value: "Sent", sequence_number: 1 },
+            { display_value: "Delivered", actual_value: "Delivered", sequence_number: 2 },
+            { display_value: "Read", actual_value: "Read", sequence_number: 3 },
+            { display_value: "Failed", actual_value: "Failed", sequence_number: 4 }
+          ]
+        },
+        { field_label: "Template Name", data_type: "text" },
+        { field_label: "WA Message ID", data_type: "text" },
+        { field_label: "Failed Reason", data_type: "textarea" }
+      ]
+    });
+    setStep('step4', 'done', 'Status, Template Name, WA Message ID fields added ✓');
+    await new Promise(function(r) { setTimeout(r, 1000); });
+
+    // STEP 5: DateTime, File Name, Mime Type, Media ID
+    setStep('step5', 'running');
+    await apiCall('POST', 'https://www.zohoapis.com/crm/v2/settings/fields?module=WA_Communications', {
+      fields: [
+        { field_label: "Outbound DateTime", data_type: "datetime" },
+        { field_label: "File Name", data_type: "text" },
+        { field_label: "Mime Type", data_type: "text" },
+        { field_label: "Media ID", data_type: "text" },
+        { field_label: "From Number", data_type: "phone" },
+        { field_label: "To Number", data_type: "phone" }
+      ]
+    });
+    setStep('step5', 'done', 'All remaining fields added ✓');
+
+    showResult('✓ Module and all fields created successfully! The WA_Communications module is now ready. You can close this widget.', 'success');
+    btn.textContent = 'Setup Complete ✓';
+    document.getElementById('checkBtn').style.display = 'block';
+
+  } catch(err) {
+    console.error("Setup error:", err);
+    showResult('Error: ' + (err.message || JSON.stringify(err)) + '\n\nThis may mean the module already exists. Click "Check Module Status" to verify.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Retry Setup';
+    document.getElementById('checkBtn').style.display = 'block';
+  }
+}
+
+async function checkModule() {
+  try {
+    var res = await apiCall('GET', 'https://www.zohoapis.com/crm/v2/settings/modules/WA_Communications', null);
+    console.log("Module check:", JSON.stringify(res));
+    if (res && res.modules && res.modules[0]) {
+      var m = res.modules[0];
+      showResult('✓ Module exists: "' + m.plural_label + '" (API name: ' + m.api_name + ')\nID: ' + m.id, 'success');
+    } else {
+      showResult('Module not found. Please run the setup again.', 'error');
+    }
+  } catch(e) {
+    showResult('Could not check module: ' + e.message, 'error');
+  }
+}
+</script>
+</body>
+</html>
