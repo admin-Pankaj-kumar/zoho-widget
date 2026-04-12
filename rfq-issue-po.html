@@ -343,7 +343,14 @@ async function issuePOs() {
     document.getElementById('pbar').style.width = Math.round(i/groups.length*100) + '%';
 
     try {
-      var itemSummary = g.items.map(function(i){ return i.productName + " | Qty: 1 | Price: Rs." + fmt(i.price); }).join(", ");
+      // Build Product_Details array — correct format confirmed working
+      var productDetails = g.items.map(function(item) {
+        return {
+          product: { id: item.productId },
+          quantity: 1,
+          list_price: item.price
+        };
+      });
 
       var rec = {
         Subject: rfqName + " - PO - " + g.vendorName,
@@ -351,30 +358,30 @@ async function issuePOs() {
         Related_RFQ: { id: rfqId },
         Status: "Created",
         PO_Date: today,
-        Description: itemSummary
+        Product_Details: productDetails
       };
 
       console.log("Creating PO for", g.vendorName, "payload:", JSON.stringify(rec));
       var res = await ZOHO.CRM.API.insertRecord({
         Entity: "Purchase_Orders",
         APIData: rec,
-        Trigger: ["workflow"]
+        Trigger: []
       });
       console.log("Result:", JSON.stringify(res));
 
-      console.log("Raw response:", JSON.stringify(res));
-      // insertRecord returns array at top level
       var resData = null;
       if (res && res.data && res.data[0]) resData = res.data[0];
       else if (Array.isArray(res) && res[0]) resData = res[0];
+      else if (res && res.code) resData = res;
 
       var ok = resData && resData.code === 'SUCCESS';
       var poId = ok ? (resData.details && resData.details.id) : null;
-      var errMsg = ok ? '' : (resData ? (resData.message || resData.code || JSON.stringify(resData).substring(0,80)) : 'Unknown error');
+      var errMsg = ok ? '' : (resData ? (typeof resData.message === 'string' ? resData.message : JSON.stringify(resData).substring(0,80)) : 'Unknown error');
       results.push({ vendor: g.vendorName, items: g.items.length, total: g.items.reduce(function(s,i){return s+i.price;},0), ok: ok, id: poId, msg: errMsg });
     } catch(e) {
       console.error("Exception:", e);
-      results.push({ vendor: g.vendorName, items: g.items.length, total: 0, ok: false, msg: e.message ? String(e.message).substring(0,80) : JSON.stringify(e).substring(0,80) });
+      var errMsg = typeof e === 'string' ? e : (e && e.message ? e.message : JSON.stringify(e).substring(0,60));
+      results.push({ vendor: g.vendorName, items: g.items.length, total: 0, ok: false, msg: errMsg });
     }
   }
 
