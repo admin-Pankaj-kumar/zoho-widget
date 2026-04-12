@@ -343,22 +343,15 @@ async function issuePOs() {
     document.getElementById('pbar').style.width = Math.round(i/groups.length*100) + '%';
 
     try {
-      var purchaseItems = g.items.map(function(item) {
-        return {
-          Product_Details: { id: item.productId, name: item.productName },
-          Quantity: 1,
-          List_Price: item.price,
-          Discount: 0
-        };
-      });
+      var itemSummary = g.items.map(function(i){ return i.productName + " | Qty: 1 | Price: Rs." + fmt(i.price); }).join(", ");
 
       var rec = {
-        Subject: rfqName + ' - PO - ' + g.vendorName,
+        Subject: rfqName + " - PO - " + g.vendorName,
         Vendor_Name: { id: g.vendorId },
         Related_RFQ: { id: rfqId },
-        Status: 'Created',
+        Status: "Created",
         PO_Date: today,
-        Purchase_Items: purchaseItems
+        Description: itemSummary
       };
 
       console.log("Creating PO for", g.vendorName, "payload:", JSON.stringify(rec));
