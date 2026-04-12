@@ -24,8 +24,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .add-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 40px);margin:8px 20px 12px;padding:9px;border:1.5px dashed #cbd5e1;border-radius:8px;background:none;font-size:13px;color:#64748b;cursor:pointer;transition:all .15s;font-family:inherit}
 .add-btn:hover{border-color:#3b82f6;color:#3b82f6;background:#eff6ff}
 .card-foot{padding:14px 20px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
-.info{font-size:12px;color:#94a3b8}
-.info b{color:#3b82f6}
+.info{font-size:12px;color:#94a3b8}.info b{color:#3b82f6}
 .btns{display:flex;gap:10px}
 .save-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;background:#3b82f6;border:none;border-radius:9px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
 .save-btn:hover:not(:disabled){background:#2563eb}
@@ -37,18 +36,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .save-btn.loading .lbl{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;white-space:nowrap}
-.toast.ok{background:#15803d}
-.toast.er{background:#dc2626}
+.toast.ok{background:#15803d}.toast.er{background:#dc2626}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .success{display:none;text-align:center;padding:40px 20px}
 .success.show{display:block}
 .success-icon{width:56px;height:56px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
 .success h3{font-size:16px;font-weight:600;color:#15803d;margin-bottom:8px}
 .success p{font-size:13px;color:#64748b;margin-bottom:20px}
+.debug{background:#1e293b;color:#94a3b8;font-family:monospace;font-size:11px;padding:8px 12px;margin:0 20px 12px;border-radius:6px;display:none;word-break:break-all}
 </style>
 </head>
 <body>
-
 <div class="card" id="mainCard">
   <div class="card-head">
     <div class="card-title">
@@ -69,6 +67,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
     Add another contact
   </button>
+  <div class="debug" id="debug"></div>
   <div class="card-foot">
     <div class="info">Creating <b id="cnt">1</b> contact(s) linked to this account</div>
     <div class="btns">
@@ -97,14 +96,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 var accountId = null;
 var rowIdx = 0;
 
+function showDebug(msg) {
+  var d = document.getElementById('debug');
+  d.style.display = 'block';
+  d.textContent = msg;
+}
+
 ZOHO.embeddedApp.on("PageLoad", function(data) {
-  // EntityId can be array or string - handle both
-  if (Array.isArray(data.EntityId)) {
-    accountId = data.EntityId[0];
+  console.log("Full PageLoad data:", JSON.stringify(data));
+
+  // Extract account ID - handles both string and array
+  var rawId = data.EntityId;
+  if (Array.isArray(rawId)) {
+    accountId = String(rawId[0]);
   } else {
-    accountId = data.EntityId;
+    accountId = String(rawId);
   }
-  console.log("Widget loaded. Raw EntityId:", data.EntityId, "| Resolved accountId:", accountId);
+
+  console.log("Resolved accountId:", accountId);
+  showDebug("Account ID: " + accountId);
 });
 
 ZOHO.embeddedApp.init();
@@ -120,7 +130,7 @@ function addRow() {
     '<input type="text" placeholder="Last name" id="ln' + id + '">' +
     '<input type="email" placeholder="email@example.com" id="em' + id + '">' +
     '<input type="tel" placeholder="+91 98765 43210" id="ph' + id + '">' +
-    '<button class="del" onclick="delRow(' + id + ')" title="Remove">' +
+    '<button class="del" onclick="delRow(' + id + ')">' +
       '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
     '</button>';
   document.getElementById('rows').appendChild(div);
@@ -129,8 +139,7 @@ function addRow() {
 }
 
 function delRow(id) {
-  var rows = document.querySelectorAll('.row');
-  if (rows.length <= 1) { showToast('Need at least one row', 'er'); return; }
+  if (document.querySelectorAll('.row').length <= 1) { showToast('Need at least one row', 'er'); return; }
   document.getElementById('r' + id).remove();
   updateCount();
 }
@@ -167,60 +176,57 @@ function saveContacts() {
     var ln = document.getElementById('ln' + id).value.trim();
     var em = document.getElementById('em' + id).value.trim();
     var ph = document.getElementById('ph' + id).value.trim();
-    if (!ln) {
-      document.getElementById('ln' + id).classList.add('err');
-      hasErr = true;
-      return;
-    }
-    if (fn || ln || em || ph) {
-      list.push({ First_Name: fn, Last_Name: ln, Email: em, Phone: ph });
-    }
+    if (!ln) { document.getElementById('ln' + id).classList.add('err'); hasErr = true; return; }
+    if (fn || ln || em || ph) list.push({ fn: fn, ln: ln, em: em, ph: ph });
   });
 
-  if (hasErr) { showToast('Last Name is required for all rows', 'er'); return; }
-  if (!list.length) { showToast('Please enter at least one contact', 'er'); return; }
-  if (!accountId) { showToast('Account not detected. Please reopen the widget.', 'er'); return; }
+  if (hasErr) { showToast('Last Name is required', 'er'); return; }
+  if (!list.length) { showToast('Enter at least one contact', 'er'); return; }
+  if (!accountId) { showToast('Account ID not found. Close and reopen.', 'er'); return; }
 
   var btn = document.getElementById('saveBtn');
   btn.classList.add('loading');
   btn.disabled = true;
 
-  var ok = 0;
-  var fail = 0;
-  var total = list.length;
-  var done = 0;
+  var ok = 0, fail = 0, done = 0, total = list.length;
 
-  // Insert one by one to avoid bulk API issues
   list.forEach(function(c) {
+    // Build minimal payload - Account_Name as lookup with id
     var payload = {
-      Last_Name: c.Last_Name,
+      Last_Name: c.ln,
       Account_Name: { id: accountId }
     };
-    if (c.First_Name) payload.First_Name = c.First_Name;
-    if (c.Email) payload.Email = c.Email;
-    if (c.Phone) payload.Phone = c.Phone;
+    if (c.fn) payload.First_Name = c.fn;
+    if (c.em) payload.Email = c.em;
+    if (c.ph) payload.Phone = c.ph;
 
-    console.log("Inserting:", JSON.stringify(payload));
+    console.log("Sending payload:", JSON.stringify(payload));
+    showDebug("Sending: " + JSON.stringify(payload));
 
     ZOHO.CRM.API.insertRecord({
       Entity: "Contacts",
-      APIData: payload,
-      Trigger: ["workflow"]
+      APIData: payload
     }).then(function(res) {
-      console.log("Response:", JSON.stringify(res));
       done++;
-      if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
-        ok++;
-      } else {
-        fail++;
-        console.error("Failed:", JSON.stringify(res));
+      console.log("Raw response:", JSON.stringify(res));
+
+      var success = false;
+      // Handle various response formats
+      if (res && res.data && Array.isArray(res.data) && res.data[0]) {
+        success = res.data[0].code === 'SUCCESS';
+        if (!success) showDebug("Error: " + JSON.stringify(res.data[0]));
+      } else if (res && res.code === 'SUCCESS') {
+        success = true;
       }
-      if (done === total) { finish(ok, fail); }
+
+      if (success) ok++; else fail++;
+      if (done === total) finish(ok, fail);
     }).catch(function(err) {
-      console.error("Error:", err);
       done++;
       fail++;
-      if (done === total) { finish(ok, fail); }
+      console.error("Catch error:", JSON.stringify(err));
+      showDebug("Catch: " + JSON.stringify(err));
+      if (done === total) finish(ok, fail);
     });
   });
 }
@@ -230,6 +236,8 @@ function finish(ok, fail) {
   btn.classList.remove('loading');
   btn.disabled = false;
 
+  console.log("Result - ok:", ok, "fail:", fail);
+
   if (ok > 0 && fail === 0) {
     document.getElementById('mainCard').style.display = 'none';
     document.getElementById('successMsg').textContent = ok + ' contact' + (ok > 1 ? 's' : '') + ' created and linked successfully!';
@@ -238,7 +246,7 @@ function finish(ok, fail) {
   } else if (ok > 0) {
     showToast(ok + ' created, ' + fail + ' failed', 'er');
   } else {
-    showToast('Failed to create contacts. Try again.', 'er');
+    showToast('Failed. Check console for details.', 'er');
   }
 }
 
