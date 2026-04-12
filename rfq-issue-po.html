@@ -347,7 +347,8 @@ async function issuePOs() {
         return {
           Product_Name: { id: item.productId },
           Quantity: 1,
-          List_Price: item.price
+          List_Price: item.price,
+          Discount: 0
         };
       });
 
