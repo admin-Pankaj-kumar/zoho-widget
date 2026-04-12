@@ -242,7 +242,7 @@ function finish(ok, fail) {
     document.getElementById('mainCard').style.display = 'none';
     document.getElementById('successMsg').textContent = ok + ' contact' + (ok > 1 ? 's' : '') + ' created and linked successfully!';
     document.getElementById('successDiv').classList.add('show');
-    setTimeout(function() { ZOHO.CRM.UI.Popup.closeReload(); }, 2500);
+    setTimeout(function() { try { ZOHO.CRM.UI.Popup.closeReload(); } catch(e) { console.log("closeReload:", e); window.location.reload(); } }, 2500);
   } else if (ok > 0) {
     showToast(ok + ' created, ' + fail + ' failed', 'er');
   } else {
