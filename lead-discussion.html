@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Lead Discussion</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1f36;font-size:13px}
+
+/* LOADING */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;color:#94a3b8}
+.loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MAIN */
+.wrap{padding:16px;display:flex;flex-direction:column;gap:10px;max-width:700px;margin:0 auto}
+
+/* LEAD HEADER */
+.lead-header{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lead-info{display:flex;align-items:center;gap:12px}
+.avatar{width:38px;height:38px;border-radius:50%;background:#eff6ff;color:#185FA5;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lead-name{font-size:14px;font-weight:600;color:#1a1f36}
+.lead-meta{font-size:11px;color:#64748b;margin-top:2px}
+.status-select{border:0.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#f8fafc;outline:none;cursor:pointer}
+.status-select:focus{border-color:#3b82f6}
+
+/* ACCORDION */
+.accordion{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;overflow:hidden}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:#fafbfc}
+.acc-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#1a1f36}
+.acc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+.tag-readonly{background:#f1f5f9;color:#475569}
+.tag-edit{background:#eff6ff;color:#185FA5}
+.acc-arrow{width:16px;height:16px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
+.acc-arrow.open{transform:rotate(180deg)}
+.acc-body{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease}
+.acc-body.open{padding:0 16px 14px;max-height:800px}
+
+/* READ ONLY */
+.readonly-content{font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.readonly-empty{font-size:12px;color:#94a3b8;font-style:italic}
+
+/* NOTES LIST */
+.note-item{padding:10px 0;border-bottom:0.5px solid #f1f5f9}
+.note-item:last-child{border-bottom:none}
+.note-date{font-size:11px;color:#94a3b8;margin-bottom:4px}
+.note-text{font-size:12px;color:#374151;line-height:1.5}
+
+/* EDIT - TODAY'S DISCUSSION */
+.today-label{font-size:11px;font-weight:600;color:#185FA5;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.today-date-prefix{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#185FA5}
+.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:100px;transition:border .15s,box-shadow .15s;line-height:1.6}
+.discussion-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.discussion-input::placeholder{color:#94a3b8}
+
+/* FOOTER */
+.footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:4px}
+.char-count{font-size:11px;color:#94a3b8}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
+.btn-primary{background:#3b82f6;color:#fff}
+.btn-primary:hover:not(:disabled){background:#2563eb}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:none;border:0.5px solid #e2e8f0;color:#64748b}
+.btn-ghost:hover{background:#f1f5f9}
+.spin-sm{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.btn-primary.loading .spin-sm{display:block}
+.btn-primary.loading .lbl{display:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;pointer-events:none}
+.toast.ok{background:#15803d}.toast.er{background:#dc2626}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* SUCCESS */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.9);align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:99}
+.success-overlay.show{display:flex}
+.success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.success-overlay h3{font-size:15px;font-weight:600;color:#15803d}
+.success-overlay p{font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loadingState">
+  <div class="loader"></div>
+  <span>Loading lead details...</span>
+</div>
+
+<div class="wrap" id="mainWrap" style="display:none">
+
+  <!-- LEAD HEADER -->
+  <div class="lead-header">
+    <div class="lead-info">
+      <div class="avatar" id="avatar">?</div>
+      <div>
+        <div class="lead-name" id="leadName">Loading...</div>
+        <div class="lead-meta" id="leadMeta"></div>
+      </div>
+    </div>
+    <select class="status-select" id="statusSelect">
+      <option value="">-None-</option>
+      <option value="New">New</option>
+      <option value="Contact in Future">Contact in Future</option>
+      <option value="Contacted">Contacted</option>
+      <option value="Junk Lead">Junk Lead</option>
+      <option value="Future Prospect">Future Prospect</option>
+      <option value="Not Contacted">Not Contacted</option>
+      <option value="Discovery Call">Discovery Call</option>
+      <option value="Not Interested">Not Interested</option>
+      <option value="Not Qualified">Not Qualified</option>
+    </select>
+  </div>
+
+  <!-- REQUIREMENT DETAILS -->
+  <div class="accordion" id="acc-req">
+    <div class="acc-header" onclick="toggleAcc('req')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#94a3b8" stroke-width="1.2"/><path d="M3.5 4.5h7M3.5 7h7M3.5 9.5h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Requirement Details
+        <span class="acc-tag tag-readonly">Read Only</span>
+      </div>
+      <svg class="acc-arrow" id="arrow-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="acc-body" id="body-req">
+      <div id="reqContent" class="readonly-empty">No requirement details available.</div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="accordion" id="acc-notes">
+    <div class="acc-header" onclick="toggleAcc('notes')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2h10v8l-3 2H2V2z" stroke="#94a3b8" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 10v2l2-2" stroke="#94a3b8" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 5h6M4 7h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Notes
+        <span class="acc-tag tag-readonly">Read Only</span>
+        <span id="notesBadge" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600"></span>
+      </div>
+      <svg class="acc-arrow" id="arrow-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="acc-body" id="body-notes">
+      <div id="notesContent" class="readonly-empty">No notes found.</div>
+    </div>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="accordion" id="acc-desc">
+    <div class="acc-header" onclick="toggleAcc('desc')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 6h10M2 9h6" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Description
+        <span class="acc-tag tag-readonly">Read Only</span>
+      </div>
+      <svg class="acc-arrow" id="arrow-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="acc-body" id="body-desc">
+      <div id="descContent" class="readonly-empty">No description available.</div>
+    </div>
+  </div>
+
+  <!-- TODAY'S DISCUSSION -->
+  <div class="accordion" id="acc-today">
+    <div class="acc-header" onclick="toggleAcc('today')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="7" r="3" stroke="#185FA5" stroke-width="1.2"/></svg>
+        Today's Discussion
+        <span class="acc-tag tag-edit">Edit</span>
+      </div>
+      <svg class="acc-arrow open" id="arrow-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="acc-body open" id="body-today">
+      <div class="today-label">
+        <span class="today-date-prefix" id="todayPrefix">12 Apr 2026 -</span>
+        <span style="color:#64748b;font-weight:400">Type your discussion notes below</span>
+      </div>
+      <textarea class="discussion-input" id="discussionInput" placeholder="Enter today's discussion details, next steps, or any important notes..." oninput="onInput()"></textarea>
+      <div class="footer">
+        <span class="char-count" id="charCount">0 characters</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="clearDiscussion()">Clear</button>
+          <button class="btn btn-primary" id="saveBtn" onclick="saveAll()">
+            <div class="spin-sm"></div>
+            <span class="lbl">Save Changes</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <h3>Saved Successfully!</h3>
+  <p id="savedSummary">Lead updated.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
+<script>
+var leadId   = null;
+var leadData = null;
+var openAccordions = { today: true };
+
+// Format today's date
+function formatDate(d) {
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var day = d.getDate();
+  var suffix = day === 1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
+  return day + suffix + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+var today = new Date();
+var todayStr = formatDate(today);
+var todayPrefix = todayStr + ' -';
+document.getElementById('todayPrefix').textContent = todayPrefix;
+
+// ═══ INIT ═══
+ZOHO.embeddedApp.on("PageLoad", function(data) {
+  var raw = data.EntityId;
+  leadId = String(Array.isArray(raw) ? raw[0] : raw);
+  console.log("Lead ID:", leadId);
+  loadLead();
+});
+ZOHO.embeddedApp.init();
+
+// ═══ LOAD LEAD ═══
+function loadLead() {
+  ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId })
+    .then(function(res) {
+      if (res && res.data && res.data[0]) {
+        leadData = res.data[0];
+        populateUI();
+        loadNotes();
+      } else {
+        showToast('Failed to load lead data', 'er');
+      }
+    })
+    .catch(function(err) {
+      console.error("Load error:", err);
+      showToast('Error loading lead', 'er');
+    });
+}
+
+function loadNotes() {
+  ZOHO.CRM.API.getRelatedRecords({
+    Entity: "Leads",
+    RecordID: leadId,
+    RelatedList: "Notes",
+    page: 1,
+    per_page: 10
+  }).then(function(res) {
+    var notes = (res && res.data) ? res.data : [];
+    var container = document.getElementById('notesContent');
+    var badge = document.getElementById('notesBadge');
+
+    if (notes.length === 0) {
+      container.innerHTML = '<div class="readonly-empty">No notes found.</div>';
+    } else {
+      badge.textContent = notes.length;
+      badge.style.display = '';
+      var html = '';
+      notes.forEach(function(n) {
+        var d = n.Created_Time ? new Date(n.Created_Time) : null;
+        var dateStr = d ? formatDate(d) : '';
+        html += '<div class="note-item">';
+        if (dateStr) html += '<div class="note-date">' + esc(dateStr) + '</div>';
+        html += '<div class="note-text">' + esc(n.Note_Content || n.Content || '') + '</div>';
+        html += '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('mainWrap').style.display = 'flex';
+  })
+  .catch(function() {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('mainWrap').style.display = 'flex';
+  });
+}
+
+function populateUI() {
+  var d = leadData;
+  var fn = d.First_Name || '';
+  var ln = d.Last_Name || '';
+  var fullName = (fn + ' ' + ln).trim() || 'Unknown Lead';
+  var initials = ((fn[0]||'') + (ln[0]||'')).toUpperCase() || '?';
+
+  document.getElementById('avatar').textContent = initials;
+  document.getElementById('leadName').textContent = fullName;
+
+  var meta = [];
+  if (d.Mobile) meta.push(d.Mobile);
+  if (d.Email) meta.push(d.Email);
+  if (d.Company) meta.push(d.Company);
+  document.getElementById('leadMeta').textContent = meta.join(' · ');
+
+  // Status
+  var sel = document.getElementById('statusSelect');
+  sel.value = d.Lead_Status || '';
+
+  // Requirement Details
+  var req = document.getElementById('reqContent');
+  if (d.Requirement_Details) {
+    req.className = 'readonly-content';
+    req.textContent = d.Requirement_Details;
+  } else {
+    req.className = 'readonly-empty';
+    req.textContent = 'No requirement details available.';
+  }
+
+  // Description
+  var desc = document.getElementById('descContent');
+  if (d.Description) {
+    desc.className = 'readonly-content';
+    desc.textContent = d.Description;
+  } else {
+    desc.className = 'readonly-empty';
+    desc.textContent = 'No description available.';
+  }
+}
+
+// ═══ ACCORDIONS ═══
+function toggleAcc(key) {
+  openAccordions[key] = !openAccordions[key];
+  var body  = document.getElementById('body-' + key);
+  var arrow = document.getElementById('arrow-' + key);
+  if (openAccordions[key]) {
+    body.classList.add('open');
+    arrow.classList.add('open');
+  } else {
+    body.classList.remove('open');
+    arrow.classList.remove('open');
+  }
+}
+
+// ═══ DISCUSSION INPUT ═══
+function onInput() {
+  var val = document.getElementById('discussionInput').value;
+  document.getElementById('charCount').textContent = val.length + ' character' + (val.length !== 1 ? 's' : '');
+}
+
+function clearDiscussion() {
+  document.getElementById('discussionInput').value = '';
+  onInput();
+}
+
+// ═══ SAVE ═══
+function saveAll() {
+  var discussion = document.getElementById('discussionInput').value.trim();
+  var newStatus  = document.getElementById('statusSelect').value;
+
+  if (!discussion) {
+    showToast("Please enter today's discussion notes", 'er');
+    document.getElementById('discussionInput').focus();
+    return;
+  }
+
+  var btn = document.getElementById('saveBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  // Build new Description = existing + newline + "Date - Discussion"
+  var existingDesc = (leadData && leadData.Description) ? leadData.Description : '';
+  var newEntry = todayPrefix + ' ' + discussion;
+  var newDescription = existingDesc
+    ? existingDesc + '\n' + newEntry
+    : newEntry;
+
+  var payload = {
+    id: leadId,
+    Description: newDescription
+  };
+  if (newStatus) payload.Lead_Status = newStatus;
+
+  ZOHO.CRM.API.updateRecord({ Entity: 'Leads', APIData: payload })
+    .then(function(res) {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+
+      if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
+        // Update local data
+        leadData.Description = newDescription;
+        if (newStatus) leadData.Lead_Status = newStatus;
+        // Refresh description accordion
+        var desc = document.getElementById('descContent');
+        desc.className = 'readonly-content';
+        desc.textContent = newDescription;
+        // Clear input
+        document.getElementById('discussionInput').value = '';
+        onInput();
+
+        var parts = [];
+        parts.push('Discussion saved');
+        if (newStatus) parts.push('Status → ' + newStatus);
+        document.getElementById('savedSummary').textContent = parts.join(' · ');
+        document.getElementById('successOverlay').classList.add('show');
+        setTimeout(function() {
+          document.getElementById('successOverlay').classList.remove('show');
+          try { ZOHO.CRM.UI.Popup.closeReload(); } catch(e) {}
+        }, 2000);
+      } else {
+        showToast('Save failed. Please try again.', 'er');
+      }
+    })
+    .catch(function(err) {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      console.error("Save error:", err);
+      showToast('Error saving. Please try again.', 'er');
+    });
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'ok') + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 3000);
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
