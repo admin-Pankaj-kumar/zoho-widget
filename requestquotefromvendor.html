@@ -6,7 +6,7 @@
 <title>RFQ — Send to Vendor</title>
 
 <!-- Zoho Embedded App SDK -->
-<script src="https://live.zwidgets.com/js-sdk/1.0.5/ZohoEmbeddedAppSDK.min.js"></script>
+<!-- Zoho SDK is auto-injected by CRM into widget iframes -->
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -385,24 +385,18 @@ const avCls = i => AV[i % AV.length];
 /* ══════════════════════════════════════════
    SDK BOOT
 ══════════════════════════════════════════ */
-// Wait for SDK script to be fully ready before calling ZOHO APIs
-window.addEventListener('load', function() {
-  if (typeof ZOHO === 'undefined') {
-    document.getElementById('loadingScreen').innerHTML =
-      '<div style="text-align:center;padding:40px">' +
-      '<p style="font-size:24px;margin-bottom:8px">⚠️</p>' +
-      '<p style="color:#C0392B;font-weight:500">Zoho SDK could not be loaded.</p>' +
-      '<p style="color:#888;font-size:12px;margin-top:6px">Please check your internet connection and reload.</p>' +
-      '<button onclick="location.reload()" style="margin-top:16px;padding:8px 20px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px">Reload</button>' +
-      '</div>';
-    return;
+// Poll for ZOHO object — CRM injects SDK asynchronously into the iframe
+(function waitForZOHO() {
+  if (typeof ZOHO !== 'undefined' && ZOHO.embeddedApp) {
+    ZOHO.embeddedApp.on('PageLoad', async function(data) {
+      RFQ_ID = data.EntityId;
+      await initWidget();
+    });
+    ZOHO.embeddedApp.init();
+  } else {
+    setTimeout(waitForZOHO, 100);
   }
-  ZOHO.embeddedApp.on('PageLoad', async function(data) {
-    RFQ_ID = data.EntityId;
-    await initWidget();
-  });
-  ZOHO.embeddedApp.init();
-});
+})();
 
 async function initWidget() {
   showScreen('loading');
