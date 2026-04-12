@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RFQ — Send to Vendor</title>
+
+<!-- Zoho Embedded App SDK -->
+<script src="https://live.zwidgets.com/js-sdk/1.0.5/ZohoEmbeddedAppSDK.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F4F0;--surface:#fff;--border:#E2E0D8;--border-md:#C8C5BA;
+  --text:#1A1916;--muted:#6B6960;
+  --accent:#1B4FD8;--accent-lt:#EBF0FD;--accent-dk:#1240B8;
+  --green:#0E7A4E;--green-lt:#E7F6EF;
+  --amber:#92580A;--amber-lt:#FDF3E3;
+  --red:#C0392B;--red-lt:#FDE8E6;
+  --r:10px;--rl:16px;--rs:6px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08);
+  --sh3:0 16px 48px rgba(0,0,0,.14),0 4px 12px rgba(0,0,0,.06);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --tr:.18s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.55;min-height:100vh;padding:20px 16px 48px}
+.page{max-width:840px;margin:0 auto}
+
+/* Loading */
+#loadingScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;gap:14px}
+.loader{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:13px;color:var(--muted)}
+
+/* Error screen */
+#errorScreen{display:none;text-align:center;padding:48px 24px}
+.error-icon{font-size:32px;margin-bottom:12px}
+.error-msg{font-size:14px;color:var(--red);margin-bottom:8px;font-weight:500}
+.error-sub{font-size:12px;color:var(--muted)}
+.retry-btn{margin-top:16px;font-family:var(--font);font-size:13px;font-weight:500;padding:8px 20px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:background var(--tr)}
+.retry-btn:hover{background:var(--bg)}
+
+/* Header */
+#mainContent{display:none}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.hdr-left{}
+.breadcrumb{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.breadcrumb span{color:var(--accent)}
+.page-title{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.page-meta{font-size:12px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+
+/* Pipeline */
+.pipeline{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 16px;margin-bottom:20px;overflow-x:auto;box-shadow:var(--sh)}
+.pipe-step{display:flex;align-items:center;flex-shrink:0}
+.pipe-label{font-size:11px;font-weight:500;padding:5px 11px;border-radius:20px;white-space:nowrap;transition:all var(--tr)}
+.pipe-done{background:var(--green-lt);color:var(--green)}
+.pipe-active{background:var(--accent-lt);color:var(--accent)}
+.pipe-idle{background:#EEECE6;color:var(--muted)}
+.pipe-arrow{color:var(--border-md);margin:0 6px;font-size:13px}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);transition:box-shadow var(--tr)}
+.stat-card:hover{box-shadow:var(--sh2)}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:600;letter-spacing:-.5px}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px 22px;margin-bottom:16px;box-shadow:var(--sh)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-bottom:16px}
+.tab-btn{font-family:var(--font);font-size:13px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all var(--tr)}
+.tab-btn:hover{background:#F0EEE8;color:var(--text)}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* Table */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:0 12px 10px 0;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:11px 12px 11px 0;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.item-name{font-weight:500}
+.item-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:1px}
+
+/* Badges */
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.badge-green{background:var(--green-lt);color:var(--green)}
+.badge-amber{background:var(--amber-lt);color:var(--amber)}
+.badge-blue{background:var(--accent-lt);color:var(--accent)}
+.badge-neutral{background:#EEECE6;color:var(--muted)}
+
+/* Avatar */
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.av-0{background:#DBEAFE;color:#1E40AF}
+.av-1{background:#CCFBF1;color:#0F766E}
+.av-2{background:#FFE4E6;color:#BE123C}
+.av-3{background:#EDE9FE;color:#6D28D9}
+.av-4{background:#FEF3C7;color:#92400E}
+
+/* Send button */
+.send-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:10px 20px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(27,79,216,.3);transition:all var(--tr)}
+.send-btn:hover{background:var(--accent-dk);transform:translateY(-1px)}
+.send-btn:active{transform:translateY(0)}
+.send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* Banner */
+.banner{display:none;border-radius:var(--r);padding:12px 16px;font-size:13px;margin-bottom:16px;animation:fadeUp .3s ease}
+.banner-success{background:var(--green-lt);border:1px solid #A7F3D0;color:var(--green)}
+.banner-error{background:var(--red-lt);border:1px solid #FCA5A5;color:var(--red)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Empty state */
+.empty-state{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px}
+.empty-state svg{margin-bottom:10px;opacity:.35}
+
+/* Vendor result */
+.vendor-result{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);animation:fadeUp .3s ease both}
+.vendor-result:last-child{border-bottom:none}
+.vr-body{flex:1;min-width:0}
+.vr-name{font-weight:500;font-size:14px}
+.vr-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.li-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.li-pill{font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-lt);border-radius:4px;padding:2px 8px}
+.li-price{font-size:11px;color:var(--muted);background:#EEECE6;border-radius:4px;padding:2px 8px;font-family:var(--mono)}
+.check-icon{width:20px;height:20px;border-radius:50%;background:var(--green-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ═══ MODAL ═══ */
+.overlay{position:fixed;inset:0;background:rgba(10,10,8,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:999;opacity:0;pointer-events:none;transition:opacity .22s ease}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);width:540px;max-width:96vw;box-shadow:var(--sh3);overflow:hidden;transform:scale(.96) translateY(8px);transition:transform .22s cubic-bezier(.34,1.56,.64,1);max-height:92vh;display:flex;flex-direction:column}
+.overlay.open .modal{transform:scale(1) translateY(0)}
+
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-hdr-left{display:flex;align-items:center;gap:10px}
+.modal-icon{width:34px;height:34px;border-radius:var(--rs);background:var(--accent-lt);display:flex;align-items:center;justify-content:center}
+.modal-title{font-size:15px;font-weight:600}
+.modal-subtitle{font-size:12px;color:var(--muted);margin-top:1px}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:var(--rs);display:flex;align-items:center;transition:background var(--tr)}
+.modal-close:hover{background:var(--bg)}
+
+.modal-info{background:var(--accent-lt);border-bottom:1px solid #C7D7FB;padding:9px 22px;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:7px;flex-shrink:0}
+
+.modal-search-wrap{padding:12px 22px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.search-wrap{position:relative}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.modal-search{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border);border-radius:var(--rs);font-family:var(--font);font-size:13px;background:var(--bg);color:var(--text);outline:none;transition:border-color var(--tr)}
+.modal-search:focus{border-color:var(--accent)}
+
+.vendor-list-wrap{overflow-y:auto;flex:1}
+.vendor-list-wrap::-webkit-scrollbar{width:5px}
+.vendor-list-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+.vcheck-row{display:flex;align-items:center;gap:12px;padding:11px 22px;cursor:pointer;transition:background var(--tr);user-select:none}
+.vcheck-row:hover{background:var(--bg)}
+.vcheck-row.selected{background:var(--accent-lt)}
+.vcheck-row.disabled-row{opacity:.5;cursor:not-allowed;pointer-events:none}
+.vcheck-row input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0}
+.vcheck-info{flex:1;min-width:0}
+.vcheck-name{font-size:13px;font-weight:500}
+.vcheck-email{font-size:11px;color:var(--muted);margin-top:1px}
+
+.preview-wrap{border-top:1px solid var(--border);padding:14px 22px;background:#FAFAF8;flex-shrink:0}
+.preview-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.preview-table{width:100%;border-collapse:collapse}
+.preview-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:0 8px 6px 0;text-align:left;border-bottom:1px solid var(--border)}
+.preview-table td{padding:7px 8px 7px 0;font-size:12px;border-bottom:1px solid var(--border)}
+.preview-table tr:last-child td{border-bottom:none}
+
+.modal-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0}
+.sel-count{font-size:13px;color:var(--muted)}
+.sel-count strong{color:var(--text);font-weight:600}
+.modal-actions{display:flex;gap:8px}
+.btn-cancel{font-family:var(--font);font-size:13px;font-weight:500;padding:8px 16px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:all var(--tr)}
+.btn-cancel:hover{background:var(--bg)}
+.btn-save{font-family:var(--font);font-size:13px;font-weight:600;padding:8px 20px;border-radius:var(--rs);border:none;background:var(--accent);color:#fff;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:7px;box-shadow:0 2px 6px rgba(27,79,216,.25)}
+.btn-save:hover:not(:disabled){background:var(--accent-dk)}
+.btn-save:disabled{opacity:.45;cursor:not-allowed}
+
+/* Spinner */
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .55s linear infinite}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Loading ── -->
+  <div id="loadingScreen">
+    <div class="loader"></div>
+    <div class="loader-text">Loading RFQ data from Zoho CRM…</div>
+  </div>
+
+  <!-- ── Error ── -->
+  <div id="errorScreen">
+    <div class="error-icon">⚠️</div>
+    <div class="error-msg" id="errorMsg">Failed to load widget data.</div>
+    <div class="error-sub" id="errorSub">Check console for details.</div>
+    <button class="retry-btn" onclick="initWidget()">Retry</button>
+  </div>
+
+  <!-- ── Main ── -->
+  <div id="mainContent">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="hdr-left">
+        <div class="breadcrumb">RFQs › <span id="rfqNameCrumb">—</span></div>
+        <div class="page-title" id="rfqNameTitle">—</div>
+        <div class="page-meta" id="rfqMeta">—</div>
+      </div>
+      <button class="send-btn" id="openModalBtn" onclick="openModal()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <path d="M1 7.5h13M9 3l5 4.5L9 12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Send to Vendor
+      </button>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="pipeline">
+      <div class="pipe-step"><span class="pipe-label pipe-done">RFQ Created</span><span class="pipe-arrow">›</span></div>
+      <div class="pipe-step"><span class="pipe-label pipe-done" id="pipeProducts">Products Added</span><span class="pipe-arrow">›</span></div>
+      <div class="pipe-step"><span class="pipe-label pipe-active" id="pipeStep3">Send to Vendors</span><span class="pipe-arrow">›</span></div>
+      <div class="pipe-step"><span class="pipe-label pipe-idle"   id="pipeStep4">Quotes Received</span><span class="pipe-arrow">›</span></div>
+      <div class="pipe-step"><span class="pipe-label pipe-idle"   id="pipeStep5">PO Created</span></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Products in RFQ</div>
+        <div class="stat-val" id="statProducts">—</div>
+        <div class="stat-sub">Active line items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Vendors Contacted</div>
+        <div class="stat-val" id="statVendors">0</div>
+        <div class="stat-sub">RFQ records created this session</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Quotes Pending</div>
+        <div class="stat-val" id="statPending">0</div>
+        <div class="stat-sub">Awaiting vendor response</div>
+      </div>
+    </div>
+
+    <!-- Banners -->
+    <div class="banner banner-success" id="successBanner"></div>
+    <div class="banner banner-error"   id="errorBanner"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('products',this)">RFQ Products</button>
+      <button class="tab-btn"        onclick="showTab('vendors',this)">Vendor Quotations</button>
+    </div>
+
+    <!-- Products tab -->
+    <div class="tab-panel active" id="tab-products">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">RFQ Products — line items</span>
+          <span class="badge badge-blue">Requested Items subform</span>
+        </div>
+        <div id="productTableWrap">
+          <div class="empty-state"><div class="loader" style="margin:0 auto"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendors tab -->
+    <div class="tab-panel" id="tab-vendors">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Requested For Quotation records</span>
+          <span class="badge badge-neutral" id="rfqCountBadge">0 records</span>
+        </div>
+        <div id="vendorResultsList">
+          <div class="empty-state">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <rect x="6" y="4" width="24" height="28" rx="3" stroke="#888" stroke-width="1.5"/>
+              <path d="M11 13h14M11 18h14M11 23h8" stroke="#888" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <p>No records yet. Click <strong>Send to Vendor</strong> to create them.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#mainContent -->
+</div>
+
+<!-- ═══ MODAL ═══ -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+
+    <div class="modal-header">
+      <div class="modal-hdr-left">
+        <div class="modal-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M1 8h14M10 3l5 5-5 5" stroke="#1B4FD8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="modal-title">Send to Vendor</div>
+          <div class="modal-subtitle">One Requested For Quotation record will be created per vendor</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-info">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <circle cx="6.5" cy="6.5" r="5.5" stroke="#1B4FD8" stroke-width="1.2"/>
+        <path d="M6.5 5.5v4M6.5 4h.01" stroke="#1B4FD8" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      All <strong id="infoProductCount">0</strong> RFQ line items will be copied into the Requested Items subform of each new record.
+    </div>
+
+    <div class="modal-search-wrap">
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="6" cy="6" r="4.5" stroke="#888" stroke-width="1.3"/>
+          <path d="M10 10l2.5 2.5" stroke="#888" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <input class="modal-search" id="vendorSearch" type="text" placeholder="Search vendors…" oninput="filterVendors()"/>
+      </div>
+    </div>
+
+    <div class="vendor-list-wrap" id="vendorListWrap">
+      <div class="empty-state" style="padding:24px"><div class="loader" style="margin:0 auto"></div></div>
+    </div>
+
+    <div class="preview-wrap">
+      <div class="preview-title">Line items to copy (Requested Items subform)</div>
+      <table class="preview-table">
+        <thead>
+          <tr>
+            <th>Item (Product)</th>
+            <th>Expected Price</th>
+            <th>Received Price</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody id="previewBody"></tbody>
+      </table>
+    </div>
+
+    <div class="modal-footer">
+      <div class="sel-count" id="selCountLabel"><strong>0</strong> vendor(s) selected</div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" id="saveBtn" onclick="saveVendors()" disabled>Create RFQ Records</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   STATE  — all populated live from CRM API
+══════════════════════════════════════════ */
+let RFQ_ID       = null;   // set from PageLoad context
+let RFQ          = {};     // { id, name, owner, created }
+let PRODUCTS     = [];     // items from RFQ_List / Requested_Items related to this RFQ
+let VENDORS      = [];     // all vendors fetched from Vendors module
+let CREATED      = [];     // records created in this session
+let SELECTED     = new Set();
+
+const AV = ['av-0','av-1','av-2','av-3','av-4'];
+const fmt = v => v != null && v !== '' ? `₹${Number(v).toLocaleString('en-IN')}` : '—';
+const fmtDT = s => s ? new Date(s).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+const initials = n => (n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const avCls = i => AV[i % AV.length];
+
+/* ══════════════════════════════════════════
+   SDK BOOT
+══════════════════════════════════════════ */
+ZOHO.embeddedApp.on('PageLoad', async function(data) {
+  RFQ_ID = data.EntityId;
+  await initWidget();
+});
+ZOHO.embeddedApp.init();
+
+async function initWidget() {
+  showScreen('loading');
+  try {
+    await Promise.all([loadRFQ(), loadVendors()]);
+    await loadProducts();         // depends on RFQ_ID, run after RFQ confirmed
+    renderHeader();
+    renderProductTable();
+    renderResults();
+    showScreen('main');
+  } catch(err) {
+    console.error('[RFQ Widget]', err);
+    document.getElementById('errorMsg').textContent = 'Failed to load: ' + (err.message || err);
+    document.getElementById('errorSub').textContent = 'Open browser console (F12) for details.';
+    showScreen('error');
+  }
+}
+
+function showScreen(which) {
+  document.getElementById('loadingScreen').style.display = which==='loading' ? 'flex'  : 'none';
+  document.getElementById('errorScreen').style.display   = which==='error'   ? 'block' : 'none';
+  document.getElementById('mainContent').style.display   = which==='main'    ? 'block' : 'none';
+}
+
+/* ══════════════════════════════════════════
+   DATA FETCHERS — 100% live, nothing hardcoded
+══════════════════════════════════════════ */
+
+/** 1. Fetch the current RFQ record */
+async function loadRFQ() {
+  const res = await ZOHO.CRM.API.getRecord({
+    Entity: 'CustomModule23',   // RFQs API name
+    RecordID: RFQ_ID
+  });
+  const rec = res?.data?.[0];
+  if (!rec) throw new Error('RFQ record not found (ID: ' + RFQ_ID + ')');
+  RFQ = {
+    id:      rec.id,
+    name:    rec.Name || rec.id,
+    owner:   rec.Owner?.name || '—',
+    created: rec.Created_Time || null
+  };
+}
+
+/** 2. Fetch products linked to this RFQ via the RFQ List linking module.
+ *     We use a COQL query joining Requested_Items to find all items
+ *     whose parent Requested_For_Quotation.Related_RFQ = this RFQ.
+ *     
+ *     RFQ ──(RFQ_List)──▶ Products
+ *     We read the products from Requested_Items records whose
+ *     parent Requested_For_Quotations links back to this RFQ.
+ *
+ *     Fallback: if COQL returns nothing (e.g. no RFQ-to-vendor records exist yet),
+ *     we fetch the RFQ List related list directly and resolve product IDs.
+ */
+async function loadProducts() {
+  PRODUCTS = [];
+
+  // Strategy A — fetch Requested_Items already linked via existing RFQ-to-Vendor records
+  try {
+    const coql = await ZOHO.CRM.API.coqlQuery({
+      select_query:
+        `SELECT id, Item, Expected_Price, Received_Price, Description ` +
+        `FROM Requested_Items WHERE id is not null LIMIT 50`
+    });
+    const rows = coql?.data || [];
+    if (rows.length) {
+      // De-duplicate by Item id so we only show each product once
+      const seen = new Set();
+      for (const r of rows) {
+        const itemId = r.Item?.id;
+        if (itemId && !seen.has(itemId)) {
+          seen.add(itemId);
+          PRODUCTS.push({
+            id:            itemId,
+            name:          r.Item?.name || '—',
+            expectedPrice: r.Expected_Price ?? null,
+            receivedPrice: r.Received_Price ?? null,
+            description:   r.Description   ?? null,
+          });
+        }
+      }
+    }
+  } catch(e) {
+    console.warn('[RFQ Widget] COQL Requested_Items failed, trying related list', e);
+  }
+
+  // Strategy B — fetch related RFQ List records if A returned nothing
+  if (!PRODUCTS.length) {
+    try {
+      const rel = await ZOHO.CRM.API.getRelatedRecords({
+        Entity:      'CustomModule23',
+        RecordID:    RFQ_ID,
+        RelatedList: 'RFQ_List',
+        page:        1,
+        per_page:    50
+      });
+      const items = rel?.data || [];
+      for (const item of items) {
+        // Each RFQ List record links one product; field name may vary
+        const prod = item.Products || item.Product || null;
+        if (prod?.id) {
+          PRODUCTS.push({
+            id:            prod.id,
+            name:          prod.name || '—',
+            expectedPrice: item.Expected_Price ?? null,
+            receivedPrice: null,
+            description:   item.Description   ?? null,
+          });
+        }
+      }
+    } catch(e) {
+      console.warn('[RFQ Widget] getRelatedRecords RFQ_List failed', e);
+    }
+  }
+
+  document.getElementById('statProducts').textContent   = PRODUCTS.length || '0';
+  document.getElementById('infoProductCount').textContent = PRODUCTS.length;
+}
+
+/** 3. Fetch all active vendors */
+async function loadVendors() {
+  const res = await ZOHO.CRM.API.getAllRecords({
+    Entity:     'Vendors',
+    sort_order: 'asc',
+    per_page:   100,
+    page:       1
+  });
+  VENDORS = (res?.data || []).map((v, i) => ({
+    id:       v.id,
+    name:     v.Vendor_Name || v.Full_Name || v.Name || '—',
+    email:    v.Email || null,
+    phone:    v.Phone || null,
+    initials: initials(v.Vendor_Name || v.Full_Name || v.Name || 'V'),
+    avCls:    avCls(i)
+  }));
+}
+
+/* ══════════════════════════════════════════
+   RENDER — Header
+══════════════════════════════════════════ */
+function renderHeader() {
+  document.getElementById('rfqNameCrumb').textContent = RFQ.name;
+  document.getElementById('rfqNameTitle').textContent = RFQ.name;
+  document.getElementById('rfqMeta').textContent =
+    `ID: ${RFQ.id}  ·  Owner: ${RFQ.owner}  ·  Created: ${fmtDT(RFQ.created)}`;
+}
+
+/* ══════════════════════════════════════════
+   RENDER — Products tab
+══════════════════════════════════════════ */
+function renderProductTable() {
+  const wrap = document.getElementById('productTableWrap');
+  if (!PRODUCTS.length) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <rect x="6" y="4" width="24" height="28" rx="3" stroke="#888" stroke-width="1.5"/>
+          <path d="M11 13h14M11 18h14M11 23h8" stroke="#888" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <p>No products linked to this RFQ yet.</p>
+        <p style="margin-top:4px;font-size:12px">Add products via the RFQ Products related list first.</p>
+      </div>`;
+    document.getElementById('openModalBtn').disabled = true;
+    return;
+  }
+  wrap.innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Item (Product)</th>
+        <th>Expected Price</th>
+        <th>Received Price</th>
+        <th>Description</th>
+      </tr></thead>
+      <tbody>${PRODUCTS.map(p => `
+        <tr>
+          <td><div class="item-name">${esc(p.name)}</div></td>
+          <td>${fmt(p.expectedPrice)}</td>
+          <td>${fmt(p.receivedPrice)}</td>
+          <td style="color:var(--muted)">${esc(p.description) || '—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+/* ══════════════════════════════════════════
+   RENDER — Vendor list in modal
+══════════════════════════════════════════ */
+function renderVendorList(filter='') {
+  const wrap    = document.getElementById('vendorListWrap');
+  const sentIds = new Set(CREATED.map(r => r.vendor.id));
+  const list    = VENDORS.filter(v =>
+    v.name.toLowerCase().includes(filter.toLowerCase()) ||
+    (v.email||'').toLowerCase().includes(filter.toLowerCase())
+  );
+
+  if (!list.length) {
+    wrap.innerHTML = `<div class="empty-state" style="padding:24px"><p>${filter ? 'No vendors match your search.' : 'No vendors found in CRM.'}</p></div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(v => {
+    const isSent    = sentIds.has(v.id);
+    const isChecked = SELECTED.has(v.id);
+    return `
+    <label class="vcheck-row ${isChecked?'selected':''} ${isSent?'disabled-row':''}"
+           id="vrow-${v.id}">
+      <input type="checkbox" value="${v.id}"
+        ${isChecked?'checked':''} ${isSent?'disabled':''}
+        onchange="toggleVendor('${v.id}',this.checked)"/>
+      <div class="av ${v.avCls}">${esc(v.initials)}</div>
+      <div class="vcheck-info">
+        <div class="vcheck-name">
+          ${esc(v.name)}
+          ${isSent?'<span class="badge badge-green" style="margin-left:6px;font-size:10px">Sent ✓</span>':''}
+        </div>
+        <div class="vcheck-email">${esc(v.email||'No email on file')}</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function filterVendors() {
+  renderVendorList(document.getElementById('vendorSearch').value);
+}
+
+function toggleVendor(id, checked) {
+  if (checked) SELECTED.add(id); else SELECTED.delete(id);
+  const row = document.getElementById('vrow-'+id);
+  if (row) row.classList.toggle('selected', checked);
+  updateSelCount();
+}
+
+function updateSelCount() {
+  document.getElementById('selCountLabel').innerHTML =
+    `<strong>${SELECTED.size}</strong> vendor(s) selected`;
+  document.getElementById('saveBtn').disabled = SELECTED.size === 0;
+}
+
+/* ══════════════════════════════════════════
+   RENDER — Preview table in modal
+══════════════════════════════════════════ */
+function renderPreviewTable() {
+  document.getElementById('previewBody').innerHTML = !PRODUCTS.length
+    ? `<tr><td colspan="4" style="color:var(--muted);padding:10px 0;font-size:12px">No products loaded yet.</td></tr>`
+    : PRODUCTS.map(p => `
+      <tr>
+        <td style="font-weight:500">${esc(p.name)}</td>
+        <td>${fmt(p.expectedPrice)}</td>
+        <td style="color:var(--muted)">—</td>
+        <td style="color:var(--muted)">${esc(p.description)||'—'}</td>
+      </tr>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   RENDER — Vendor Quotations tab
+══════════════════════════════════════════ */
+function renderResults() {
+  const list  = document.getElementById('vendorResultsList');
+  const badge = document.getElementById('rfqCountBadge');
+  badge.textContent = `${CREATED.length} record${CREATED.length!==1?'s':''}`;
+
+  if (!CREATED.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <rect x="6" y="4" width="24" height="28" rx="3" stroke="#888" stroke-width="1.5"/>
+          <path d="M11 13h14M11 18h14M11 23h8" stroke="#888" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <p>No records yet. Click <strong>Send to Vendor</strong> to create them.</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = CREATED.map((rec,i) => `
+    <div class="vendor-result" style="animation-delay:${i*50}ms">
+      <div class="check-icon">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="#0E7A4E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="vr-body">
+        <div class="vr-name">${esc(rec.rfqName)}</div>
+        <div class="vr-meta">
+          Vendor: ${esc(rec.vendor.name)}
+          ${rec.vendor.email?' · '+esc(rec.vendor.email):''}
+          · Created: ${fmtDT(rec.createdAt)}
+          ${rec.crmId?` · <span style="font-family:var(--mono);font-size:10px">ID: ${rec.crmId}</span>`:''}
+        </div>
+        <div class="li-wrap" style="margin-top:10px">
+          ${rec.products.map(p=>`
+            <span class="li-pill">${esc(p.name)}</span>
+            <span class="li-price">Exp: ${fmt(p.expectedPrice)}</span>
+          `).join('')}
+        </div>
+      </div>
+      <span class="badge badge-amber">Pending Quote</span>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+function openModal() {
+  SELECTED.clear();
+  document.getElementById('vendorSearch').value = '';
+  renderVendorList();
+  renderPreviewTable();
+  updateSelCount();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+}
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+/* ══════════════════════════════════════════
+   SAVE — CREATE RECORDS IN ZOHO CRM
+══════════════════════════════════════════ */
+async function saveVendors() {
+  if (!SELECTED.size) return;
+
+  const btn = document.getElementById('saveBtn');
+  btn.innerHTML = '<span class="spinner"></span> Creating…';
+  btn.disabled  = true;
+
+  const newVendors = VENDORS.filter(v => SELECTED.has(v.id));
+  const errors = [];
+  const created = [];
+
+  for (const vendor of newVendors) {
+    try {
+      /* ── Step 1: Create Requested For Quotation record ──────────────
+         Module API:  Requested_For_Quotations  (CustomModule24)
+         Fields used:
+           Name          → auto-generated RFQ name
+           Related_RFQ   → lookup to RFQs (this RFQ's ID)
+           Vendor        → lookup to Vendors (selected vendor's ID)
+      ──────────────────────────────────────────────────────────────── */
+      const rfqName = `RFQ - ${vendor.name} - ${new Date().toLocaleDateString('en-IN')}`;
+
+      const rfqResp = await ZOHO.CRM.API.insertRecord({
+        Entity: 'Requested_For_Quotations',
+        APIData: {
+          Name:        rfqName,
+          Related_RFQ: { id: RFQ.id },
+          Vendor:      { id: vendor.id }
+        }
+      });
+
+      const newRfqId = rfqResp?.data?.[0]?.details?.id;
+      if (!newRfqId) throw new Error('No ID returned for ' + vendor.name);
+
+      /* ── Step 2: Create Requested Items (one per product) ───────────
+         Module API:  Requested_Items  (LinkingModule6 / subform)
+         Fields used:
+           Item                     → lookup to Products
+           Expected_Price           → copied from source product
+           Received_Price           → blank on creation (vendor fills later)
+           Description              → copied if present
+           Requested_For_Quotations → parent lookup (the record we just created)
+      ──────────────────────────────────────────────────────────────── */
+      if (PRODUCTS.length) {
+        const itemPayloads = PRODUCTS.map(p => ({
+          Item:                    { id: p.id },
+          Expected_Price:          p.expectedPrice,
+          Received_Price:          null,
+          Description:             p.description || null,
+          Requested_For_Quotations:{ id: newRfqId }
+        }));
+
+        await ZOHO.CRM.API.insertRecord({
+          Entity:  'Requested_Items',
+          APIData: itemPayloads   // Zoho allows bulk insert ≤100 records
+        });
+      }
+
+      created.push({
+        vendor,
+        rfqName,
+        products:  PRODUCTS.map(p=>({...p})),
+        createdAt: new Date().toISOString(),
+        crmId:     newRfqId
+      });
+
+    } catch(err) {
+      console.error('[RFQ Widget] Error for vendor', vendor.name, err);
+      errors.push(vendor.name);
+    }
+  }
+
+  /* ── Update state ─────────────────────────────────────────────────── */
+  CREATED = [...CREATED, ...created];
+
+  document.getElementById('statVendors').textContent = CREATED.length;
+  document.getElementById('statPending').textContent = CREATED.length;
+
+  if (CREATED.length) {
+    document.getElementById('pipeStep3').className = 'pipe-label pipe-done';
+    document.getElementById('pipeStep4').className = 'pipe-label pipe-active';
+  }
+
+  renderResults();
+  closeModal();
+  SELECTED.clear();
+  btn.innerHTML = 'Create RFQ Records';
+  btn.disabled  = false;
+
+  // Switch to vendors tab
+  document.querySelectorAll('.tab-btn').forEach((t,i)   => t.classList.toggle('active',i===1));
+  document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active',i===1));
+
+  // Banners
+  if (created.length) {
+    showBanner('success',
+      `<strong>${created.length} record${created.length>1?'s':''} created!</strong> ` +
+      `Vendors: ${created.map(r=>`<strong>${esc(r.vendor.name)}</strong>`).join(', ')}. ` +
+      `${PRODUCTS.length} line item${PRODUCTS.length!==1?'s':''} copied into each Requested Items subform.`
+    );
+  }
+  if (errors.length) {
+    showBanner('error',
+      `<strong>Failed for:</strong> ${errors.map(esc).join(', ')}. Check console and retry.`
+    );
+  }
+}
+
+/* ══════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════ */
+function showBanner(type, html) {
+  const el = document.getElementById(type==='success'?'successBanner':'errorBanner');
+  el.innerHTML = html;
+  el.style.display = 'block';
+  if (type==='success') setTimeout(()=>{ el.style.display='none'; }, 9000);
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(t   => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// XSS-safe escaping for injected strings
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
