@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Edit Contacts</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1f36;padding:16px;font-size:13px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+
+/* HEADER */
+.card-head{background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:13px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:14px;font-weight:600;color:#1a1f36;display:flex;align-items:center;gap:8px}
+.head-right{display:flex;align-items:center;gap:8px}
+.badge{border-radius:20px;font-size:11px;font-weight:600;padding:2px 10px}
+.badge-gray{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+.badge-orange{background:#fff7ed;color:#ea580c;border:1px solid #fed7aa}
+
+/* COL HEADERS */
+.col-heads{display:grid;grid-template-columns:24px 1fr 1fr 1.5fr 1.2fr 60px;gap:6px;padding:9px 20px;border-bottom:1px solid #e2e8f0;background:#fafbfc}
+.col-heads span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b}
+
+/* ROWS */
+.rows{padding:8px 20px;display:flex;flex-direction:column;gap:5px;max-height:450px;overflow-y:auto}
+.rows::-webkit-scrollbar{width:5px}
+.rows::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:3px}
+
+.row{display:grid;grid-template-columns:24px 1fr 1fr 1.5fr 1.2fr 60px;gap:6px;align-items:center;padding:2px 0;border-radius:6px}
+.row:hover{background:#fafbfc}
+
+/* STATUS DOT */
+.status-wrap{display:flex;align-items:center;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%;transition:background .2s}
+.dot-clean{background:#22c55e}
+.dot-modified{background:#f59e0b}
+
+.row input{width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s,box-shadow .15s,background .15s}
+.row input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.row input.modified{border-color:#f59e0b;background:#fffbeb}
+.row input.err{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.08)}
+.row input::placeholder{color:#94a3b8}
+.row input[readonly]{background:#f8fafc;color:#64748b;cursor:default;border-color:transparent}
+
+/* ROW ACTIONS */
+.row-acts{display:flex;gap:3px;justify-content:flex-end}
+.icon-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid transparent;border-radius:6px;cursor:pointer;color:#94a3b8;transition:all .15s}
+.icon-btn:hover.undo{background:#fff7ed;color:#d97706;border-color:#fde68a}
+.icon-btn:hover.open{background:#eff6ff;color:#3b82f6;border-color:#bfdbfe}
+
+/* LOADING */
+.loading-wrap{padding:40px 20px;text-align:center;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:12px}
+.loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
+
+/* EMPTY */
+.empty-wrap{padding:36px 20px;text-align:center;color:#94a3b8}
+.empty-wrap p{font-size:13px;margin-top:8px}
+
+/* LEGEND */
+.legend{display:flex;gap:14px;padding:6px 20px 10px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b}
+.leg-dot{width:7px;height:7px;border-radius:50%}
+
+/* FOOTER */
+.card-foot{padding:12px 20px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;gap:12px;flex-wrap:wrap}
+.foot-left{font-size:11px;color:#64748b;line-height:1.6}
+.foot-left b{color:#f59e0b}
+.foot-right{display:flex;gap:8px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
+.btn-primary{background:#3b82f6;color:#fff}
+.btn-primary:hover:not(:disabled){background:#2563eb}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:none;border:1px solid #e2e8f0;color:#64748b}
+.btn-ghost:hover{background:#f1f5f9;color:#1a1f36}
+
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.btn-primary.loading .spin{display:block}
+.btn-primary.loading .lbl{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;pointer-events:none}
+.toast.ok{background:#15803d}.toast.er{background:#dc2626}.toast.info{background:#2563eb}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* SUCCESS */
+.success{display:none;text-align:center;padding:40px 20px}
+.success.show{display:block}
+.success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.success h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:6px}
+.success p{font-size:12px;color:#64748b;margin-bottom:18px}
+</style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+  <div class="card-head">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4.5" r="2.5" stroke="#f59e0b" stroke-width="1.4"/><path d="M1 14c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5" stroke="#f59e0b" stroke-width="1.4" stroke-linecap="round"/><path d="M11.5 7l1 1-3 3-1.5.5.5-1.5 3-3z" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Edit Contacts
+    </div>
+    <div class="head-right">
+      <div class="badge badge-orange" id="modBadge" style="display:none">0 modified</div>
+      <div class="badge badge-gray" id="totalBadge">Loading...</div>
+      <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="loadContacts()">↺ Refresh</button>
+    </div>
+  </div>
+
+  <div class="col-heads">
+    <span></span>
+    <span>First Name</span>
+    <span>Last Name <span style="color:#ef4444">*</span></span>
+    <span>Email</span>
+    <span>Phone</span>
+    <span>Actions</span>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-wrap" id="loadingWrap">
+    <div class="loader"></div>
+    <span>Loading contacts...</span>
+  </div>
+
+  <!-- ROWS -->
+  <div class="rows" id="rows" style="display:none"></div>
+
+  <!-- EMPTY -->
+  <div class="empty-wrap" id="emptyWrap" style="display:none">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="15" cy="11" r="6" stroke="#cbd5e1" stroke-width="1.5"/><path d="M3 32c0-6.6 5.4-10.5 12-10.5S27 25.4 27 32" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <p>No contacts linked to this account yet.</p>
+  </div>
+
+  <div class="legend" id="legend" style="display:none">
+    <div class="leg"><div class="leg-dot" style="background:#22c55e"></div> No changes</div>
+    <div class="leg"><div class="leg-dot" style="background:#f59e0b"></div> Modified — will be saved</div>
+  </div>
+
+  <div class="card-foot" id="cardFoot" style="display:none">
+    <div class="foot-left" id="footInfo">No pending changes</div>
+    <div class="foot-right">
+      <button class="btn btn-ghost" onclick="undoAll()">↺ Undo All</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveChanges()">
+        <div class="spin"></div>
+        <span class="lbl">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" style="margin-right:3px;vertical-align:-1px"><path d="M1.5 5.5l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Save Changes
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="success" id="successDiv">
+  <div class="success-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <h3 id="successMsg">Changes saved!</h3>
+  <p id="successSub"></p>
+  <button class="btn btn-primary" style="margin:0 auto" onclick="reload()">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none" style="margin-right:3px;vertical-align:-1px"><path d="M1 5.5A4.5 4.5 0 009.5 8M10 5.5A4.5 4.5 0 001.5 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Back to Edit
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
+<script>
+var accountId = null;
+var contacts  = []; // { id, fn, ln, em, ph, orig:{fn,ln,em,ph}, rid }
+var rowIdx    = 0;
+
+/* ═══ INIT ═══ */
+ZOHO.embeddedApp.on("PageLoad", function(data) {
+  var raw = data.EntityId;
+  accountId = String(Array.isArray(raw) ? raw[0] : raw);
+  loadContacts();
+});
+ZOHO.embeddedApp.init();
+
+/* ═══ LOAD ═══ */
+function loadContacts() {
+  showState('loading');
+  contacts = [];
+  rowIdx   = 0;
+
+  ZOHO.CRM.API.getAllRecords({
+    Entity: "Contacts",
+    sort_order: "asc",
+    per_page: 100,
+    page: 1
+  }).then(function(res) {
+    var all = (res && res.data) ? res.data : [];
+    var linked = all.filter(function(c) {
+      return c.Account_Name && String(c.Account_Name.id) === String(accountId);
+    });
+
+    linked.forEach(function(c) {
+      var orig = { fn: c.First_Name||'', ln: c.Last_Name||'', em: c.Email||'', ph: c.Phone||'' };
+      contacts.push({ id:c.id, fn:orig.fn, ln:orig.ln, em:orig.em, ph:orig.ph, orig:orig, rid:null });
+    });
+
+    renderAll();
+    showState(contacts.length ? 'rows' : 'empty');
+  }).catch(function(err) {
+    console.error(err);
+    showState('empty');
+    showToast('Failed to load contacts', 'er');
+  });
+}
+
+/* ═══ RENDER ═══ */
+function renderAll() {
+  var container = document.getElementById('rows');
+  container.innerHTML = '';
+  rowIdx = 0;
+
+  contacts.forEach(function(c, idx) {
+    rowIdx++;
+    var rid = rowIdx;
+    c.rid = rid;
+
+    var div = document.createElement('div');
+    div.className = 'row';
+    div.id = 'row-' + rid;
+    div.dataset.idx = idx;
+    div.innerHTML =
+      '<div class="status-wrap"><div class="dot dot-clean" id="dot-' + rid + '"></div></div>' +
+      '<input type="text"  placeholder="First name"        id="fn-'+rid+'" value="'+esc(c.fn)+'" oninput="onChange('+rid+','+idx+')">' +
+      '<input type="text"  placeholder="Last name"         id="ln-'+rid+'" value="'+esc(c.ln)+'" oninput="onChange('+rid+','+idx+')">' +
+      '<input type="email" placeholder="email@example.com" id="em-'+rid+'" value="'+esc(c.em)+'" oninput="onChange('+rid+','+idx+')">' +
+      '<input type="tel"   placeholder="+91 98765 43210"   id="ph-'+rid+'" value="'+esc(c.ph)+'" oninput="onChange('+rid+','+idx+')">' +
+      '<div class="row-acts">' +
+        '<button class="icon-btn undo" onclick="undoRow('+rid+','+idx+')" title="Undo this row">' +
+          '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4H7a3 3 0 010 6H3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M4 2L2 4l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '</button>' +
+        '<button class="icon-btn open" onclick="openRecord(\''+c.id+'\')" title="Open contact record">' +
+          '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8 1h3m0 0v3m0-3L5.5 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '</button>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  updateBadges();
+  updateFooter();
+  document.getElementById('totalBadge').textContent = contacts.length + ' contact' + (contacts.length !== 1 ? 's' : '');
+}
+
+/* ═══ INPUT CHANGE ═══ */
+function onChange(rid, idx) {
+  var c = contacts[idx];
+  c.fn = val('fn-'+rid);
+  c.ln = val('ln-'+rid);
+  c.em = val('em-'+rid);
+  c.ph = val('ph-'+rid);
+
+  var mod = isModified(c);
+  document.getElementById('dot-'+rid).className = 'dot ' + (mod ? 'dot-modified' : 'dot-clean');
+
+  ['fn','ln','em','ph'].forEach(function(f) {
+    var el = document.getElementById(f+'-'+rid);
+    if (el) el.classList.toggle('modified', c[f] !== c.orig[f]);
+  });
+
+  document.getElementById('ln-'+rid).classList.remove('err');
+  updateBadges();
+  updateFooter();
+}
+
+/* ═══ UNDO ROW ═══ */
+function undoRow(rid, idx) {
+  var c = contacts[idx];
+  c.fn = c.orig.fn; c.ln = c.orig.ln; c.em = c.orig.em; c.ph = c.orig.ph;
+  set('fn-'+rid, c.fn); set('ln-'+rid, c.ln); set('em-'+rid, c.em); set('ph-'+rid, c.ph);
+  ['fn','ln','em','ph'].forEach(function(f) {
+    var el = document.getElementById(f+'-'+rid);
+    if (el) el.classList.remove('modified','err');
+  });
+  document.getElementById('dot-'+rid).className = 'dot dot-clean';
+  updateBadges(); updateFooter();
+  showToast('Row reset to original', 'info');
+}
+
+/* ═══ UNDO ALL ═══ */
+function undoAll() {
+  contacts.forEach(function(c) { undoRow(c.rid, contacts.indexOf(c)); });
+  showToast('All changes undone', 'info');
+}
+
+/* ═══ SAVE ═══ */
+function saveChanges() {
+  var toSave = contacts.filter(isModified);
+  if (!toSave.length) { showToast('No changes to save', 'info'); return; }
+
+  // Validate
+  var hasErr = false;
+  toSave.forEach(function(c) {
+    if (!c.ln) {
+      var el = document.getElementById('ln-'+c.rid);
+      if (el) el.classList.add('err');
+      hasErr = true;
+    }
+  });
+  if (hasErr) { showToast('Last Name is required', 'er'); return; }
+
+  var btn = document.getElementById('saveBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  var done = 0, ok = 0, total = toSave.length;
+
+  toSave.forEach(function(c) {
+    var payload = { id: c.id, Last_Name: c.ln, First_Name: c.fn, Email: c.em, Phone: c.ph };
+    ZOHO.CRM.API.updateRecord({ Entity: 'Contacts', APIData: payload })
+      .then(function(res) {
+        done++;
+        if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
+          ok++;
+          // Update original so dot resets
+          c.orig = { fn:c.fn, ln:c.ln, em:c.em, ph:c.ph };
+        }
+        if (done === total) finish(ok, total - ok);
+      })
+      .catch(function(err) {
+        done++; console.error(err);
+        if (done === total) finish(ok, total - ok);
+      });
+  });
+}
+
+function finish(ok, fail) {
+  var btn = document.getElementById('saveBtn');
+  btn.classList.remove('loading'); btn.disabled = false;
+
+  if (ok > 0 && fail === 0) {
+    document.getElementById('mainCard').style.display = 'none';
+    document.getElementById('successMsg').textContent = ok + ' contact' + (ok>1?'s':'') + ' updated successfully!';
+    document.getElementById('successSub').textContent = 'All changes have been saved to Zoho CRM.';
+    document.getElementById('successDiv').classList.add('show');
+    try { ZOHO.CRM.UI.Popup.closeReload(); } catch(e) {}
+  } else if (ok > 0) {
+    showToast(ok + ' saved, ' + fail + ' failed', 'er');
+    // Reset successful ones
+    updateBadges(); updateFooter();
+  } else {
+    showToast('Save failed. Please try again.', 'er');
+  }
+}
+
+/* ═══ OPEN RECORD ═══ */
+function openRecord(id) {
+  ZOHO.CRM.UI.Record.open({ Entity: 'Contacts', RecordID: id });
+}
+
+/* ═══ HELPERS ═══ */
+function isModified(c) {
+  return c.fn!==c.orig.fn || c.ln!==c.orig.ln || c.em!==c.orig.em || c.ph!==c.orig.ph;
+}
+
+function updateBadges() {
+  var n = contacts.filter(isModified).length;
+  var mb = document.getElementById('modBadge');
+  mb.textContent = n + ' modified';
+  mb.style.display = n ? '' : 'none';
+}
+
+function updateFooter() {
+  var n = contacts.filter(isModified).length;
+  document.getElementById('footInfo').innerHTML = n
+    ? '<b>' + n + '</b> contact' + (n>1?'s':'') + ' modified — click Save to apply'
+    : 'No pending changes';
+}
+
+function showState(s) {
+  document.getElementById('loadingWrap').style.display = s==='loading' ? '' : 'none';
+  document.getElementById('rows').style.display        = s==='rows'    ? '' : 'none';
+  document.getElementById('emptyWrap').style.display   = s==='empty'   ? '' : 'none';
+  document.getElementById('legend').style.display      = s==='rows'    ? '' : 'none';
+  document.getElementById('cardFoot').style.display    = s==='rows'    ? '' : 'none';
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type||'ok') + ' show';
+  setTimeout(function() { t.className='toast'; }, 3000);
+}
+
+function reload() {
+  document.getElementById('successDiv').classList.remove('show');
+  document.getElementById('mainCard').style.display = '';
+  loadContacts();
+}
+
+function val(id) { var e=document.getElementById(id); return e?e.value.trim():''; }
+function set(id,v){ var e=document.getElementById(id); if(e) e.value=v; }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+</script>
+</body>
+</html>
