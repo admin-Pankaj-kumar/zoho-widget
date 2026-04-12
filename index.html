@@ -3,78 +3,162 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Create Contacts</title>
+<title>Manage Contacts</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1f36;padding:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1f36;padding:16px;font-size:13px}
+
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-.card-head{background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-.card-title{font-size:15px;font-weight:600;color:#1a1f36;display:flex;align-items:center;gap:8px}
-.badge{background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;border-radius:20px;font-size:11px;font-weight:600;padding:2px 10px}
-.col-heads{display:grid;grid-template-columns:1fr 1fr 1.5fr 1.2fr 40px;gap:8px;padding:10px 20px;border-bottom:1px solid #e2e8f0;background:#fafbfc}
-.col-heads span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b}
-.rows{padding:10px 20px;display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto}
-.row{display:grid;grid-template-columns:1fr 1fr 1.5fr 1.2fr 40px;gap:8px;align-items:center}
-.row input{width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s,box-shadow .15s}
-.row input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
-.row input.err{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+
+/* HEADER */
+.card-head{background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:13px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:14px;font-weight:600;color:#1a1f36;display:flex;align-items:center;gap:8px}
+.head-badges{display:flex;gap:6px;align-items:center}
+.badge{border-radius:20px;font-size:11px;font-weight:600;padding:2px 10px}
+.badge-blue{background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe}
+.badge-green{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.badge-orange{background:#fff7ed;color:#ea580c;border:1px solid #fed7aa}
+
+/* COL HEADERS */
+.col-heads{display:grid;grid-template-columns:22px 1fr 1fr 1.5fr 1.2fr 70px;gap:6px;padding:9px 20px;border-bottom:1px solid #e2e8f0;background:#fafbfc}
+.col-heads span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b}
+
+/* ROWS */
+.rows{padding:8px 20px;display:flex;flex-direction:column;gap:5px;max-height:420px;overflow-y:auto}
+.rows::-webkit-scrollbar{width:5px}
+.rows::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:3px}
+
+.row{display:grid;grid-template-columns:22px 1fr 1fr 1.5fr 1.2fr 70px;gap:6px;align-items:center;padding:3px 0;border-radius:6px;transition:background .1s}
+.row:hover{background:#fafbfc}
+
+/* STATUS DOT */
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin:auto}
+.dot-existing{background:#22c55e}
+.dot-new{background:#3b82f6}
+.dot-modified{background:#f59e0b}
+
+.row input{width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s,box-shadow .15s}
+.row input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.row input.modified{border-color:#f59e0b;background:#fffbeb}
+.row input.err{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.08)}
 .row input::placeholder{color:#94a3b8}
-.del{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid transparent;border-radius:8px;cursor:pointer;color:#94a3b8;transition:all .15s;flex-shrink:0}
-.del:hover{background:#fef2f2;color:#ef4444;border-color:#fecaca}
-.add-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 40px);margin:8px 20px 12px;padding:9px;border:1.5px dashed #cbd5e1;border-radius:8px;background:none;font-size:13px;color:#64748b;cursor:pointer;transition:all .15s;font-family:inherit}
+
+.row-actions{display:flex;gap:4px;justify-content:flex-end}
+.icon-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid transparent;border-radius:6px;cursor:pointer;color:#94a3b8;transition:all .15s;flex-shrink:0}
+.icon-btn:hover.del-btn{background:#fef2f2;color:#ef4444;border-color:#fecaca}
+.icon-btn:hover.undo-btn{background:#fffbeb;color:#d97706;border-color:#fde68a}
+
+/* LOADING */
+.loading-state{padding:32px 20px;text-align:center;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:10px}
+.loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
+
+/* EMPTY */
+.empty-state{padding:28px 20px;text-align:center;color:#94a3b8}
+.empty-state p{font-size:13px;margin-top:6px}
+
+/* ADD ROW BTN */
+.add-row-wrap{padding:6px 20px 10px}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:8px;border:1.5px dashed #cbd5e1;border-radius:8px;background:none;font-size:12px;color:#64748b;cursor:pointer;transition:all .15s;font-family:inherit}
 .add-btn:hover{border-color:#3b82f6;color:#3b82f6;background:#eff6ff}
-.card-foot{padding:14px 20px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
-.info{font-size:12px;color:#94a3b8}.info b{color:#3b82f6}
-.btns{display:flex;gap:10px}
-.save-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;background:#3b82f6;border:none;border-radius:9px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
-.save-btn:hover:not(:disabled){background:#2563eb}
-.save-btn:disabled{opacity:.55;cursor:not-allowed}
-.clear-btn{padding:10px 16px;background:none;border:1px solid #e2e8f0;border-radius:9px;font-size:13px;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s}
-.clear-btn:hover{background:#f1f5f9}
-.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
-.save-btn.loading .spin{display:block}
-.save-btn.loading .lbl{display:none}
+
+/* LEGEND */
+.legend{display:flex;align-items:center;gap:14px;padding:0 20px 10px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b}
+.legend-dot{width:7px;height:7px;border-radius:50%}
+
+/* FOOTER */
+.card-foot{padding:12px 20px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;flex-wrap:wrap;gap:8px}
+.foot-info{font-size:11px;color:#94a3b8;line-height:1.5}
+.foot-info b{color:#3b82f6}
+.btns{display:flex;gap:8px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
+.btn-primary{background:#3b82f6;color:#fff}
+.btn-primary:hover:not(:disabled){background:#2563eb}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-secondary{background:none;border:1px solid #e2e8f0;color:#64748b}
+.btn-secondary:hover{background:#f1f5f9;color:#1a1f36}
+
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.btn-primary.loading .spin{display:block}
+.btn-primary.loading .lbl{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;white-space:nowrap}
-.toast.ok{background:#15803d}.toast.er{background:#dc2626}
+
+/* TOAST */
+.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;white-space:nowrap;pointer-events:none}
+.toast.ok{background:#15803d}.toast.er{background:#dc2626}.toast.info{background:#2563eb}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.success{display:none;text-align:center;padding:40px 20px}
+
+/* SUCCESS */
+.success{display:none;text-align:center;padding:36px 20px}
 .success.show{display:block}
-.success-icon{width:56px;height:56px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-.success h3{font-size:16px;font-weight:600;color:#15803d;margin-bottom:8px}
-.success p{font-size:13px;color:#64748b;margin-bottom:20px}
-.debug{background:#1e293b;color:#94a3b8;font-family:monospace;font-size:11px;padding:8px 12px;margin:0 20px 12px;border-radius:6px;display:none;word-break:break-all}
+.success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.success h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:6px}
+.success p{font-size:12px;color:#64748b;margin-bottom:18px}
 </style>
 </head>
 <body>
+
 <div class="card" id="mainCard">
   <div class="card-head">
     <div class="card-title">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="7" cy="5" r="3" stroke="#3b82f6" stroke-width="1.5"/><path d="M1 16c0-3.3 2.7-5 6-5s6 1.7 6 5" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><path d="M14 4v4M12 6h4" stroke="#3b82f6" stroke-width="1.4" stroke-linecap="round"/></svg>
-      Add Contacts to Account
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4.5" r="2.5" stroke="#3b82f6" stroke-width="1.4"/><path d="M1 14c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5" stroke="#3b82f6" stroke-width="1.4" stroke-linecap="round"/><path d="M12.5 5v3.5M10.75 6.75H14.25" stroke="#3b82f6" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Manage Contacts
     </div>
-    <div class="badge" id="badge">1 contact</div>
+    <div class="head-badges">
+      <div class="badge badge-green" id="existingBadge" style="display:none">0 existing</div>
+      <div class="badge badge-blue" id="newBadge" style="display:none">0 new</div>
+      <div class="badge badge-orange" id="modifiedBadge" style="display:none">0 modified</div>
+    </div>
   </div>
+
   <div class="col-heads">
+    <span></span>
     <span>First Name</span>
     <span>Last Name <span style="color:#ef4444">*</span></span>
     <span>Email</span>
     <span>Phone</span>
-    <span></span>
+    <span>Actions</span>
   </div>
-  <div class="rows" id="rows"></div>
-  <button class="add-btn" onclick="addRow()">
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-    Add another contact
-  </button>
-  <div class="debug" id="debug"></div>
-  <div class="card-foot">
-    <div class="info">Creating <b id="cnt">1</b> contact(s) linked to this account</div>
+
+  <!-- LOADING -->
+  <div class="loading-state" id="loadingState">
+    <div class="loader"></div>
+    <span>Loading contacts...</span>
+  </div>
+
+  <!-- ROWS -->
+  <div class="rows" id="rows" style="display:none"></div>
+
+  <!-- EMPTY -->
+  <div class="empty-state" id="emptyState" style="display:none">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="13" cy="10" r="5" stroke="#cbd5e1" stroke-width="1.5"/><path d="M3 28c0-5.5 4.5-9 10-9s10 3.5 10 9" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <p>No contacts yet. Add your first contact below.</p>
+  </div>
+
+  <div class="add-row-wrap" id="addRowWrap" style="display:none">
+    <button class="add-btn" onclick="addNewRow()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Add new contact
+    </button>
+  </div>
+
+  <div class="legend" id="legend" style="display:none">
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Existing contact</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Modified</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> New contact</div>
+  </div>
+
+  <div class="card-foot" id="cardFoot" style="display:none">
+    <div class="foot-info" id="footInfo">Loading...</div>
     <div class="btns">
-      <button class="clear-btn" onclick="clearAll()">Clear All</button>
-      <button class="save-btn" id="saveBtn" onclick="saveContacts()">
+      <button class="btn btn-secondary" onclick="reloadContacts()">↺ Refresh</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveAll()">
         <div class="spin"></div>
-        <span class="lbl">Save Contacts</span>
+        <span class="lbl">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-right:3px;vertical-align:-1px"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Save All Changes
+        </span>
       </button>
     </div>
   </div>
@@ -82,11 +166,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <div class="success" id="successDiv">
   <div class="success-icon">
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M5 13l6 6L21 7" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   <h3 id="successMsg"></h3>
-  <p>Contacts have been created and linked to this account.</p>
-  <button class="save-btn" style="margin:0 auto" onclick="resetAll()">Add More Contacts</button>
+  <p id="successSub"></p>
+  <button class="btn btn-primary" style="margin:0 auto" onclick="reloadAll()">Done</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -95,168 +179,340 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 var accountId = null;
 var rowIdx = 0;
+// contacts: { id (null if new), fn, ln, em, ph, original: {fn,ln,em,ph} or null, deleted }
+var contacts = [];
 
-function showDebug(msg) {
-  var d = document.getElementById('debug');
-  d.style.display = 'block';
-  d.textContent = msg;
-}
-
+/* ---- INIT ---- */
 ZOHO.embeddedApp.on("PageLoad", function(data) {
-  console.log("Full PageLoad data:", JSON.stringify(data));
-
-  // Extract account ID - handles both string and array
   var rawId = data.EntityId;
-  if (Array.isArray(rawId)) {
-    accountId = String(rawId[0]);
-  } else {
-    accountId = String(rawId);
-  }
-
-  console.log("Resolved accountId:", accountId);
-  showDebug("Account ID: " + accountId);
+  accountId = String(Array.isArray(rawId) ? rawId[0] : rawId);
+  loadContacts();
 });
-
 ZOHO.embeddedApp.init();
 
-function addRow() {
-  rowIdx++;
-  var id = rowIdx;
-  var div = document.createElement('div');
-  div.className = 'row';
-  div.id = 'r' + id;
-  div.innerHTML =
-    '<input type="text" placeholder="First name" id="fn' + id + '">' +
-    '<input type="text" placeholder="Last name" id="ln' + id + '">' +
-    '<input type="email" placeholder="email@example.com" id="em' + id + '">' +
-    '<input type="tel" placeholder="+91 98765 43210" id="ph' + id + '">' +
-    '<button class="del" onclick="delRow(' + id + ')">' +
-      '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
-    '</button>';
-  document.getElementById('rows').appendChild(div);
-  updateCount();
-  document.getElementById('fn' + id).focus();
+/* ---- LOAD EXISTING CONTACTS ---- */
+function loadContacts() {
+  showState('loading');
+  contacts = [];
+
+  ZOHO.CRM.API.getAllRecords({
+    Entity: "Contacts",
+    sort_order: "asc",
+    per_page: 100,
+    page: 1
+  }).then(function(res) {
+    var all = (res && res.data) ? res.data : [];
+    // Filter contacts belonging to this account
+    var linked = all.filter(function(c) {
+      return c.Account_Name && c.Account_Name.id && String(c.Account_Name.id) === String(accountId);
+    });
+
+    linked.forEach(function(c) {
+      contacts.push({
+        id: c.id,
+        fn: c.First_Name || '',
+        ln: c.Last_Name || '',
+        em: c.Email || '',
+        ph: c.Phone || '',
+        original: { fn: c.First_Name || '', ln: c.Last_Name || '', em: c.Email || '', ph: c.Phone || '' },
+        isNew: false,
+        deleted: false
+      });
+    });
+
+    renderRows();
+    showState('rows');
+  }).catch(function(err) {
+    console.error("Load error:", err);
+    // fallback: show empty with ability to add
+    renderRows();
+    showState('rows');
+  });
 }
 
-function delRow(id) {
-  if (document.querySelectorAll('.row').length <= 1) { showToast('Need at least one row', 'er'); return; }
-  document.getElementById('r' + id).remove();
-  updateCount();
-}
-
-function updateCount() {
-  var n = document.querySelectorAll('.row').length;
-  document.getElementById('badge').textContent = n + ' contact' + (n !== 1 ? 's' : '');
-  document.getElementById('cnt').textContent = n;
-}
-
-function clearAll() {
-  document.getElementById('rows').innerHTML = '';
+/* ---- RENDER ALL ROWS ---- */
+function renderRows() {
+  var container = document.getElementById('rows');
+  container.innerHTML = '';
   rowIdx = 0;
-  addRow();
-}
 
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + (type || 'ok') + ' show';
-  setTimeout(function() { t.className = 'toast'; }, 3500);
-}
-
-function saveContacts() {
-  var rows = document.querySelectorAll('.row');
-  var list = [];
-  var hasErr = false;
-
-  document.querySelectorAll('.row input').forEach(function(i) { i.classList.remove('err'); });
-
-  rows.forEach(function(row) {
-    var id = row.id.replace('r', '');
-    var fn = document.getElementById('fn' + id).value.trim();
-    var ln = document.getElementById('ln' + id).value.trim();
-    var em = document.getElementById('em' + id).value.trim();
-    var ph = document.getElementById('ph' + id).value.trim();
-    if (!ln) { document.getElementById('ln' + id).classList.add('err'); hasErr = true; return; }
-    if (fn || ln || em || ph) list.push({ fn: fn, ln: ln, em: em, ph: ph });
+  contacts.forEach(function(c, idx) {
+    if (!c.deleted) renderRow(c, idx);
   });
 
-  if (hasErr) { showToast('Last Name is required', 'er'); return; }
-  if (!list.length) { showToast('Enter at least one contact', 'er'); return; }
-  if (!accountId) { showToast('Account ID not found. Close and reopen.', 'er'); return; }
+  updateBadges();
+  updateFootInfo();
+}
+
+function renderRow(c, idx) {
+  rowIdx++;
+  var rid = rowIdx;
+  c._rid = rid; // assign render id
+
+  var isModified = !c.isNew && isContactModified(c);
+  var dotClass = c.isNew ? 'dot-new' : (isModified ? 'dot-modified' : 'dot-existing');
+
+  var div = document.createElement('div');
+  div.className = 'row';
+  div.id = 'row-' + rid;
+  div.dataset.idx = idx;
+
+  div.innerHTML =
+    '<div class="status-dot ' + dotClass + '" id="dot-' + rid + '"></div>' +
+    '<input type="text" placeholder="First name" id="fn-' + rid + '" value="' + esc(c.fn) + '" oninput="onInput(' + rid + ',' + idx + ')">' +
+    '<input type="text" placeholder="Last name" id="ln-' + rid + '" value="' + esc(c.ln) + '" oninput="onInput(' + rid + ',' + idx + ')">' +
+    '<input type="email" placeholder="email@example.com" id="em-' + rid + '" value="' + esc(c.em) + '" oninput="onInput(' + rid + ',' + idx + ')">' +
+    '<input type="tel" placeholder="+91 98765 43210" id="ph-' + rid + '" value="' + esc(c.ph) + '" oninput="onInput(' + rid + ',' + idx + ')">' +
+    '<div class="row-actions">' +
+      (c.isNew ? '' : '<button class="icon-btn undo-btn" onclick="undoRow(' + rid + ',' + idx + ')" title="Undo changes">' +
+        '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4H7a3 3 0 010 6H3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M4 2L2 4l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '</button>') +
+      '<button class="icon-btn del-btn" onclick="deleteRow(' + rid + ',' + idx + ')" title="Remove">' +
+        '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>' +
+      '</button>' +
+    '</div>';
+
+  document.getElementById('rows').appendChild(div);
+}
+
+/* ---- INPUT HANDLER ---- */
+function onInput(rid, idx) {
+  var c = contacts[idx];
+  c.fn = document.getElementById('fn-' + rid).value.trim();
+  c.ln = document.getElementById('ln-' + rid).value.trim();
+  c.em = document.getElementById('em-' + rid).value.trim();
+  c.ph = document.getElementById('ph-' + rid).value.trim();
+
+  // Clear error styling
+  document.getElementById('ln-' + rid).classList.remove('err');
+
+  // Update dot color
+  var dot = document.getElementById('dot-' + rid);
+  if (dot) {
+    if (c.isNew) {
+      dot.className = 'status-dot dot-new';
+    } else if (isContactModified(c)) {
+      dot.className = 'status-dot dot-modified';
+      // Highlight modified fields
+      ['fn','ln','em','ph'].forEach(function(f) {
+        var el = document.getElementById(f + '-' + rid);
+        if (el) el.classList.toggle('modified', c[f] !== c.original[f]);
+      });
+    } else {
+      dot.className = 'status-dot dot-existing';
+      ['fn','ln','em','ph'].forEach(function(f) {
+        var el = document.getElementById(f + '-' + rid);
+        if (el) el.classList.remove('modified');
+      });
+    }
+  }
+
+  updateBadges();
+  updateFootInfo();
+}
+
+/* ---- ADD NEW ROW ---- */
+function addNewRow() {
+  var idx = contacts.length;
+  contacts.push({ id: null, fn: '', ln: '', em: '', ph: '', original: null, isNew: true, deleted: false });
+  renderRow(contacts[idx], idx);
+  updateBadges();
+  updateFootInfo();
+  // Focus first name of new row
+  setTimeout(function() {
+    var inputs = document.querySelectorAll('.row input');
+    if (inputs.length) inputs[inputs.length - 4].focus();
+  }, 50);
+}
+
+/* ---- DELETE ROW ---- */
+function deleteRow(rid, idx) {
+  var c = contacts[idx];
+  if (c.isNew) {
+    // Just remove from DOM and array
+    contacts.splice(idx, 1);
+    renderRows(); // re-render to fix indices
+  } else {
+    // Mark as deleted
+    c.deleted = true;
+    var row = document.getElementById('row-' + rid);
+    if (row) row.style.display = 'none';
+    showToast('Contact will be removed on Save', 'info');
+  }
+  updateBadges();
+  updateFootInfo();
+}
+
+/* ---- UNDO ROW ---- */
+function undoRow(rid, idx) {
+  var c = contacts[idx];
+  if (!c.original) return;
+  c.fn = c.original.fn;
+  c.ln = c.original.ln;
+  c.em = c.original.em;
+  c.ph = c.original.ph;
+  // Reset inputs
+  document.getElementById('fn-' + rid).value = c.fn;
+  document.getElementById('ln-' + rid).value = c.ln;
+  document.getElementById('em-' + rid).value = c.em;
+  document.getElementById('ph-' + rid).value = c.ph;
+  // Reset styling
+  ['fn','ln','em','ph'].forEach(function(f) {
+    var el = document.getElementById(f + '-' + rid);
+    if (el) el.classList.remove('modified','err');
+  });
+  document.getElementById('dot-' + rid).className = 'status-dot dot-existing';
+  updateBadges();
+  updateFootInfo();
+  showToast('Changes undone', 'info');
+}
+
+/* ---- SAVE ALL ---- */
+function saveAll() {
+  // Validate
+  var hasErr = false;
+  contacts.forEach(function(c) {
+    if (c.deleted) return;
+    if (!c.ln) {
+      // find the row and highlight
+      var ridEl = document.querySelector('[data-idx="' + contacts.indexOf(c) + '"] input[id^="ln-"]');
+      if (ridEl) ridEl.classList.add('err');
+      hasErr = true;
+    }
+  });
+  if (hasErr) { showToast('Last Name is required for all contacts', 'er'); return; }
+
+  var toCreate = contacts.filter(function(c) { return c.isNew && !c.deleted && c.ln; });
+  var toUpdate = contacts.filter(function(c) { return !c.isNew && !c.deleted && isContactModified(c); });
+  var toDelete = contacts.filter(function(c) { return !c.isNew && c.deleted; });
+
+  if (!toCreate.length && !toUpdate.length && !toDelete.length) {
+    showToast('No changes to save', 'info'); return;
+  }
 
   var btn = document.getElementById('saveBtn');
   btn.classList.add('loading');
   btn.disabled = true;
 
-  var ok = 0, fail = 0, done = 0, total = list.length;
+  var promises = [];
+  var created = 0, updated = 0, deleted = 0;
 
-  list.forEach(function(c) {
-    // Build minimal payload - Account_Name as lookup with id
-    var payload = {
-      Last_Name: c.ln,
-      Account_Name: { id: accountId }
-    };
+  // CREATE
+  toCreate.forEach(function(c) {
+    var payload = { Last_Name: c.ln, Account_Name: { id: accountId } };
     if (c.fn) payload.First_Name = c.fn;
     if (c.em) payload.Email = c.em;
     if (c.ph) payload.Phone = c.ph;
+    promises.push(
+      ZOHO.CRM.API.insertRecord({ Entity: 'Contacts', APIData: payload })
+        .then(function(res) {
+          if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') created++;
+        }).catch(function(e) { console.error('Create err', e); })
+    );
+  });
 
-    console.log("Sending payload:", JSON.stringify(payload));
-    showDebug("Sending: " + JSON.stringify(payload));
+  // UPDATE
+  toUpdate.forEach(function(c) {
+    var payload = { id: c.id, Last_Name: c.ln, First_Name: c.fn, Email: c.em, Phone: c.ph };
+    promises.push(
+      ZOHO.CRM.API.updateRecord({ Entity: 'Contacts', APIData: payload })
+        .then(function(res) {
+          if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') updated++;
+        }).catch(function(e) { console.error('Update err', e); })
+    );
+  });
 
-    ZOHO.CRM.API.insertRecord({
-      Entity: "Contacts",
-      APIData: payload
-    }).then(function(res) {
-      done++;
-      console.log("Raw response:", JSON.stringify(res));
+  // DELETE (in Zoho we just disassociate by removing Account_Name — or we can delete the record)
+  toDelete.forEach(function(c) {
+    promises.push(
+      ZOHO.CRM.API.deleteRecord({ Entity: 'Contacts', RecordID: c.id })
+        .then(function(res) {
+          if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') deleted++;
+        }).catch(function(e) { console.error('Delete err', e); })
+    );
+  });
 
-      var success = false;
-      // Handle various response formats
-      if (res && res.data && Array.isArray(res.data) && res.data[0]) {
-        success = res.data[0].code === 'SUCCESS';
-        if (!success) showDebug("Error: " + JSON.stringify(res.data[0]));
-      } else if (res && res.code === 'SUCCESS') {
-        success = true;
-      }
+  Promise.all(promises).then(function() {
+    btn.classList.remove('loading');
+    btn.disabled = false;
 
-      if (success) ok++; else fail++;
-      if (done === total) finish(ok, fail);
-    }).catch(function(err) {
-      done++;
-      fail++;
-      console.error("Catch error:", JSON.stringify(err));
-      showDebug("Catch: " + JSON.stringify(err));
-      if (done === total) finish(ok, fail);
-    });
+    var parts = [];
+    if (created) parts.push(created + ' created');
+    if (updated) parts.push(updated + ' updated');
+    if (deleted) parts.push(deleted + ' deleted');
+
+    document.getElementById('mainCard').style.display = 'none';
+    document.getElementById('successMsg').textContent = 'Changes saved successfully!';
+    document.getElementById('successSub').textContent = parts.join(', ') + '.';
+    document.getElementById('successDiv').classList.add('show');
+
+    try { ZOHO.CRM.UI.Popup.closeReload(); } catch(e) {}
   });
 }
 
-function finish(ok, fail) {
-  var btn = document.getElementById('saveBtn');
-  btn.classList.remove('loading');
-  btn.disabled = false;
-
-  console.log("Result - ok:", ok, "fail:", fail);
-
-  if (ok > 0 && fail === 0) {
-    document.getElementById('mainCard').style.display = 'none';
-    document.getElementById('successMsg').textContent = ok + ' contact' + (ok > 1 ? 's' : '') + ' created and linked successfully!';
-    document.getElementById('successDiv').classList.add('show');
-    setTimeout(function() { try { ZOHO.CRM.UI.Popup.closeReload(); } catch(e) { console.log("closeReload:", e); window.location.reload(); } }, 2500);
-  } else if (ok > 0) {
-    showToast(ok + ' created, ' + fail + ' failed', 'er');
-  } else {
-    showToast('Failed. Check console for details.', 'er');
-  }
+/* ---- HELPERS ---- */
+function isContactModified(c) {
+  if (!c.original) return false;
+  return c.fn !== c.original.fn || c.ln !== c.original.ln || c.em !== c.original.em || c.ph !== c.original.ph;
 }
 
-function resetAll() {
+function esc(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+function updateBadges() {
+  var existing = contacts.filter(function(c) { return !c.isNew && !c.deleted; }).length;
+  var newOnes  = contacts.filter(function(c) { return c.isNew && !c.deleted; }).length;
+  var modified = contacts.filter(function(c) { return !c.isNew && !c.deleted && isContactModified(c); }).length;
+  var deleted  = contacts.filter(function(c) { return c.deleted; }).length;
+
+  var eb = document.getElementById('existingBadge');
+  var nb = document.getElementById('newBadge');
+  var mb = document.getElementById('modifiedBadge');
+
+  eb.textContent = existing + ' existing'; eb.style.display = existing ? '' : 'none';
+  nb.textContent = newOnes + ' new';       nb.style.display = newOnes ? '' : 'none';
+  mb.textContent = modified + ' modified'; mb.style.display = modified ? '' : 'none';
+}
+
+function updateFootInfo() {
+  var toCreate = contacts.filter(function(c) { return c.isNew && !c.deleted; }).length;
+  var toUpdate = contacts.filter(function(c) { return !c.isNew && !c.deleted && isContactModified(c); }).length;
+  var toDelete = contacts.filter(function(c) { return c.deleted; }).length;
+
+  var parts = [];
+  if (toCreate) parts.push('<b>' + toCreate + '</b> to create');
+  if (toUpdate) parts.push('<b>' + toUpdate + '</b> to update');
+  if (toDelete) parts.push('<b style="color:#ef4444">' + toDelete + '</b> to delete');
+  document.getElementById('footInfo').innerHTML = parts.length ? parts.join(' &nbsp;·&nbsp; ') : 'No pending changes';
+}
+
+function showState(state) {
+  document.getElementById('loadingState').style.display  = state==='loading' ? '' : 'none';
+  document.getElementById('rows').style.display          = state==='rows'    ? '' : 'none';
+  document.getElementById('emptyState').style.display    = (state==='rows' && contacts.filter(function(c){return !c.deleted}).length===0) ? '' : 'none';
+  document.getElementById('addRowWrap').style.display    = state==='rows'    ? '' : 'none';
+  document.getElementById('legend').style.display        = state==='rows'    ? '' : 'none';
+  document.getElementById('cardFoot').style.display      = state==='rows'    ? '' : 'none';
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type||'ok') + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 3000);
+}
+
+function reloadContacts() {
+  showState('loading');
+  loadContacts();
+}
+
+function reloadAll() {
   document.getElementById('successDiv').classList.remove('show');
   document.getElementById('mainCard').style.display = '';
-  clearAll();
+  reloadContacts();
 }
-
-addRow();
 </script>
 </body>
 </html>
