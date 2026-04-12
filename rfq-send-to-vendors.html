@@ -83,7 +83,6 @@
   }
   .product-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); flex-shrink: 0; }
   .product-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; }
-  .product-id { font-size: 10px; color: var(--text2); font-family: 'DM Mono', monospace; }
   .search-wrap { padding: 8px; border-bottom: 1px solid var(--border); }
   .search-input {
     width: 100%; background: var(--surface2); border: 1px solid var(--border);
@@ -155,7 +154,6 @@
   .btn-primary { background: var(--accent); color: white; box-shadow: 0 2px 10px rgba(59,110,240,0.3); }
   .btn-primary:hover:not(:disabled) { background: #2554d0; transform: translateY(-1px); }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  /* Progress overlay */
   .progress-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(240,244,248,0.97); z-index: 100;
@@ -170,8 +168,7 @@
   .progress-step {
     display: flex; align-items: center; gap: 8px;
     padding: 8px 12px; background: var(--surface); border-radius: 7px;
-    border: 1px solid var(--border); font-size: 12px; color: var(--text2);
-    box-shadow: var(--shadow); transition: all 0.2s;
+    border: 1px solid var(--border); font-size: 12px; color: var(--text2); transition: all 0.2s;
   }
   .progress-step.active { border-color: var(--accent); color: var(--text); background: #ebf4ff; }
   .progress-step.done { border-color: var(--success); color: var(--success); background: #f0fff4; }
@@ -230,7 +227,6 @@
   <button class="btn btn-primary" id="sendBtn" onclick="sendRFQ()" disabled>✉️ Send to Vendors</button>
 </div>
 
-<!-- Progress Overlay -->
 <div class="progress-overlay" id="progressOverlay">
   <div class="spinner" id="overlaySpinner"></div>
   <div class="progress-title" id="progressTitle">Creating RFQ records...</div>
@@ -248,13 +244,13 @@
 <script>
 var rfqId = null;
 var rfqName = '';
-var lineItems = []; // [{id, productId, productName}]
+var lineItems = [];
 var allVendors = [];
 var filteredVendors = [];
 var selectedVendors = new Set();
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
-  console.log("PageLoad data:", JSON.stringify(data));
+  console.log("PageLoad:", JSON.stringify(data));
   rfqId = data.EntityId;
   if (Array.isArray(rfqId)) rfqId = rfqId[0];
   rfqId = String(rfqId);
@@ -267,10 +263,30 @@ async function loadAll() {
   await Promise.all([loadRFQAndLineItems(), loadVendors()]);
 }
 
+// ── Helper: call Zoho CRM v2 API via ZOHO.CRM.HTTP ───────
+async function crmGet(path) {
+  var res = await ZOHO.CRM.HTTP.get({
+    url: 'https://www.zohoapis.com/crm/v2/' + path,
+    headers: { 'Content-Type': 'application/json' },
+    parameters: {}
+  });
+  return typeof res === 'string' ? JSON.parse(res) : res;
+}
+
+async function crmPost(path, body) {
+  var res = await ZOHO.CRM.HTTP.post({
+    url: 'https://www.zohoapis.com/crm/v2/' + path,
+    headers: { 'Content-Type': 'application/json' },
+    parameters: {},
+    body: JSON.stringify(body)
+  });
+  return typeof res === 'string' ? JSON.parse(res) : res;
+}
+
 // ── Load RFQ name ─────────────────────────────────────────
 async function loadRFQAndLineItems() {
   try {
-    var rfqRes = await ZOHO.CRM.API.getRecord({ Entity: "RFQs", RecordID: rfqId });
+    var rfqRes = await crmGet('RFQs/' + rfqId);
     if (rfqRes && rfqRes.data && rfqRes.data[0]) {
       rfqName = rfqRes.data[0].Name || ('RFQ-' + rfqId.slice(-6));
     } else {
@@ -278,23 +294,18 @@ async function loadRFQAndLineItems() {
     }
   } catch(e) {
     rfqName = 'RFQ-' + rfqId.slice(-6);
-    console.warn('Could not load RFQ name', e);
+    console.warn('RFQ name error:', e);
   }
   document.getElementById('rfqName').textContent = rfqName;
 
-  // Load line items via COQL using ZOHO.CRM.API.searchRecord with Type coql
+  // Load line items via COQL
   try {
-    var query = "SELECT id, Name, RFQ_List, Line_Items FROM RFQ_List WHERE RFQ_List = '" + rfqId + "' LIMIT 200";
-    console.log("COQL query:", query);
-
-    var res = await ZOHO.CRM.API.searchRecord({
-      Entity: "RFQ_List",
-      Type: "coql",
-      Query: query
+    var coqlRes = await crmPost('coql', {
+      select_query: "SELECT id, Name, RFQ_List, Line_Items FROM RFQ_List WHERE RFQ_List = '" + rfqId + "' LIMIT 200"
     });
-    console.log("Line items raw:", JSON.stringify(res));
+    console.log("COQL line items:", JSON.stringify(coqlRes));
 
-    var data = (res && res.data) ? res.data : [];
+    var data = (coqlRes && coqlRes.data) ? coqlRes.data : [];
     lineItems = data.map(function(row) {
       var product = row.Line_Items || {};
       return {
@@ -309,13 +320,13 @@ async function loadRFQAndLineItems() {
       renderProducts();
     } else {
       document.getElementById('productsList').innerHTML =
-        '<div class="state-msg">⚠️ No line items on this RFQ.<br/>Add products to RFQ List first.</div>';
+        '<div class="state-msg">⚠️ No line items found on this RFQ.<br/>Add products to RFQ List first.</div>';
     }
     updateSendButton();
   } catch(e) {
     console.error('Line items error:', e);
     document.getElementById('productsList').innerHTML =
-      '<div class="state-msg">⚠️ ' + escHtml(String(e.message || e)) + '</div>';
+      '<div class="state-msg">⚠️ Error loading line items:<br/>' + escHtml(String(e.message || e)) + '</div>';
   }
 }
 
@@ -324,7 +335,6 @@ function renderProducts() {
     return '<div class="product-chip">' +
       '<div class="product-dot"></div>' +
       '<span class="product-name">' + escHtml(item.productName) + '</span>' +
-      '<span class="product-id">' + String(item.productId || '').slice(-6) + '</span>' +
     '</div>';
   }).join('');
 }
@@ -332,30 +342,25 @@ function renderProducts() {
 // ── Load Vendors ──────────────────────────────────────────
 async function loadVendors() {
   try {
-    var res = await ZOHO.CRM.API.getRecords({
-      Entity: "Vendors",
-      sort_order: "asc",
-      per_page: 200,
-      page: 1
-    });
-    console.log("Vendors raw:", JSON.stringify(res));
+    var res = await crmGet('Vendors?fields=id,Vendor_Name,Email&per_page=200&sort_order=asc');
+    console.log("Vendors:", JSON.stringify(res));
     allVendors = (res && res.data) ? res.data : [];
     filteredVendors = allVendors.slice();
     document.getElementById('vendorCount').textContent = allVendors.length;
     renderVendors();
+    if (!allVendors.length) {
+      document.getElementById('vendorsList').innerHTML = '<div class="state-msg">No vendors found in CRM</div>';
+    }
   } catch(e) {
     console.error('Vendors error:', e);
     document.getElementById('vendorsList').innerHTML =
-      '<div class="state-msg">⚠️ Error loading vendors: ' + escHtml(String(e.message || e)) + '</div>';
+      '<div class="state-msg">⚠️ Error loading vendors:<br/>' + escHtml(String(e.message || e)) + '</div>';
   }
 }
 
 function renderVendors() {
   var el = document.getElementById('vendorsList');
-  if (!filteredVendors.length) {
-    el.innerHTML = '<div class="state-msg">No vendors found</div>';
-    return;
-  }
+  if (!filteredVendors.length) { el.innerHTML = '<div class="state-msg">No vendors found</div>'; return; }
   el.innerHTML = filteredVendors.map(function(v) {
     var name = v.Vendor_Name || v.Name || 'Vendor';
     var email = v.Email || '—';
@@ -382,8 +387,7 @@ function filterVendors() {
 function toggleVendor(id) {
   if (selectedVendors.has(id)) selectedVendors.delete(id);
   else selectedVendors.add(id);
-  updateSelectedCount();
-  renderVendors();
+  updateSelectedCount(); renderVendors();
 }
 
 function toggleSelectAll() {
@@ -392,8 +396,7 @@ function toggleSelectAll() {
   } else {
     filteredVendors.forEach(function(v) { selectedVendors.add(v.id); });
   }
-  updateSelectedCount();
-  renderVendors();
+  updateSelectedCount(); renderVendors();
 }
 
 function updateSelectedCount() {
@@ -405,7 +408,7 @@ function updateSendButton() {
   document.getElementById('sendBtn').disabled = (selectedVendors.size === 0 || lineItems.length === 0);
 }
 
-// ── Send RFQ to Vendors ───────────────────────────────────
+// ── Send RFQ ──────────────────────────────────────────────
 async function sendRFQ() {
   var vendors = allVendors.filter(function(v) { return selectedVendors.has(v.id); });
   if (!vendors.length) return;
@@ -434,7 +437,7 @@ async function sendRFQ() {
     bar.style.width = Math.round((i / total) * 100) + '%';
 
     try {
-      // Build subform array for Requested_Items
+      // Build subform items
       var subformItems = lineItems
         .filter(function(item) { return item.productId; })
         .map(function(item) { return { Item: { id: item.productId } }; });
@@ -448,23 +451,17 @@ async function sendRFQ() {
         recordData.Requested_Items = subformItems;
       }
 
-      console.log("Inserting record:", JSON.stringify(recordData));
-      var createRes = await ZOHO.CRM.API.insertRecord({
-        Entity: "Requested_For_Quotations",
-        APIData: recordData,
-        Trigger: []
-      });
-      console.log("Insert result:", JSON.stringify(createRes));
+      console.log("Creating:", JSON.stringify(recordData));
+      var createRes = await crmPost('Requested_For_Quotations', { data: [recordData], trigger: [] });
+      console.log("Result:", JSON.stringify(createRes));
 
-      var success = createRes && createRes.data && createRes.data[0] &&
-                    createRes.data[0].code === 'SUCCESS';
-
+      var success = createRes && createRes.data && createRes.data[0] && createRes.data[0].code === 'SUCCESS';
       if (success) {
         results.push({ vendor: vName, ok: true });
         if (stepEl) { stepEl.className = 'progress-step done'; stepEl.querySelector('span').textContent = '✅'; }
       } else {
-        var errMsg = (createRes && createRes.data && createRes.data[0] && createRes.data[0].message) || 'Unknown error';
-        throw new Error(errMsg);
+        var msg = (createRes && createRes.data && createRes.data[0] && createRes.data[0].message) || JSON.stringify(createRes);
+        throw new Error(msg);
       }
     } catch(err) {
       console.error('Error for', vName, err);
