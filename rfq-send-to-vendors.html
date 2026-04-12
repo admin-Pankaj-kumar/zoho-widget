@@ -193,16 +193,17 @@ ZOHO.embeddedApp.on("PageLoad", function(data) {
 ZOHO.embeddedApp.init();
 
 async function loadData() {
-  // 1. Get RFQ record — Line_Items array is returned directly inside getRecord response
+  // 1. Get RFQ record name
   try {
     var r = await ZOHO.CRM.API.getRecord({ Entity: "RFQs", RecordID: rfqId });
-    var rec = r && r.data && r.data[0];
-    rfqName = (rec && rec.Name) || rfqId;
+    if (r && r.data && r.data[0]) rfqName = r.data[0].Name || rfqId;
+    else rfqName = rfqId;
+  } catch(e) { rfqName = rfqId; }
 
-    // Line_Items is inside the RFQ record itself — no need for getRelatedRecords
-    var rawItems = (rec && rec.Line_Items) ? rec.Line_Items : [];
+  // 2. Get line items — Line_Items array is inside the RFQ getRecord response
+  try {
+    var rawItems = (r && r.data && r.data[0] && r.data[0].Line_Items) ? r.data[0].Line_Items : [];
     console.log("Line_Items from getRecord:", JSON.stringify(rawItems));
-
     lineItems = [];
     for (var i = 0; i < rawItems.length; i++) {
       var p = rawItems[i].Line_Items || {};
@@ -214,9 +215,8 @@ async function loadData() {
       } catch(pe) {}
       lineItems.push({ productId: p.id, productName: p.name || 'Product', unitPrice: unitPrice });
     }
-
-    // If RFQ has more than 10 items ($has_more = true), also fetch via getRelatedRecords
-    if (rec && rec.$has_more && rec.$has_more.Line_Items) {
+    // If more than 10 items exist ($has_more), fetch via getRelatedRecords
+    if (r && r.data && r.data[0] && r.data[0].$has_more && r.data[0].$has_more.Line_Items) {
       try {
         var more = await ZOHO.CRM.API.getRelatedRecords({
           Entity: "RFQs", RecordID: rfqId, RelatedList: "RFQ_List", page: 1, per_page: 200
@@ -237,29 +237,22 @@ async function loadData() {
       } catch(re) { console.warn("getRelatedRecords error:", re); }
     }
   } catch(e) {
-    console.warn("getRecord RFQ error:", e);
-    rfqName = rfqId;
+    console.warn("Line items error:", e);
     lineItems = [];
   }
 
-  // 2. Get vendors — use multiple word searches to catch all vendors
+  // 3. Get vendors — directly query the Vendors module
   try {
-    var vendorMap = {};
-    var letters = ['a','e','i','o','u','r','s','m','c','b','v','n','d','g','l'];
-    for (var k = 0; k < letters.length; k++) {
-      try {
-        var vr = await ZOHO.CRM.API.searchRecord({
-          Entity: "Vendors", Type: "word", Query: letters[k]
-        });
-        if (vr && vr.data) {
-          vr.data.forEach(function(v) { vendorMap[v.id] = v; });
-        }
-      } catch(ve) {}
-    }
-    allVendors = Object.values(vendorMap);
-    console.log("Vendors found:", allVendors.length);
+    var vRes = await ZOHO.CRM.API.getRecords({
+      Entity: "Vendors",
+      sort_order: "asc",
+      per_page: 200,
+      page: 1
+    });
+    console.log("Vendors:", JSON.stringify(vRes));
+    allVendors = (vRes && vRes.data) ? vRes.data : [];
   } catch(e) {
-    console.warn("Vendors search error:", e);
+    console.warn("getRecords failed for Vendors:", e);
     allVendors = [];
   }
 
