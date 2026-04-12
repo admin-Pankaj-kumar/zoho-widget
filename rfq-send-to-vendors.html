@@ -5,128 +5,172 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Send RFQ to Vendors</title>
 <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #f0f4f8; --surface: #ffffff; --surface2: #f7f9fc;
-    --border: #e2e8f0; --accent: #3b6ef0; --accent2: #12b886;
-    --text: #1a202c; --text2: #718096; --danger: #e53e3e;
-    --success: #12b886; --radius: 10px; --shadow: 0 1px 8px rgba(0,0,0,0.07);
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f7fa;
+    padding: 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
-  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:12px; display:flex; flex-direction:column; gap:10px; }
-  .header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow); }
-  .header-icon { width:36px; height:36px; background:linear-gradient(135deg,#3b6ef0,#12b886); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
-  .header-info h2 { font-size:14px; font-weight:600; }
-  .header-info p { font-size:11px; color:var(--text2); margin-top:1px; }
-  .rfq-badge { margin-left:auto; background:#ebf4ff; border:1px solid #bee3f8; color:#2b6cb0; padding:3px 9px; border-radius:20px; font-size:11px; font-family:'DM Mono',monospace; }
-  .section { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow); overflow:hidden; }
-  .section-header { padding:9px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.7px; background:var(--surface2); }
-  .badge { background:#edf2f7; color:#4a5568; font-family:'DM Mono',monospace; font-size:10px; padding:1px 7px; border-radius:20px; margin-left:auto; border:1px solid var(--border); }
-  .products-list { padding:6px; display:flex; flex-direction:column; gap:3px; max-height:120px; overflow-y:auto; }
-  .product-chip { display:flex; align-items:center; gap:8px; padding:6px 10px; background:var(--surface2); border-radius:6px; border:1px solid var(--border); }
-  .product-dot { width:6px; height:6px; border-radius:50%; background:var(--accent2); flex-shrink:0; }
-  .product-name { font-size:12px; font-weight:500; flex:1; }
-  .search-wrap { padding:8px; border-bottom:1px solid var(--border); }
-  .search-input { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:7px 11px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:12px; outline:none; }
-  .search-input:focus { border-color:var(--accent); }
-  .search-input::placeholder { color:var(--text2); }
-  .select-all-row { display:flex; align-items:center; justify-content:space-between; padding:5px 10px; border-bottom:1px solid var(--border); background:var(--surface2); }
-  .select-all-btn { background:none; border:none; color:var(--accent); font-size:11px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; padding:2px 6px; border-radius:4px; }
-  .select-all-btn:hover { background:#ebf4ff; }
-  .selected-count { font-size:11px; color:var(--text2); font-family:'DM Mono',monospace; }
-  .vendors-list { padding:6px; display:flex; flex-direction:column; gap:3px; max-height:200px; overflow-y:auto; }
-  .vendor-item { display:flex; align-items:center; gap:9px; padding:8px 11px; background:var(--surface2); border-radius:7px; border:1px solid var(--border); cursor:pointer; transition:all 0.15s; user-select:none; }
-  .vendor-item:hover { border-color:#bee3f8; background:#ebf8ff; }
-  .vendor-item.selected { border-color:var(--accent); background:#ebf4ff; }
-  .vendor-checkbox { width:16px; height:16px; border-radius:4px; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:10px; }
-  .vendor-item.selected .vendor-checkbox { background:var(--accent); border-color:var(--accent); color:#fff; }
-  .vendor-avatar { width:28px; height:28px; border-radius:7px; background:#ebf4ff; border:1px solid #bee3f8; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent); flex-shrink:0; }
-  .vendor-info { flex:1; min-width:0; }
-  .vendor-name { font-size:12px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .vendor-email { font-size:10px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .state-msg { padding:18px; text-align:center; color:var(--text2); font-size:12px; line-height:1.6; }
-  .spinner { width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 8px; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .footer { display:flex; gap:8px; padding:10px 12px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow); }
-  .btn { flex:1; padding:9px 14px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
-  .btn-secondary { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
-  .btn-secondary:hover { background:#edf2f7; color:var(--text); }
-  .btn-primary { background:var(--accent); color:white; box-shadow:0 2px 10px rgba(59,110,240,0.3); }
-  .btn-primary:hover:not(:disabled) { background:#2554d0; transform:translateY(-1px); }
-  .btn-primary:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
-  .progress-overlay { display:none; position:fixed; inset:0; background:rgba(240,244,248,0.97); z-index:100; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:28px; }
-  .progress-overlay.show { display:flex; }
-  .progress-title { font-size:14px; font-weight:600; color:var(--text); }
-  .progress-bar-wrap { width:100%; max-width:280px; height:4px; background:var(--border); border-radius:4px; overflow:hidden; }
-  .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:4px; transition:width 0.4s; width:0%; }
-  .progress-steps { width:100%; max-width:300px; display:flex; flex-direction:column; gap:5px; max-height:220px; overflow-y:auto; }
-  .progress-step { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--surface); border-radius:7px; border:1px solid var(--border); font-size:12px; color:var(--text2); transition:all 0.2s; }
-  .progress-step.active { border-color:var(--accent); color:var(--text); background:#ebf4ff; }
-  .progress-step.done { border-color:var(--success); color:var(--success); background:#f0fff4; }
-  .progress-step.error { border-color:var(--danger); color:var(--danger); background:#fff5f5; }
-  .result-box { display:none; flex-direction:column; align-items:center; gap:10px; text-align:center; }
-  .result-box.show { display:flex; }
-  .result-icon { font-size:36px; }
-  .result-title { font-size:15px; font-weight:600; color:var(--text); }
-  .result-sub { font-size:12px; color:var(--text2); line-height:1.6; }
-  .result-list { width:100%; max-width:300px; display:flex; flex-direction:column; gap:3px; max-height:120px; overflow-y:auto; }
-  .result-item { display:flex; align-items:center; gap:7px; padding:6px 10px; background:var(--surface); border-radius:6px; font-size:11px; color:var(--text2); border:1px solid var(--border); }
-  .result-item.ok { border-left:3px solid var(--success); }
-  .result-item.fail { border-left:3px solid var(--danger); }
-  ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a202c;
+    padding: 10px 14px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h3 span { font-size: 11px; color: #718096; font-weight: 400; margin-left: auto; }
+  .vendor-list {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    flex: 1;
+  }
+  .vendor-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f4f8;
+    cursor: pointer;
+    transition: background 0.1s;
+    user-select: none;
+  }
+  .vendor-row:last-child { border-bottom: none; }
+  .vendor-row:hover { background: #f7f9fc; }
+  .vendor-row.selected { background: #ebf4ff; }
+  .cb {
+    width: 18px; height: 18px;
+    border: 2px solid #cbd5e0;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    color: transparent;
+    transition: all 0.1s;
+  }
+  .vendor-row.selected .cb {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+  }
+  .av {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: #dbeafe;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #2563eb;
+    flex-shrink: 0;
+  }
+  .vname { font-size: 13px; font-weight: 500; color: #1a202c; }
+  .vemail { font-size: 11px; color: #718096; margin-top: 1px; }
+  .loading { padding: 24px; text-align: center; color: #a0aec0; font-size: 13px; }
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .footer {
+    display: flex; gap: 8px;
+  }
+  .btn {
+    flex: 1; padding: 11px;
+    border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn-cancel { background: #edf2f7; color: #718096; }
+  .btn-cancel:hover { background: #e2e8f0; }
+  .btn-send { background: #3b82f6; color: white; }
+  .btn-send:hover:not(:disabled) { background: #2563eb; }
+  .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+  /* Result screen */
+  .result {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 32px 16px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    flex: 1;
+  }
+  .result.show { display: flex; }
+  .result-icon { font-size: 40px; }
+  .result-title { font-size: 15px; font-weight: 600; color: #1a202c; }
+  .result-sub { font-size: 12px; color: #718096; line-height: 1.6; }
+  .result-items { width: 100%; display: flex; flex-direction: column; gap: 4px; }
+  .ri {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; background: #f7f9fc;
+    border-radius: 6px; font-size: 12px; color: #4a5568;
+    border-left: 3px solid #48bb78;
+  }
+  .ri.fail { border-left-color: #f56565; }
+  /* Progress screen */
+  .progress {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 32px 16px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    flex: 1;
+  }
+  .progress.show { display: flex; }
+  .progress-title { font-size: 14px; font-weight: 600; color: #1a202c; }
+  .progress-sub { font-size: 12px; color: #718096; }
+  .pbar-wrap { width: 100%; max-width: 260px; height: 4px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+  .pbar { height: 100%; background: #3b82f6; border-radius: 4px; transition: width 0.3s; width: 0%; }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-icon">📋</div>
-  <div class="header-info">
-    <h2>Send RFQ to Vendors</h2>
-    <p id="rfqName">Loading...</p>
-  </div>
-  <div class="rfq-badge" id="rfqBadge">—</div>
+<h3>📋 Select Vendors <span id="countLabel">0 selected</span></h3>
+
+<div class="vendor-list" id="vendorList">
+  <div class="loading"><div class="spinner"></div>Loading vendors...</div>
 </div>
 
-<div class="section">
-  <div class="section-header">📦 RFQ Line Items <span class="badge" id="lineItemCount">0</span></div>
-  <div class="products-list" id="productsList">
-    <div class="state-msg"><div class="spinner"></div>Loading items...</div>
-  </div>
+<div class="progress" id="progressScreen">
+  <div class="spinner"></div>
+  <div class="progress-title" id="progTitle">Creating records...</div>
+  <div class="progress-sub" id="progSub"></div>
+  <div class="pbar-wrap"><div class="pbar" id="pbar"></div></div>
 </div>
 
-<div class="section">
-  <div class="section-header">🏭 Select Vendors <span class="badge" id="vendorCount">0</span></div>
-  <div class="search-wrap">
-    <input class="search-input" id="vendorSearch" type="text" placeholder="🔍  Search vendors..." oninput="filterVendors()"/>
-  </div>
-  <div class="select-all-row">
-    <button class="select-all-btn" onclick="toggleSelectAll()">Select All</button>
-    <span class="selected-count" id="selectedCount">0 selected</span>
-  </div>
-  <div class="vendors-list" id="vendorsList">
-    <div class="state-msg"><div class="spinner"></div>Loading vendors...</div>
-  </div>
+<div class="result" id="resultScreen">
+  <div class="result-icon" id="resIcon">🎉</div>
+  <div class="result-title" id="resTitle"></div>
+  <div class="result-sub" id="resSub"></div>
+  <div class="result-items" id="resItems"></div>
 </div>
 
-<div class="footer">
-  <button class="btn btn-secondary" onclick="ZOHO.CRM.UI.Popup.close()">Cancel</button>
-  <button class="btn btn-primary" id="sendBtn" onclick="sendRFQ()" disabled>✉️ Send to Vendors</button>
-</div>
-
-<div class="progress-overlay" id="progressOverlay">
-  <div class="spinner" id="overlaySpinner"></div>
-  <div class="progress-title" id="progressTitle">Creating RFQ records...</div>
-  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
-  <div class="progress-steps" id="progressSteps"></div>
-  <div class="result-box" id="resultBox">
-    <div class="result-icon" id="resultIcon">✅</div>
-    <div class="result-title" id="resultTitle"></div>
-    <div class="result-sub" id="resultSub"></div>
-    <div class="result-list" id="resultList"></div>
-    <button class="btn btn-primary" style="max-width:160px;margin-top:8px" onclick="closeWidget()">Done ✓</button>
-  </div>
+<div class="footer" id="footer">
+  <button class="btn btn-cancel" onclick="cancel()">Cancel</button>
+  <button class="btn btn-send" id="sendBtn" onclick="send()" disabled>✉️ Send RFQ</button>
 </div>
 
 <script>
@@ -134,273 +178,195 @@ var rfqId = null;
 var rfqName = '';
 var lineItems = [];
 var allVendors = [];
-var filteredVendors = [];
-var selectedVendors = new Set();
+var selected = new Set();
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
   console.log("PageLoad:", JSON.stringify(data));
   rfqId = data.EntityId;
   if (Array.isArray(rfqId)) rfqId = rfqId[0];
   rfqId = String(rfqId);
-  document.getElementById('rfqBadge').textContent = rfqId.slice(-6);
-  loadAll();
+
+  // Load RFQ name + line items + vendors
+  loadData();
 });
 ZOHO.embeddedApp.init();
 
-async function loadAll() {
-  await Promise.all([loadRFQAndLineItems(), loadVendors()]);
-}
-
-// ── Load RFQ name + line items ────────────────────────────
-async function loadRFQAndLineItems() {
-  // Get RFQ name
+async function loadData() {
+  // 1. Get RFQ record name
   try {
-    var rfqRes = await ZOHO.CRM.API.getRecord({ Entity: "RFQs", RecordID: rfqId });
-    rfqName = (rfqRes && rfqRes.data && rfqRes.data[0] && rfqRes.data[0].Name) || ('RFQ-' + rfqId.slice(-6));
-  } catch(e) {
-    rfqName = 'RFQ-' + rfqId.slice(-6);
-  }
-  document.getElementById('rfqName').textContent = rfqName;
+    var r = await ZOHO.CRM.API.getRecord({ Entity: "RFQs", RecordID: rfqId });
+    if (r && r.data && r.data[0]) rfqName = r.data[0].Name || rfqId;
+    else rfqName = rfqId;
+  } catch(e) { rfqName = rfqId; }
 
-  // Get line items — use searchRecord with criteria
+  // 2. Get line items using getRelatedRecords
   try {
-    var res = await ZOHO.CRM.API.searchRecord({
-      Entity: "RFQ_List",
-      Type: "criteria",
-      Query: "(RFQ_List:equals:" + rfqId + ")"
+    var li = await ZOHO.CRM.API.getRelatedRecords({
+      Entity: "RFQs",
+      RecordID: rfqId,
+      RelatedList: "RFQ_List",
+      page: 1,
+      per_page: 200
     });
-    console.log("Line items:", JSON.stringify(res));
-
-    var data = (res && res.data) ? res.data : [];
-    lineItems = data.map(function(row) {
-      var product = row.Line_Items || {};
-      return {
-        id: row.id,
-        productId: product.id || '',
-        productName: product.name || product.Name || 'Product'
-      };
-    });
-
-    document.getElementById('lineItemCount').textContent = lineItems.length;
-    if (lineItems.length > 0) {
-      renderProducts();
-    } else {
-      document.getElementById('productsList').innerHTML =
-        '<div class="state-msg">⚠️ No line items on this RFQ.<br/>Add products to RFQ List first.</div>';
+    console.log("Line items:", JSON.stringify(li));
+    if (li && li.data) {
+      lineItems = li.data.map(function(row) {
+        var p = row.Line_Items || {};
+        return { productId: p.id || '', productName: p.name || 'Product' };
+      }).filter(function(x) { return x.productId; });
     }
-    updateSendButton();
   } catch(e) {
-    console.error('Line items error:', e);
-    document.getElementById('productsList').innerHTML =
-      '<div class="state-msg">⚠️ ' + escHtml(String(e.message || e)) + '</div>';
+    console.warn("getRelatedRecords failed, trying direct:", e);
+    // fallback: just proceed with empty line items — records will still be created
+    lineItems = [];
   }
-}
 
-function renderProducts() {
-  document.getElementById('productsList').innerHTML = lineItems.map(function(item) {
-    return '<div class="product-chip"><div class="product-dot"></div><span class="product-name">' + escHtml(item.productName) + '</span></div>';
-  }).join('');
-}
-
-// ── Load Vendors ──────────────────────────────────────────
-async function loadVendors() {
+  // 3. Get vendors using getRecord on each known vendor
+  // Use a direct search via getAllRecords equivalent
   try {
-    // Use searchRecord with word search to get all vendors
-    var res = await ZOHO.CRM.API.searchRecord({
+    var vRes = await ZOHO.CRM.API.getRecords({
       Entity: "Vendors",
-      Type: "word",
-      Query: "a"
+      sort_order: "asc",
+      per_page: 200,
+      page: 1
     });
-    console.log("Vendors search a:", JSON.stringify(res));
-    var vendors = (res && res.data) ? res.data : [];
-
-    // Also try getting more with another letter to catch all
+    console.log("Vendors:", JSON.stringify(vRes));
+    allVendors = (vRes && vRes.data) ? vRes.data : [];
+  } catch(e1) {
+    console.warn("getRecords failed:", e1);
+    // Try searchRecord as fallback
     try {
-      var res2 = await ZOHO.CRM.API.searchRecord({
+      var vRes2 = await ZOHO.CRM.API.searchRecord({
         Entity: "Vendors",
         Type: "word",
-        Query: "b"
+        Query: "vendor"
       });
-      if (res2 && res2.data) {
-        res2.data.forEach(function(v) {
-          if (!vendors.find(function(x) { return x.id === v.id; })) {
-            vendors.push(v);
-          }
-        });
-      }
-    } catch(e2) {}
-
-    // Also try getAllRecords as fallback if search returned nothing
-    if (!vendors.length) {
-      try {
-        var res3 = await ZOHO.CRM.API.getAllRecords({
-          Entity: "Vendors",
-          sort_order: "asc",
-          per_page: 200,
-          page: 1
-        });
-        vendors = (res3 && res3.data) ? res3.data : [];
-      } catch(e3) {
-        console.warn("getAllRecords failed:", e3);
-      }
+      allVendors = (vRes2 && vRes2.data) ? vRes2.data : [];
+    } catch(e2) {
+      console.warn("searchRecord also failed:", e2);
+      allVendors = [];
     }
-
-    allVendors = vendors;
-    filteredVendors = allVendors.slice();
-    document.getElementById('vendorCount').textContent = allVendors.length;
-
-    if (!allVendors.length) {
-      document.getElementById('vendorsList').innerHTML = '<div class="state-msg">No vendors found in CRM</div>';
-    } else {
-      renderVendors();
-    }
-  } catch(e) {
-    console.error('Vendors error:', e);
-    document.getElementById('vendorsList').innerHTML =
-      '<div class="state-msg">⚠️ Error loading vendors:<br/>' + escHtml(String(e.message || e)) + '</div>';
   }
-}
 
-function renderVendors() {
-  var el = document.getElementById('vendorsList');
-  if (!filteredVendors.length) { el.innerHTML = '<div class="state-msg">No vendors found</div>'; return; }
-  el.innerHTML = filteredVendors.map(function(v) {
-    var name = v.Vendor_Name || v.Name || 'Vendor';
-    var email = v.Email || '—';
-    var initials = name.substring(0, 2).toUpperCase();
-    var sel = selectedVendors.has(v.id) ? 'selected' : '';
-    return '<div class="vendor-item ' + sel + '" onclick="toggleVendor(\'' + v.id + '\')">' +
-      '<div class="vendor-checkbox">' + (sel ? '✓' : '') + '</div>' +
-      '<div class="vendor-avatar">' + initials + '</div>' +
-      '<div class="vendor-info"><div class="vendor-name">' + escHtml(name) + '</div><div class="vendor-email">' + escHtml(email) + '</div></div>' +
-    '</div>';
-  }).join('');
-}
-
-function filterVendors() {
-  var q = document.getElementById('vendorSearch').value.toLowerCase();
-  filteredVendors = allVendors.filter(function(v) {
-    return (v.Vendor_Name || '').toLowerCase().includes(q) || (v.Email || '').toLowerCase().includes(q);
-  });
   renderVendors();
 }
 
-function toggleVendor(id) {
-  if (selectedVendors.has(id)) selectedVendors.delete(id);
-  else selectedVendors.add(id);
-  updateSelectedCount(); renderVendors();
-}
-
-function toggleSelectAll() {
-  if (selectedVendors.size === filteredVendors.length && filteredVendors.length > 0) {
-    filteredVendors.forEach(function(v) { selectedVendors.delete(v.id); });
-  } else {
-    filteredVendors.forEach(function(v) { selectedVendors.add(v.id); });
+function renderVendors() {
+  var el = document.getElementById('vendorList');
+  if (!allVendors.length) {
+    el.innerHTML = '<div class="loading">⚠️ No vendors found in CRM</div>';
+    return;
   }
-  updateSelectedCount(); renderVendors();
+  el.innerHTML = allVendors.map(function(v) {
+    var name = v.Vendor_Name || v.Name || 'Vendor';
+    var email = v.Email || '';
+    var init = name.substring(0, 2).toUpperCase();
+    var sel = selected.has(v.id) ? 'selected' : '';
+    return '<div class="vendor-row ' + sel + '" onclick="toggle(\'' + v.id + '\')">' +
+      '<div class="cb">' + (selected.has(v.id) ? '✓' : '') + '</div>' +
+      '<div class="av">' + init + '</div>' +
+      '<div><div class="vname">' + esc(name) + '</div>' +
+      (email ? '<div class="vemail">' + esc(email) + '</div>' : '') +
+      '</div></div>';
+  }).join('');
 }
 
-function updateSelectedCount() {
-  document.getElementById('selectedCount').textContent = selectedVendors.size + ' selected';
-  updateSendButton();
+function toggle(id) {
+  if (selected.has(id)) selected.delete(id);
+  else selected.add(id);
+  var n = selected.size;
+  document.getElementById('countLabel').textContent = n + ' selected';
+  document.getElementById('sendBtn').disabled = (n === 0);
+  renderVendors();
 }
 
-function updateSendButton() {
-  document.getElementById('sendBtn').disabled = (selectedVendors.size === 0 || lineItems.length === 0);
+function cancel() {
+  try { ZOHO.CRM.UI.Popup.close(); } catch(e) {}
 }
 
-// ── Send RFQ ──────────────────────────────────────────────
-async function sendRFQ() {
-  var vendors = allVendors.filter(function(v) { return selectedVendors.has(v.id); });
+async function send() {
+  var vendors = allVendors.filter(function(v) { return selected.has(v.id); });
   if (!vendors.length) return;
 
-  var overlay = document.getElementById('progressOverlay');
-  var stepsEl = document.getElementById('progressSteps');
-  var bar = document.getElementById('progressBar');
-  var titleEl = document.getElementById('progressTitle');
-  overlay.classList.add('show');
-
-  stepsEl.innerHTML = vendors.map(function(v) {
-    var name = v.Vendor_Name || v.Name || 'Vendor';
-    return '<div class="progress-step" id="vstep_' + v.id + '"><span>⏳</span><span>' + escHtml(name) + '</span></div>';
-  }).join('');
+  // Hide main UI, show progress
+  document.getElementById('vendorList').style.display = 'none';
+  document.getElementById('footer').style.display = 'none';
+  document.querySelector('h3').style.display = 'none';
+  document.getElementById('progressScreen').classList.add('show');
 
   var results = [];
   var total = vendors.length;
 
+  // Build subform items
+  var subformItems = lineItems.map(function(item) {
+    return { Item: { id: item.productId } };
+  });
+
   for (var i = 0; i < vendors.length; i++) {
-    var vendor = vendors[i];
-    var vName = vendor.Vendor_Name || vendor.Name || 'Vendor';
-    var stepEl = document.getElementById('vstep_' + vendor.id);
-    if (stepEl) { stepEl.className = 'progress-step active'; stepEl.querySelector('span').textContent = '🔄'; }
-    titleEl.textContent = 'Creating ' + (i + 1) + ' of ' + total + ': ' + vName;
-    bar.style.width = Math.round((i / total) * 100) + '%';
+    var v = vendors[i];
+    var vName = v.Vendor_Name || v.Name || 'Vendor';
+
+    document.getElementById('progTitle').textContent = 'Creating ' + (i + 1) + ' of ' + total + '...';
+    document.getElementById('progSub').textContent = vName;
+    document.getElementById('pbar').style.width = Math.round((i / total) * 100) + '%';
 
     try {
-      var subformItems = lineItems
-        .filter(function(item) { return item.productId; })
-        .map(function(item) { return { Item: { id: item.productId } }; });
-
-      var recordData = {
+      var rec = {
         Name: rfqName + ' - ' + vName,
-        Vendor: { id: vendor.id },
+        Vendor: { id: v.id },
         Related_RFQ: { id: rfqId }
       };
       if (subformItems.length > 0) {
-        recordData.Requested_Items = subformItems;
+        rec.Requested_Items = subformItems;
       }
 
-      console.log("Inserting:", JSON.stringify(recordData));
-
-      var createRes = await ZOHO.CRM.API.insertRecord({
+      console.log("Creating:", JSON.stringify(rec));
+      var res = await ZOHO.CRM.API.insertRecord({
         Entity: "Requested_For_Quotations",
-        APIData: recordData,
+        APIData: rec,
         Trigger: []
       });
+      console.log("Result:", JSON.stringify(res));
 
-      console.log("Result:", JSON.stringify(createRes));
-
-      // Check success - insertRecord returns array
-      var success = false;
-      if (createRes && createRes.data && createRes.data[0]) {
-        success = createRes.data[0].code === 'SUCCESS';
-      }
-
-      if (success) {
-        results.push({ vendor: vName, ok: true });
-        if (stepEl) { stepEl.className = 'progress-step done'; stepEl.querySelector('span').textContent = '✅'; }
-      } else {
-        var msg = (createRes && createRes.data && createRes.data[0] && createRes.data[0].message) || JSON.stringify(createRes).substring(0, 100);
-        throw new Error(msg);
-      }
-    } catch(err) {
-      console.error('Error for', vName, err);
-      results.push({ vendor: vName, ok: false, error: String(err.message || err).substring(0, 80) });
-      if (stepEl) { stepEl.className = 'progress-step error'; stepEl.querySelector('span').textContent = '❌'; }
+      var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
+      results.push({ name: vName, ok: ok, msg: ok ? '' : ((res && res.data && res.data[0] && res.data[0].message) || 'Failed') });
+    } catch(e) {
+      results.push({ name: vName, ok: false, msg: String(e.message || e).substring(0, 60) });
     }
   }
 
-  bar.style.width = '100%';
-  var ok = results.filter(function(r) { return r.ok; }).length;
-  var fail = results.filter(function(r) { return !r.ok; }).length;
+  document.getElementById('pbar').style.width = '100%';
 
-  document.getElementById('overlaySpinner').style.display = 'none';
-  document.getElementById('progressTitle').style.display = 'none';
-  document.querySelector('.progress-bar-wrap').style.display = 'none';
+  // Show result
+  var okCount = results.filter(function(r) { return r.ok; }).length;
+  var failCount = results.filter(function(r) { return !r.ok; }).length;
 
-  document.getElementById('resultIcon').textContent = fail === 0 ? '🎉' : (ok > 0 ? '⚠️' : '❌');
-  document.getElementById('resultTitle').textContent = fail === 0 ? 'All Done!' : ok + ' Created, ' + fail + ' Failed';
-  document.getElementById('resultSub').textContent = ok + ' Requested For Quotation record(s) created with items populated.';
-  document.getElementById('resultList').innerHTML = results.map(function(r) {
-    return '<div class="result-item ' + (r.ok ? 'ok' : 'fail') + '">' + (r.ok ? '✅' : '❌') + ' ' + escHtml(r.vendor) + (r.ok ? '' : ' — ' + escHtml(r.error || '')) + '</div>';
+  document.getElementById('progressScreen').classList.remove('show');
+  var rs = document.getElementById('resultScreen');
+  rs.classList.add('show');
+
+  document.getElementById('resIcon').textContent = failCount === 0 ? '🎉' : (okCount > 0 ? '⚠️' : '❌');
+  document.getElementById('resTitle').textContent = failCount === 0
+    ? okCount + ' RFQ(s) Created!'
+    : okCount + ' Created, ' + failCount + ' Failed';
+  document.getElementById('resSub').textContent = 'Requested For Quotation records have been created.';
+  document.getElementById('resItems').innerHTML = results.map(function(r) {
+    return '<div class="ri ' + (r.ok ? '' : 'fail') + '">' + (r.ok ? '✅' : '❌') + ' ' + esc(r.name) + (r.msg ? ' — ' + esc(r.msg) : '') + '</div>';
   }).join('');
-  document.getElementById('resultBox').classList.add('show');
 
-  if (ok > 0) setTimeout(function() { try { ZOHO.CRM.UI.Record.reload(); } catch(e) {} }, 1500);
+  // Show close button
+  document.getElementById('footer').style.display = 'flex';
+  document.getElementById('sendBtn').style.display = 'none';
+  document.getElementById('footer').querySelector('.btn-cancel').textContent = 'Close';
+
+  if (okCount > 0) {
+    setTimeout(function() { try { ZOHO.CRM.UI.Record.reload(); } catch(e) {} }, 1000);
+  }
 }
 
-function closeWidget() { try { ZOHO.CRM.UI.Popup.close(); } catch(e) {} }
-function escHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 </script>
 </body>
 </html>
