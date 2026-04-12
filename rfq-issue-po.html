@@ -345,7 +345,7 @@ async function issuePOs() {
     try {
       var purchaseItems = g.items.map(function(item) {
         return {
-          Product_Name: { id: item.productId },
+          Product_Details: { id: item.productId, name: item.productName },
           Quantity: 1,
           List_Price: item.price,
           Discount: 0
