@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Create Contacts</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1f36;padding:16px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.card-head{background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:15px;font-weight:600;color:#1a1f36;display:flex;align-items:center;gap:8px}
+.badge{background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;border-radius:20px;font-size:11px;font-weight:600;padding:2px 10px}
+.col-heads{display:grid;grid-template-columns:1fr 1fr 1.5fr 1.2fr 40px;gap:8px;padding:10px 20px;border-bottom:1px solid #e2e8f0;background:#fafbfc}
+.col-heads span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b}
+.rows{padding:10px 20px;display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto}
+.row{display:grid;grid-template-columns:1fr 1fr 1.5fr 1.2fr 40px;gap:8px;align-items:center}
+.row input{width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s,box-shadow .15s}
+.row input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.row input.err{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+.row input::placeholder{color:#94a3b8}
+.del{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid transparent;border-radius:8px;cursor:pointer;color:#94a3b8;transition:all .15s;flex-shrink:0}
+.del:hover{background:#fef2f2;color:#ef4444;border-color:#fecaca}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 40px);margin:8px 20px 12px;padding:9px;border:1.5px dashed #cbd5e1;border-radius:8px;background:none;font-size:13px;color:#64748b;cursor:pointer;transition:all .15s;font-family:inherit}
+.add-btn:hover{border-color:#3b82f6;color:#3b82f6;background:#eff6ff}
+.card-foot{padding:14px 20px;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
+.info{font-size:12px;color:#94a3b8}
+.info b{color:#3b82f6}
+.btns{display:flex;gap:10px}
+.save-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;background:#3b82f6;border:none;border-radius:9px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+.save-btn:hover:not(:disabled){background:#2563eb}
+.save-btn:disabled{opacity:.55;cursor:not-allowed}
+.clear-btn{padding:10px 16px;background:none;border:1px solid #e2e8f0;border-radius:9px;font-size:13px;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s}
+.clear-btn:hover{background:#f1f5f9}
+.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.save-btn.loading .spin{display:block}
+.save-btn.loading .lbl{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);background:#1e293b;color:#fff;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0}
+.toast.ok{background:#15803d}
+.toast.er{background:#dc2626}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.success{display:none;text-align:center;padding:40px 20px}
+.success.show{display:block}
+.success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.success h3{font-size:16px;font-weight:600;color:#15803d;margin-bottom:6px}
+.success p{font-size:13px;color:#64748b;margin-bottom:20px}
+</style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+  <div class="card-head">
+    <div class="card-title">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="7" cy="5" r="3" stroke="#3b82f6" stroke-width="1.5"/><path d="M1 16c0-3.3 2.7-5 6-5s6 1.7 6 5" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><path d="M14 4v4M12 6h4" stroke="#3b82f6" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Add Contacts to Account
+    </div>
+    <div class="badge" id="badge">1 contact</div>
+  </div>
+  <div class="col-heads">
+    <span>First Name</span>
+    <span>Last Name <span style="color:#ef4444">*</span></span>
+    <span>Email</span>
+    <span>Phone</span>
+    <span></span>
+  </div>
+  <div class="rows" id="rows"></div>
+  <button class="add-btn" onclick="addRow()">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    Add another contact
+  </button>
+  <div class="card-foot">
+    <div class="info">Creating <b id="cnt">1</b> contact(s) linked to this account</div>
+    <div class="btns">
+      <button class="clear-btn" onclick="clearAll()">Clear All</button>
+      <button class="save-btn" id="saveBtn" onclick="saveContacts()">
+        <div class="spin"></div>
+        <span class="lbl">Save Contacts</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="success" id="successDiv">
+  <div class="success-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <h3 id="successMsg"></h3>
+  <p>Contacts have been linked to this account.</p>
+  <button class="save-btn" onclick="resetAll()">Add More Contacts</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
+<script>
+var accountId = null;
+var rowIdx = 0;
+
+ZOHO.embeddedApp.on("PageLoad", function(data) {
+  accountId = data.EntityId;
+});
+ZOHO.embeddedApp.init();
+
+function addRow() {
+  rowIdx++;
+  var id = rowIdx;
+  var div = document.createElement('div');
+  div.className = 'row';
+  div.id = 'r' + id;
+  div.innerHTML =
+    '<input type="text" placeholder="First name" id="fn' + id + '">' +
+    '<input type="text" placeholder="Last name" id="ln' + id + '">' +
+    '<input type="email" placeholder="email@example.com" id="em' + id + '">' +
+    '<input type="tel" placeholder="+91 98765 43210" id="ph' + id + '">' +
+    '<button class="del" onclick="delRow(' + id + ')" title="Remove">' +
+      '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
+    '</button>';
+  document.getElementById('rows').appendChild(div);
+  updateCount();
+  document.getElementById('fn' + id).focus();
+}
+
+function delRow(id) {
+  var rows = document.querySelectorAll('.row');
+  if (rows.length <= 1) { showToast('Need at least one row', 'er'); return; }
+  var el = document.getElementById('r' + id);
+  if (el) el.remove();
+  updateCount();
+}
+
+function updateCount() {
+  var n = document.querySelectorAll('.row').length;
+  document.getElementById('badge').textContent = n + ' contact' + (n !== 1 ? 's' : '');
+  document.getElementById('cnt').textContent = n;
+}
+
+function clearAll() {
+  document.getElementById('rows').innerHTML = '';
+  rowIdx = 0;
+  addRow();
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'ok') + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 3200);
+}
+
+async function saveContacts() {
+  var rows = document.querySelectorAll('.row');
+  var list = [];
+  var hasErr = false;
+  document.querySelectorAll('.row input').forEach(function(i) { i.classList.remove('err'); });
+
+  rows.forEach(function(row) {
+    var id = row.id.replace('r', '');
+    var fn = document.getElementById('fn' + id).value.trim();
+    var ln = document.getElementById('ln' + id).value.trim();
+    var em = document.getElementById('em' + id).value.trim();
+    var ph = document.getElementById('ph' + id).value.trim();
+    if (!ln) { document.getElementById('ln' + id).classList.add('err'); hasErr = true; return; }
+    if (fn || ln || em || ph) list.push({ First_Name: fn, Last_Name: ln, Email: em, Phone: ph });
+  });
+
+  if (hasErr) { showToast('Last Name is required', 'er'); return; }
+  if (!list.length) { showToast('Enter at least one contact', 'er'); return; }
+
+  var btn = document.getElementById('saveBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  var ok = 0, fail = 0;
+  for (var i = 0; i < list.length; i++) {
+    var c = list[i];
+    try {
+      var payload = { Last_Name: c.Last_Name, Account_Name: { id: accountId } };
+      if (c.First_Name) payload.First_Name = c.First_Name;
+      if (c.Email) payload.Email = c.Email;
+      if (c.Phone) payload.Phone = c.Phone;
+      var res = await ZOHO.CRM.API.insertRecord({ Entity: 'Contacts', APIData: payload });
+      if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') ok++;
+      else fail++;
+    } catch (e) { fail++; }
+  }
+
+  btn.classList.remove('loading');
+  btn.disabled = false;
+
+  if (ok > 0 && fail === 0) {
+    document.getElementById('mainCard').style.display = 'none';
+    document.getElementById('successMsg').textContent = ok + ' contact' + (ok > 1 ? 's' : '') + ' created successfully!';
+    document.getElementById('successDiv').classList.add('show');
+  } else if (ok > 0) {
+    showToast(ok + ' created, ' + fail + ' failed', 'er');
+  } else {
+    showToast('Failed to create contacts. Try again.', 'er');
+  }
+}
+
+function resetAll() {
+  document.getElementById('successDiv').classList.remove('show');
+  document.getElementById('mainCard').style.display = '';
+  clearAll();
+}
+
+addRow();
+</script>
+</body>
+</html>
