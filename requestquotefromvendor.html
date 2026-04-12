@@ -6,7 +6,34 @@
 <title>RFQ — Send to Vendor</title>
 
 <!-- Zoho Embedded App SDK -->
-<script src="https://live.zwidgets.com/js-sdk/1.0.5/ZohoEmbeddedAppSDK.min.js"></script>
+<script>
+/* Load Zoho SDK — try primary URL, fallback to secondary */
+(function() {
+  var urls = [
+    'https://js.zwidgets.com/widgets/zoho-embedded-app-sdk-1.1.js',
+    'https://live.zwidgets.com/js-sdk/1.0.5/ZohoEmbeddedAppSDK.min.js'
+  ];
+  var idx = 0;
+  function loadSDK() {
+    var s = document.createElement('script');
+    s.src = urls[idx];
+    s.onload = function() { console.log('[SDK] Loaded from', urls[idx]); };
+    s.onerror = function() {
+      idx++;
+      if (idx < urls.length) { loadSDK(); }
+      else {
+        document.getElementById('loadingScreen').innerHTML =
+          '<div style="color:#C0392B;text-align:center;padding:40px;font-size:13px">' +
+          '<p style="font-size:20px;margin-bottom:8px">⚠️</p>' +
+          '<p><strong>Zoho SDK failed to load.</strong></p>' +
+          '<p style="margin-top:6px;color:#888">Check your internet connection and reload the page.</p></div>';
+      }
+    };
+    document.head.appendChild(s);
+  }
+  loadSDK();
+})();
+</script>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
