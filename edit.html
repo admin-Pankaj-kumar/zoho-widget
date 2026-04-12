@@ -62,7 +62,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
 .success h3{font-size:15px;font-weight:600;color:#15803d;margin-bottom:6px}
 .success p{font-size:12px;color:#64748b;margin-bottom:18px}
-.debug-bar{background:#1e293b;color:#94a3b8;font-family:monospace;font-size:10px;padding:6px 20px;word-break:break-all}
+.debug{background:#1e293b;color:#7dd3fc;font-family:monospace;font-size:10px;padding:6px 12px;word-break:break-all}
 </style>
 </head>
 <body>
@@ -79,7 +79,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
   </div>
 
-  <div class="debug-bar" id="debugBar">Initializing...</div>
+  <div class="debug" id="dbg">Starting...</div>
 
   <div class="col-heads">
     <span></span>
@@ -133,113 +133,80 @@ var accountId = null;
 var contacts  = [];
 var rowIdx    = 0;
 
-function debug(msg) {
-  document.getElementById('debugBar').textContent = msg;
-  console.log(msg);
+function dbg(msg) {
+  document.getElementById('dbg').textContent = msg;
+  console.log('[EditWidget]', msg);
 }
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
-  console.log("Full PageLoad data:", JSON.stringify(data));
+  dbg("PageLoad: " + JSON.stringify(data));
 
-  // Try to get Account ID from the parent window URL first
-  var urlAccountId = getAccountIdFromParentUrl();
-
-  // data.EntityId could be the account or something else
+  // For a Button widget on Accounts, data.EntityId is the Account ID
+  // But sometimes it's an array — handle both
   var rawId = data.EntityId;
   var sdkId = String(Array.isArray(rawId) ? rawId[0] : rawId);
 
-  debug("SDK EntityId: " + sdkId + " | URL AccountId: " + urlAccountId + " | Entity: " + data.Entity);
+  dbg("Entity=" + data.Entity + " | EntityId=" + sdkId);
 
-  // Use URL account ID if available and different from SDK ID
-  // For Accounts module button widget, Entity should be "Accounts"
+  // If Entity is Accounts, use it directly
   if (data.Entity === "Accounts") {
     accountId = sdkId;
-    debug("Using SDK ID (Accounts entity): " + accountId);
-  } else if (urlAccountId) {
-    accountId = urlAccountId;
-    debug("Using URL Account ID: " + accountId);
-  } else {
-    accountId = sdkId;
-    debug("Fallback to SDK ID: " + accountId);
+    dbg("✓ Got account ID from Entity=Accounts: " + accountId);
+    loadContacts();
+    return;
   }
 
-  loadContacts();
+  // Otherwise try to get Account ID from the page using getCurrentRecord
+  dbg("Entity is not Accounts, trying getCurrentRecord...");
+  ZOHO.CRM.UI.Record.getCurrentRecord()
+    .then(function(rec) {
+      dbg("getCurrentRecord: " + JSON.stringify(rec));
+      if (rec && rec.id) {
+        accountId = String(rec.id);
+        dbg("✓ Got account ID from getCurrentRecord: " + accountId);
+      } else {
+        accountId = sdkId;
+        dbg("Fallback to SDK EntityId: " + accountId);
+      }
+      loadContacts();
+    })
+    .catch(function(e) {
+      dbg("getCurrentRecord failed, using SDK ID: " + sdkId);
+      accountId = sdkId;
+      loadContacts();
+    });
 });
-ZOHO.embeddedApp.init();
 
-function getAccountIdFromParentUrl() {
-  try {
-    // Try to get the parent page URL which contains the Account ID
-    var url = window.parent.location.href;
-    var match = url.match(/\/Accounts\/(\d+)/);
-    if (match) return match[1];
-  } catch(e) {
-    // Cross-origin, can't access parent URL
-    try {
-      // Try referrer
-      var ref = document.referrer;
-      var match2 = ref.match(/\/Accounts\/(\d+)/);
-      if (match2) return match2[1];
-    } catch(e2) {}
-  }
-  return null;
-}
+ZOHO.embeddedApp.init();
 
 function loadContacts() {
   showState('loading');
   contacts = [];
   rowIdx = 0;
-  debug("Loading contacts for Account ID: " + accountId);
+  dbg("Loading contacts for account: " + accountId);
 
-  // Use COQL via the SDK to get contacts linked to this account
+  // Use COQL via Zoho CRM API
   ZOHO.CRM.API.searchRecord({
     Entity: "Contacts",
     Type: "criteria",
     Query: "(Account_Name:equals:" + accountId + ")"
   }).then(function(res) {
-    console.log("Search result:", JSON.stringify(res));
-    debug("Search result: " + (res && res.data ? res.data.length + " records" : "no data, status: " + (res && res.status)));
+    dbg("Search response status: " + (res ? res.status || 'ok' : 'null') + " | records: " + (res && res.data ? res.data.length : 0));
 
     if (res && res.data && res.data.length > 0) {
       processContacts(res.data);
     } else {
-      // Try alternative search by account name
-      ZOHO.CRM.API.getRecord({ Entity: "Accounts", RecordID: accountId })
-        .then(function(acctRes) {
-          var acct = acctRes && acctRes.data && acctRes.data[0];
-          var acctName = acct ? (acct.Account_Name || acct.Name) : null;
-          debug("Account name: " + acctName + " — searching contacts by name");
-          if (acctName) {
-            searchByAccountName(acctName);
-          } else {
-            fetchAllAndFilter();
-          }
-        }).catch(function() { fetchAllAndFilter(); });
+      // Fallback: fetch all contacts and filter
+      dbg("No results, trying getAllRecords fallback...");
+      fetchAllAndFilter();
     }
   }).catch(function(err) {
-    console.error("Search error:", err);
-    debug("Search failed, trying fallback");
+    dbg("searchRecord error: " + JSON.stringify(err));
     fetchAllAndFilter();
   });
 }
 
-function searchByAccountName(acctName) {
-  ZOHO.CRM.API.searchRecord({
-    Entity: "Contacts",
-    Type: "criteria",
-    Query: "(Account_Name:equals:" + acctName + ")"
-  }).then(function(res) {
-    debug("Name search result: " + (res && res.data ? res.data.length + " records" : "no data"));
-    if (res && res.data && res.data.length > 0) {
-      processContacts(res.data);
-    } else {
-      fetchAllAndFilter();
-    }
-  }).catch(function() { fetchAllAndFilter(); });
-}
-
 function fetchAllAndFilter() {
-  debug("Fetching all contacts and filtering...");
   ZOHO.CRM.API.getAllRecords({
     Entity: "Contacts",
     sort_order: "asc",
@@ -247,14 +214,14 @@ function fetchAllAndFilter() {
     page: 1
   }).then(function(res) {
     var all = (res && res.data) ? res.data : [];
-    debug("Total contacts fetched: " + all.length + " | Filtering for account: " + accountId);
+    dbg("getAllRecords: " + all.length + " total contacts");
     var linked = all.filter(function(c) {
       return c.Account_Name && String(c.Account_Name.id) === String(accountId);
     });
-    debug("Matched contacts: " + linked.length);
+    dbg("Filtered: " + linked.length + " contacts for account " + accountId);
     processContacts(linked);
   }).catch(function(err) {
-    debug("All methods failed: " + err);
+    dbg("getAllRecords error: " + JSON.stringify(err));
     showState('empty');
     showToast('Failed to load contacts', 'er');
   });
@@ -268,6 +235,7 @@ function processContacts(data) {
   renderAll();
   showState(contacts.length ? 'rows' : 'empty');
   document.getElementById('totalBadge').textContent = contacts.length + ' contact' + (contacts.length !== 1 ? 's' : '');
+  dbg("Done. Rendered " + contacts.length + " contacts for account " + accountId);
 }
 
 function renderAll() {
