@@ -6,51 +6,109 @@
 <title>Send RFQ to Vendors</title>
 <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;padding:14px;min-height:100vh;display:flex;flex-direction:column;gap:10px;font-size:13px}
-  .card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}
-  .card-header{padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:11px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between}
-  .badge{background:#e2e8f0;color:#4a5568;font-size:10px;padding:1px 7px;border-radius:20px;font-weight:600}
-  .products-wrap{padding:6px;display:flex;flex-direction:column;gap:3px;max-height:110px;overflow-y:auto}
-  .product-row{display:flex;align-items:center;gap:8px;padding:5px 8px;background:#f8fafc;border-radius:5px;border:1px solid #e2e8f0}
-  .product-dot{width:5px;height:5px;border-radius:50%;background:#48bb78;flex-shrink:0}
-  .product-name{flex:1;font-size:12px;color:#2d3748;font-weight:500}
-  .product-price{font-size:11px;color:#718096;font-family:monospace}
-  .vendors-wrap{display:flex;flex-direction:column;max-height:220px;overflow-y:auto}
-  .vendor-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f4f8;cursor:pointer;transition:background .1s;user-select:none}
-  .vendor-row:last-child{border-bottom:none}
-  .vendor-row:hover{background:#f7fafc}
-  .vendor-row.selected{background:#ebf8ff}
-  .cb{width:17px;height:17px;border:2px solid #cbd5e0;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:transparent}
-  .vendor-row.selected .cb{background:#3b82f6;border-color:#3b82f6;color:white}
-  .av{width:30px;height:30px;border-radius:7px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#2563eb;flex-shrink:0}
-  .vinfo{flex:1;min-width:0}
-  .vname{font-size:12px;font-weight:500;color:#1a202c}
-  .vemail{font-size:10px;color:#718096;margin-top:1px}
-  .state-msg{padding:20px;text-align:center;color:#a0aec0;font-size:12px}
-  .spinner{width:18px;height:18px;border:2px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 8px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .footer{display:flex;gap:8px}
-  .btn{flex:1;padding:10px;border-radius:7px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
-  .btn-cancel{background:#edf2f7;color:#718096}
-  .btn-cancel:hover{background:#e2e8f0}
-  .btn-send{background:#3b82f6;color:white}
-  .btn-send:hover:not(:disabled){background:#2563eb}
-  .btn-send:disabled{opacity:.4;cursor:not-allowed}
-  .screen{display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:28px 16px;background:#fff;border-radius:8px;border:1px solid #e2e8f0;text-align:center;flex:1}
-  .screen.show{display:flex}
-  .screen-title{font-size:14px;font-weight:600;color:#1a202c}
-  .screen-sub{font-size:11px;color:#718096}
-  .pbar-wrap{width:100%;max-width:240px;height:4px;background:#e2e8f0;border-radius:4px;overflow:hidden}
-  .pbar{height:100%;background:#3b82f6;border-radius:4px;transition:width .3s;width:0%}
-  .res-icon{font-size:38px}
-  .res-list{width:100%;display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto}
-  .res-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f7f9fc;border-radius:5px;font-size:11px;color:#4a5568;border-left:3px solid #48bb78}
-  .res-item.fail{border-left-color:#f56565}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f7fa;
+    padding: 14px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 11px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .badge {
+    background: #e2e8f0;
+    color: #4a5568;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  /* Products */
+  .products-wrap { padding: 6px; display: flex; flex-direction: column; gap: 3px; max-height: 110px; overflow-y: auto; }
+  .product-row { display: flex; align-items: center; gap: 8px; padding: 5px 8px; background: #f8fafc; border-radius: 5px; border: 1px solid #e2e8f0; }
+  .product-dot { width: 5px; height: 5px; border-radius: 50%; background: #48bb78; flex-shrink: 0; }
+  .product-name { flex: 1; font-size: 12px; color: #2d3748; font-weight: 500; }
+  .product-price { font-size: 11px; color: #718096; font-family: monospace; }
+  /* Vendors */
+  .vendors-wrap { display: flex; flex-direction: column; max-height: 220px; overflow-y: auto; }
+  .vendor-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f4f8;
+    cursor: pointer;
+    transition: background 0.1s;
+    user-select: none;
+  }
+  .vendor-row:last-child { border-bottom: none; }
+  .vendor-row:hover { background: #f7fafc; }
+  .vendor-row.selected { background: #ebf8ff; }
+  .cb {
+    width: 17px; height: 17px;
+    border: 2px solid #cbd5e0;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 10px;
+    color: transparent;
+  }
+  .vendor-row.selected .cb { background: #3b82f6; border-color: #3b82f6; color: white; }
+  .av {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: #dbeafe; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #2563eb; flex-shrink: 0;
+  }
+  .vinfo { flex: 1; min-width: 0; }
+  .vname { font-size: 12px; font-weight: 500; color: #1a202c; }
+  .vemail { font-size: 10px; color: #718096; margin-top: 1px; }
+  /* States */
+  .state-msg { padding: 20px; text-align: center; color: #a0aec0; font-size: 12px; }
+  .spinner { width: 18px; height: 18px; border: 2px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* Footer */
+  .footer { display: flex; gap: 8px; }
+  .btn { flex: 1; padding: 10px; border-radius: 7px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .btn-cancel { background: #edf2f7; color: #718096; }
+  .btn-cancel:hover { background: #e2e8f0; }
+  .btn-send { background: #3b82f6; color: white; }
+  .btn-send:hover:not(:disabled) { background: #2563eb; }
+  .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+  /* Progress */
+  .screen { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 28px 16px; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; flex: 1; }
+  .screen.show { display: flex; }
+  .screen-title { font-size: 14px; font-weight: 600; color: #1a202c; }
+  .screen-sub { font-size: 11px; color: #718096; }
+  .pbar-wrap { width: 100%; max-width: 240px; height: 4px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+  .pbar { height: 100%; background: #3b82f6; border-radius: 4px; transition: width 0.3s; width: 0%; }
+  /* Results */
+  .res-icon { font-size: 38px; }
+  .res-list { width: 100%; display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto; }
+  .res-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #f7f9fc; border-radius: 5px; font-size: 11px; color: #4a5568; border-left: 3px solid #48bb78; }
+  .res-item.fail { border-left-color: #f56565; }
 </style>
 </head>
 <body>
 
+<!-- Line Items Section -->
 <div class="card" id="lineItemsCard">
   <div class="card-header">📦 RFQ Line Items <span class="badge" id="itemCount">0</span></div>
   <div class="products-wrap" id="productsList">
@@ -58,6 +116,7 @@
   </div>
 </div>
 
+<!-- Vendors Section -->
 <div class="card" id="vendorsCard">
   <div class="card-header">🏭 Select Vendors <span class="badge" id="vendorCount">0 selected</span></div>
   <div class="vendors-wrap" id="vendorsList">
@@ -65,6 +124,7 @@
   </div>
 </div>
 
+<!-- Progress Screen -->
 <div class="screen" id="progressScreen">
   <div class="spinner"></div>
   <div class="screen-title" id="progTitle">Creating records...</div>
@@ -72,6 +132,7 @@
   <div class="pbar-wrap"><div class="pbar" id="pbar"></div></div>
 </div>
 
+<!-- Result Screen -->
 <div class="screen" id="resultScreen">
   <div class="res-icon" id="resIcon">🎉</div>
   <div class="screen-title" id="resTitle"></div>
@@ -79,154 +140,270 @@
   <div class="res-list" id="resList"></div>
 </div>
 
+<!-- Footer -->
 <div class="footer" id="footer">
-  <button class="btn btn-cancel" id="cancelBtn" onclick="ZOHO.CRM.UI.Popup.close()">Cancel</button>
+  <button class="btn btn-cancel" id="cancelBtn" onclick="cancel()">Cancel</button>
   <button class="btn btn-send" id="sendBtn" onclick="send()" disabled>✉️ Send RFQ</button>
 </div>
 
 <script>
-var rfqId, rfqName = '', lineItems = [], allVendors = [], selected = new Set();
+var rfqId = null;
+var rfqName = '';
+var lineItems = []; // {productId, productName, unitPrice}
+var allVendors = [];
+var selected = new Set();
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
-  rfqId = String(Array.isArray(data.EntityId) ? data.EntityId[0] : data.EntityId);
+  console.log("PageLoad:", JSON.stringify(data));
+  rfqId = data.EntityId;
+  if (Array.isArray(rfqId)) rfqId = rfqId[0];
+  rfqId = String(rfqId);
   init();
 });
 ZOHO.embeddedApp.init();
 
 async function init() {
-  await Promise.all([loadLineItems(), loadVendors()]);
+  // Run in parallel
+  await Promise.all([loadRFQLineItems(), loadVendors()]);
 }
 
-// ── Line Items ────────────────────────────────────────────
-async function loadLineItems() {
+// ── Step 1: Get RFQ name ──────────────────────────────────
+async function getRFQName() {
   try {
-    // Get RFQ name
     var r = await ZOHO.CRM.API.getRecord({ Entity: "RFQs", RecordID: rfqId });
-    rfqName = (r && r.data && r.data[0] && r.data[0].Name) || rfqId;
+    if (r && r.data && r.data[0]) return r.data[0].Name || rfqId;
+  } catch(e) {}
+  return rfqId;
+}
 
-    // Get line items via COQL — confirmed working in MCP tests
-    var coql = await ZOHO.CRM.API.coqlQuery({
-      select_query: "SELECT id, Line_Items, RFQ_List FROM RFQ_List WHERE RFQ_List = '" + rfqId + "' LIMIT 200"
+// ── Step 2: Load Line Items + Unit Price ──────────────────
+async function loadRFQLineItems() {
+  rfqName = await getRFQName();
+
+  try {
+    // Get RFQ_List records linked to this RFQ
+    var rlRes = await ZOHO.CRM.API.getRelatedRecords({
+      Entity: "RFQs",
+      RecordID: rfqId,
+      RelatedList: "RFQ_List",
+      page: 1,
+      per_page: 200
     });
-    console.log("COQL:", JSON.stringify(coql));
+    console.log("RFQ_List result:", JSON.stringify(rlRes));
 
-    var rows = (coql && coql.data) ? coql.data : [];
-    lineItems = [];
+    var rlData = (rlRes && rlRes.data) ? rlRes.data : [];
+    var productIds = [];
+    var tempItems = [];
 
-    for (var i = 0; i < rows.length; i++) {
-      var p = rows[i].Line_Items || {};
-      if (!p.id) continue;
-      var unitPrice = 0;
+    rlData.forEach(function(row) {
+      var p = row.Line_Items || {};
+      if (p.id) {
+        productIds.push(p.id);
+        tempItems.push({ productId: p.id, productName: p.name || 'Product', unitPrice: 0 });
+      }
+    });
+
+    // Get Unit_Price for each product
+    if (productIds.length > 0) {
       try {
-        var pr = await ZOHO.CRM.API.getRecord({ Entity: "Products", RecordID: p.id });
-        if (pr && pr.data && pr.data[0]) unitPrice = pr.data[0].Unit_Price || 0;
-      } catch(e) {}
-      lineItems.push({ productId: p.id, productName: p.name || 'Product', unitPrice: unitPrice });
+        // Fetch each product individually to get Unit_Price
+        var priceMap = {};
+        for (var i = 0; i < productIds.length; i++) {
+          var pRes = await ZOHO.CRM.API.getRecord({ Entity: "Products", RecordID: productIds[i] });
+          if (pRes && pRes.data && pRes.data[0]) {
+            priceMap[productIds[i]] = pRes.data[0].Unit_Price || 0;
+          }
+        }
+        // Apply prices
+        tempItems.forEach(function(item) {
+          item.unitPrice = priceMap[item.productId] || 0;
+        });
+      } catch(pe) {
+        console.warn("Could not fetch unit prices:", pe);
+      }
     }
 
+    lineItems = tempItems;
     document.getElementById('itemCount').textContent = lineItems.length;
-    document.getElementById('productsList').innerHTML = lineItems.length
-      ? lineItems.map(function(x) {
-          return '<div class="product-row"><div class="product-dot"></div>' +
-            '<span class="product-name">' + esc(x.productName) + '</span>' +
-            '<span class="product-price">' + (x.unitPrice ? '&#8377;' + x.unitPrice.toLocaleString('en-IN') : '&mdash;') + '</span></div>';
-        }).join('')
-      : '<div class="state-msg">No line items found on this RFQ</div>';
+    renderProducts();
+
+    if (!lineItems.length) {
+      document.getElementById('productsList').innerHTML =
+        '<div class="state-msg">⚠️ No line items on this RFQ</div>';
+    }
   } catch(e) {
-    console.error("loadLineItems:", e);
-    document.getElementById('productsList').innerHTML = '<div class="state-msg">&#9888; ' + esc(String(e.message||e)) + '</div>';
+    console.error("Line items error:", e);
+    document.getElementById('productsList').innerHTML =
+      '<div class="state-msg">⚠️ Error loading items: ' + esc(String(e.message || e)) + '</div>';
   }
 }
 
-// ── Vendors ───────────────────────────────────────────────
+function renderProducts() {
+  var el = document.getElementById('productsList');
+  if (!lineItems.length) return;
+  el.innerHTML = lineItems.map(function(item) {
+    var price = item.unitPrice ? '₹' + Number(item.unitPrice).toLocaleString('en-IN') : '—';
+    return '<div class="product-row">' +
+      '<div class="product-dot"></div>' +
+      '<span class="product-name">' + esc(item.productName) + '</span>' +
+      '<span class="product-price">' + price + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ── Step 3: Load Vendors ──────────────────────────────────
 async function loadVendors() {
   try {
-    // COQL to get vendors — confirmed working
-    var res = await ZOHO.CRM.API.coqlQuery({
-      select_query: "SELECT id, Vendor_Name, Email FROM Vendors WHERE id is not null LIMIT 200"
+    var res = await ZOHO.CRM.API.getRecords({
+      Entity: "Vendors",
+      sort_order: "asc",
+      per_page: 200,
+      page: 1
     });
     console.log("Vendors:", JSON.stringify(res));
     allVendors = (res && res.data) ? res.data : [];
     renderVendors();
-  } catch(e) {
-    console.error("loadVendors:", e);
-    document.getElementById('vendorsList').innerHTML = '<div class="state-msg">&#9888; Error loading vendors</div>';
+  } catch(e1) {
+    console.warn("getRecords failed, trying search:", e1);
+    try {
+      var res2 = await ZOHO.CRM.API.searchRecord({ Entity: "Vendors", Type: "word", Query: "a" });
+      allVendors = (res2 && res2.data) ? res2.data : [];
+      renderVendors();
+    } catch(e2) {
+      console.error("Vendors error:", e2);
+      document.getElementById('vendorsList').innerHTML =
+        '<div class="state-msg">⚠️ Error loading vendors</div>';
+    }
   }
 }
 
 function renderVendors() {
   var el = document.getElementById('vendorsList');
-  if (!allVendors.length) { el.innerHTML = '<div class="state-msg">No vendors found</div>'; return; }
+  if (!allVendors.length) {
+    el.innerHTML = '<div class="state-msg">No vendors found</div>';
+    return;
+  }
   el.innerHTML = allVendors.map(function(v) {
     var name = v.Vendor_Name || v.Name || 'Vendor';
-    var sel = selected.has(v.id);
-    return '<div class="vendor-row' + (sel ? ' selected' : '') + '" onclick="toggle(\'' + v.id + '\')">' +
-      '<div class="cb">' + (sel ? '&#10003;' : '') + '</div>' +
-      '<div class="av">' + name.substring(0,2).toUpperCase() + '</div>' +
-      '<div class="vinfo"><div class="vname">' + esc(name) + '</div>' +
-      (v.Email ? '<div class="vemail">' + esc(v.Email) + '</div>' : '') +
-      '</div></div>';
+    var email = v.Email || '';
+    var init = name.substring(0, 2).toUpperCase();
+    var sel = selected.has(v.id) ? 'selected' : '';
+    return '<div class="vendor-row ' + sel + '" onclick="toggle(\'' + v.id + '\')">' +
+      '<div class="cb">' + (sel ? '✓' : '') + '</div>' +
+      '<div class="av">' + init + '</div>' +
+      '<div class="vinfo">' +
+        '<div class="vname">' + esc(name) + '</div>' +
+        (email ? '<div class="vemail">' + esc(email) + '</div>' : '') +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
 function toggle(id) {
-  selected.has(id) ? selected.delete(id) : selected.add(id);
-  document.getElementById('vendorCount').textContent = selected.size + ' selected';
-  document.getElementById('sendBtn').disabled = selected.size === 0;
+  if (selected.has(id)) selected.delete(id);
+  else selected.add(id);
+  var n = selected.size;
+  document.getElementById('vendorCount').textContent = n + ' selected';
+  document.getElementById('sendBtn').disabled = (n === 0);
   renderVendors();
 }
 
-// ── Send ──────────────────────────────────────────────────
+function cancel() {
+  try { ZOHO.CRM.UI.Popup.close(); } catch(e) {}
+}
+
+// ── Step 4: Create records ────────────────────────────────
 async function send() {
   var vendors = allVendors.filter(function(v) { return selected.has(v.id); });
   if (!vendors.length) return;
 
-  ['lineItemsCard','vendorsCard'].forEach(function(id) { document.getElementById(id).style.display='none'; });
+  // Switch screens
+  document.getElementById('lineItemsCard').style.display = 'none';
+  document.getElementById('vendorsCard').style.display = 'none';
   document.getElementById('footer').style.display = 'none';
   document.getElementById('progressScreen').classList.add('show');
 
-  var subform = lineItems.filter(function(x) { return x.productId; }).map(function(x) {
-    var s = { Item: { id: x.productId } };
-    if (x.unitPrice) s.Expected_Price = x.unitPrice;
-    return s;
-  });
+  var results = [];
+  var total = vendors.length;
 
-  var results = [], total = vendors.length;
-  for (var i = 0; i < total; i++) {
-    var v = vendors[i], vName = v.Vendor_Name || v.Name || 'Vendor';
-    document.getElementById('progTitle').textContent = 'Creating ' + (i+1) + ' of ' + total;
+  // Build subform — Item lookup + Expected_Price from Unit_Price
+  var subformItems = lineItems
+    .filter(function(item) { return item.productId; })
+    .map(function(item) {
+      var subItem = { Item: { id: item.productId } };
+      if (item.unitPrice) subItem.Expected_Price = item.unitPrice;
+      return subItem;
+    });
+
+  console.log("Subform items:", JSON.stringify(subformItems));
+
+  for (var i = 0; i < vendors.length; i++) {
+    var v = vendors[i];
+    var vName = v.Vendor_Name || v.Name || 'Vendor';
+
+    document.getElementById('progTitle').textContent = 'Creating ' + (i + 1) + ' of ' + total;
     document.getElementById('progSub').textContent = vName;
-    document.getElementById('pbar').style.width = Math.round(i/total*100) + '%';
+    document.getElementById('pbar').style.width = Math.round((i / total) * 100) + '%';
+
     try {
-      var rec = { Name: rfqName + ' - ' + vName, Vendor: {id:v.id}, Related_RFQ: {id:rfqId} };
-      if (subform.length) rec.Requested_Items = subform;
-      var res = await ZOHO.CRM.API.insertRecord({ Entity: "Requested_For_Quotations", APIData: rec, Trigger: [] });
+      var rec = {
+        Name: rfqName + ' - ' + vName,
+        Vendor: { id: v.id },
+        Related_RFQ: { id: rfqId }
+      };
+      if (subformItems.length > 0) {
+        rec.Requested_Items = subformItems;
+      }
+
+      console.log("Creating for", vName, JSON.stringify(rec));
+      var res = await ZOHO.CRM.API.insertRecord({
+        Entity: "Requested_For_Quotations",
+        APIData: rec,
+        Trigger: []
+      });
+      console.log("Result:", JSON.stringify(res));
+
       var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
-      results.push({ name: vName, ok: ok, msg: ok ? '' : (res.data[0].message || 'Failed') });
+      results.push({ name: vName, ok: ok, msg: ok ? '' : ((res && res.data && res.data[0] && res.data[0].message) || 'Failed') });
     } catch(e) {
-      results.push({ name: vName, ok: false, msg: String(e.message||e).substring(0,60) });
+      console.error("Error for", vName, e);
+      results.push({ name: vName, ok: false, msg: String(e.message || e).substring(0, 60) });
     }
   }
+
   document.getElementById('pbar').style.width = '100%';
 
-  var ok = results.filter(function(r){return r.ok;}).length;
-  var fail = results.length - ok;
+  // Show results
+  var okCount = results.filter(function(r) { return r.ok; }).length;
+  var failCount = results.filter(function(r) { return !r.ok; }).length;
+
   document.getElementById('progressScreen').classList.remove('show');
   document.getElementById('resultScreen').classList.add('show');
-  document.getElementById('resIcon').textContent = fail===0 ? '🎉' : ok>0 ? '⚠️' : '❌';
-  document.getElementById('resTitle').textContent = fail===0 ? ok+' RFQ(s) Sent!' : ok+' Created, '+fail+' Failed';
-  document.getElementById('resSub').textContent = 'Requested For Quotation records created with items & prices.';
+  document.getElementById('resIcon').textContent = failCount === 0 ? '🎉' : (okCount > 0 ? '⚠️' : '❌');
+  document.getElementById('resTitle').textContent = failCount === 0
+    ? okCount + ' RFQ(s) Sent Successfully!'
+    : okCount + ' Created, ' + failCount + ' Failed';
+  document.getElementById('resSub').textContent = 'Requested For Quotation records created with line items & prices.';
   document.getElementById('resList').innerHTML = results.map(function(r) {
-    return '<div class="res-item'+(r.ok?'':' fail')+'">'+(r.ok?'✅':'❌')+' '+esc(r.name)+(r.msg?' — '+esc(r.msg):'')+' </div>';
+    return '<div class="res-item ' + (r.ok ? '' : 'fail') + '">' +
+      (r.ok ? '✅' : '❌') + ' ' + esc(r.name) +
+      (r.msg ? ' — ' + esc(r.msg) : '') +
+    '</div>';
   }).join('');
 
+  // Show close button
   document.getElementById('footer').style.display = 'flex';
   document.getElementById('sendBtn').style.display = 'none';
   document.getElementById('cancelBtn').textContent = '✓ Close';
-  if (ok > 0) setTimeout(function(){ try{ZOHO.CRM.UI.Record.reload();}catch(e){} }, 1000);
+
+  if (okCount > 0) {
+    setTimeout(function() { try { ZOHO.CRM.UI.Record.reload(); } catch(e) {} }, 1000);
+  }
 }
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 </script>
 </body>
 </html>
