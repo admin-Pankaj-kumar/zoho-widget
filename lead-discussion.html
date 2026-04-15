@@ -81,6 +81,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .act-complete-btn:hover:not(:disabled){background:#15803d}
 .act-complete-btn:disabled{opacity:.4;cursor:not-allowed}
 
+/* OPEN ACTIVITIES - NEW UI */
+.act-list{display:flex;flex-direction:column;gap:8px}
+.act-empty{font-size:12px;color:#94a3b8;font-style:italic;padding:2px 0}
+.act-item{border-radius:8px;border:0.5px solid #e2e8f0;background:#f8fafc;transition:opacity .3s}
+.act-item.overdue{border-left:3px solid #ef4444}
+.act-item.today{border-left:3px solid #f59e0b}
+.act-item.upcoming{border-left:3px solid #3b82f6}
+.act-item.no-date{border-left:3px solid #94a3b8}
+.act-main-row{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.act-check{width:22px;height:22px;border-radius:50%;border:2px solid #16a34a;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.act-check:hover{background:#dcfce7;border-color:#15803d}
+.act-check svg{display:none}
+.act-check.checking{background:#16a34a;border-color:#16a34a}
+.act-check.checking svg{display:block}
+.act-info{flex:1;min-width:0}
+.act-subject{font-size:12px;font-weight:600;color:#1a1f36}
+.act-meta{display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap}
+.act-owner{font-size:11px;color:#64748b}
+.act-due{font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px}
+.act-due.overdue{background:#fee2e2;color:#dc2626}
+.act-due.today{background:#fef3c7;color:#b45309}
+.act-due.upcoming{background:#dbeafe;color:#1d4ed8}
+.act-due.no-date{background:#f1f5f9;color:#64748b}
+
+/* Completion panel - slides in */
+.act-complete-panel{display:none;border-top:0.5px solid #e2e8f0;padding:10px 12px;background:#f0fdf4;gap:8px;flex-direction:column}
+.act-complete-panel.open{display:flex}
+.act-complete-label{font-size:11px;font-weight:600;color:#15803d}
+.act-complete-textarea{width:100%;border:0.5px solid #bbf7d0;border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:none;height:60px;line-height:1.5;transition:border .15s}
+.act-complete-textarea:focus{border-color:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.1)}
+.act-complete-textarea::placeholder{color:#94a3b8}
+.act-complete-btns{display:flex;justify-content:flex-end;gap:8px}
+.act-cancel-btn{padding:6px 12px;background:#fff;border:0.5px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit}
+.act-cancel-btn:hover{background:#f1f5f9}
+.act-save-btn{padding:6px 14px;background:#16a34a;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.act-save-btn:hover:not(:disabled){background:#15803d}
+.act-save-btn:disabled{opacity:.5;cursor:not-allowed}
+.act-save-spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.act-save-btn.loading .act-save-spin{display:block}
+.act-save-btn.loading .act-save-lbl{display:none}
+
 /* CREATE ACTIVITY */
 .tabs{display:flex;gap:6px;margin-bottom:12px}
 .tab{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid #e2e8f0;background:#f8fafc;color:#64748b;transition:all .15s}
@@ -495,37 +536,75 @@ function renderActivities() {
   }
   badge.style.display = 'inline-block';
   badge.textContent = openActs.length;
-  // Auto-open
+  // Auto-open accordion
   if (!openAccordions['acts']) {
     openAccordions['acts'] = true;
     document.getElementById('body-acts').classList.add('open');
     document.getElementById('arrow-acts').classList.add('open');
   }
   el.innerHTML = openActs.map(function(t, i) {
-    var st = dueStatus(t.Due_Date || '');
-    var dueTxt = st==='overdue' ? '⚠ Overdue: '+fmtDue(t.Due_Date)
-               : st==='today'   ? '📅 Due Today'
-               : st==='upcoming'? '🗓 '+fmtDue(t.Due_Date)
-               :                  '📌 No due date';
+    var st      = dueStatus(t.Due_Date || '');
+    var dueTxt  = st==='overdue'  ? '⚠ Overdue: ' + fmtDue(t.Due_Date)
+                : st==='today'    ? '📅 Due Today'
+                : st==='upcoming' ? '🗓 ' + fmtDue(t.Due_Date)
+                :                   '📌 No due date';
+    var owner   = t.Owner ? t.Owner.name || '' : '';
     return '<div class="act-item ' + st + '" id="act-' + i + '">' +
-      '<div class="act-top">' +
-        '<span class="act-subject">📋 ' + esc(t.Subject || 'Task') + '</span>' +
-        '<span class="act-due ' + st + '">' + dueTxt + '</span>' +
+      // Main row: green checkbox + task info
+      '<div class="act-main-row">' +
+        '<div class="act-check" id="chk-' + i + '" onclick="toggleComplete(' + i + ')" title="Mark as completed">' +
+          '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '</div>' +
+        '<div class="act-info">' +
+          '<div class="act-subject">' + esc(t.Subject || 'Task') + '</div>' +
+          '<div class="act-meta">' +
+            (owner ? '<span class="act-owner">👤 ' + esc(owner) + '</span>' : '') +
+            '<span class="act-due ' + st + '">' + dueTxt + '</span>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
-      '<div class="act-row">' +
-        '<textarea class="act-note" id="note-' + i + '" placeholder="Add completion note (optional)..."></textarea>' +
-        '<button class="act-complete-btn" onclick="completeAct(' + i + ')">✓ Complete</button>' +
+      // Completion panel - hidden by default
+      '<div class="act-complete-panel" id="panel-' + i + '">' +
+        '<div class="act-complete-label">✏ Add a short note before completing</div>' +
+        '<textarea class="act-complete-textarea" id="note-' + i + '" placeholder="What was done? Any next steps?"></textarea>' +
+        '<div class="act-complete-btns">' +
+          '<button class="act-cancel-btn" onclick="cancelComplete(' + i + ')">Cancel</button>' +
+          '<button class="act-save-btn" id="savebtn-' + i + '" onclick="completeAct(' + i + ')">' +
+            '<div class="act-save-spin"></div>' +
+            '<span class="act-save-lbl">✓ Mark Complete</span>' +
+          '</button>' +
+        '</div>' +
       '</div>' +
     '</div>';
   }).join('');
+}
+
+function toggleComplete(i) {
+  var chk   = document.getElementById('chk-' + i);
+  var panel = document.getElementById('panel-' + i);
+  var isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    chk.classList.remove('checking');
+  } else {
+    panel.classList.add('open');
+    chk.classList.add('checking');
+    setTimeout(function() { var ta = document.getElementById('note-' + i); if(ta) ta.focus(); }, 100);
+  }
+}
+
+function cancelComplete(i) {
+  document.getElementById('panel-' + i).classList.remove('open');
+  document.getElementById('chk-' + i).classList.remove('checking');
+  document.getElementById('note-' + i).value = '';
 }
 
 function completeAct(i) {
   var task = openActs[i];
   if (!task) return;
   var note = (document.getElementById('note-' + i).value || '').trim();
-  var btn  = document.querySelector('#act-' + i + ' .act-complete-btn');
-  btn.disabled = true; btn.textContent = '...';
+  var btn  = document.getElementById('savebtn-' + i);
+  btn.classList.add('loading'); btn.disabled = true;
 
   var data = { id: task.id, Status: 'Completed' };
   if (note) data.Description = (task.Description ? task.Description + '\n\n' : '') + '[' + todayStr + '] ' + note;
@@ -534,18 +613,18 @@ function completeAct(i) {
     .then(function(res) {
       var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
       if (ok) {
-        showToast('Task completed!', 'ok');
+        showToast('Task marked as completed! ✓', 'ok');
         var item = document.getElementById('act-' + i);
-        if (item) item.style.opacity = '0';
+        if (item) { item.style.opacity = '0'; item.style.transition = 'opacity .3s'; }
         setTimeout(loadActivities, 350);
       } else {
         var d = res && res.data && res.data[0];
         showToast('Error: ' + (d ? d.message || JSON.stringify(d) : 'Unknown'), 'er');
-        btn.disabled = false; btn.textContent = '✓ Complete';
+        btn.classList.remove('loading'); btn.disabled = false;
       }
     }).catch(function(e) {
       showToast('Error: ' + errMsg(e), 'er');
-      btn.disabled = false; btn.textContent = '✓ Complete';
+      btn.classList.remove('loading'); btn.disabled = false;
     });
 }
 
