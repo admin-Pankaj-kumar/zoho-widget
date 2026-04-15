@@ -12,6 +12,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .wrap{padding:16px;display:flex;flex-direction:column;gap:10px;max-width:700px;margin:0 auto}
+
+/* LEAD HEADER */
 .lead-header{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .lead-info{display:flex;align-items:center;gap:12px}
 .avatar{width:38px;height:38px;border-radius:50%;background:#eff6ff;color:#185FA5;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -19,6 +21,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .lead-meta{font-size:11px;color:#64748b;margin-top:2px}
 .status-select{border:0.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#f8fafc;outline:none;cursor:pointer}
 .status-select:focus{border-color:#3b82f6}
+
+/* ACCORDION */
 .accordion{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;overflow:hidden}
 .acc-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s}
 .acc-header:hover{background:#fafbfc}
@@ -38,13 +42,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .note-item:last-child{border-bottom:none}
 .note-date{font-size:11px;color:#94a3b8;margin-bottom:4px}
 .note-text{font-size:12px;color:#374151;line-height:1.5}
+
+/* TODAY DISCUSSION */
 .today-label{font-size:11px;font-weight:600;color:#185FA5;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .today-prefix{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#185FA5}
-.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:100px;transition:border .15s,box-shadow .15s;line-height:1.6}
+.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:100px;transition:border .15s;line-height:1.6}
 .discussion-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
 .discussion-input::placeholder{color:#94a3b8}
 .disc-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px}
 .char-count{font-size:11px;color:#94a3b8}
+
+/* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
 .btn-primary{background:#3b82f6;color:#fff}
 .btn-primary:hover:not(:disabled){background:#2563eb}
@@ -61,66 +69,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* OPEN ACTIVITIES */
 .act-list{display:flex;flex-direction:column;gap:8px}
 .act-empty{font-size:12px;color:#94a3b8;font-style:italic;padding:2px 0}
-.act-item{border-radius:8px;border:0.5px solid #e2e8f0;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;transition:opacity .3s}
-.act-item.overdue{border-left:3px solid #ef4444;background:#fff5f5}
-.act-item.today{border-left:3px solid #f59e0b;background:#fffbeb}
-.act-item.upcoming{border-left:3px solid #3b82f6;background:#f0f9ff}
-.act-item.no-date{border-left:3px solid #94a3b8}
-.act-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.act-subject{font-size:12px;font-weight:600;color:#1a1f36}
-.act-due{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
-.act-due.overdue{background:#fee2e2;color:#dc2626}
-.act-due.today{background:#fef3c7;color:#b45309}
-.act-due.upcoming{background:#dbeafe;color:#1d4ed8}
-.act-due.no-date{background:#f1f5f9;color:#64748b}
-.act-row{display:flex;gap:8px;align-items:flex-start}
-.act-note{flex:1;border:0.5px solid #e2e8f0;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:none;height:34px;line-height:1.5;transition:border .15s,height .2s}
-.act-note:focus{border-color:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.08);height:54px}
-.act-note::placeholder{color:#94a3b8}
-.act-complete-btn{flex-shrink:0;padding:7px 12px;background:#16a34a;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap}
-.act-complete-btn:hover:not(:disabled){background:#15803d}
-.act-complete-btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* OPEN ACTIVITIES - NEW UI */
-.act-list{display:flex;flex-direction:column;gap:8px}
-.act-empty{font-size:12px;color:#94a3b8;font-style:italic;padding:2px 0}
-.act-item{border-radius:8px;border:0.5px solid #e2e8f0;background:#f8fafc;transition:opacity .3s}
+.act-item{border-radius:8px;border:0.5px solid #e2e8f0;background:#f8fafc;overflow:hidden;transition:opacity .3s}
 .act-item.overdue{border-left:3px solid #ef4444}
 .act-item.today{border-left:3px solid #f59e0b}
 .act-item.upcoming{border-left:3px solid #3b82f6}
 .act-item.no-date{border-left:3px solid #94a3b8}
 .act-main-row{display:flex;align-items:center;gap:10px;padding:10px 12px}
 .act-check{width:22px;height:22px;border-radius:50%;border:2px solid #16a34a;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
-.act-check:hover{background:#dcfce7;border-color:#15803d}
-.act-check svg{display:none}
-.act-check.checking{background:#16a34a;border-color:#16a34a}
-.act-check.checking svg{display:block}
+.act-check:hover{background:#dcfce7}
+.act-check.active{background:#16a34a;border-color:#16a34a}
+.act-check svg{opacity:0;transition:opacity .15s}
+.act-check.active svg{opacity:1}
 .act-info{flex:1;min-width:0}
 .act-subject{font-size:12px;font-weight:600;color:#1a1f36}
 .act-meta{display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap}
 .act-owner{font-size:11px;color:#64748b}
-.act-due{font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px}
-.act-due.overdue{background:#fee2e2;color:#dc2626}
-.act-due.today{background:#fef3c7;color:#b45309}
-.act-due.upcoming{background:#dbeafe;color:#1d4ed8}
-.act-due.no-date{background:#f1f5f9;color:#64748b}
-
-/* Completion panel - slides in */
-.act-complete-panel{display:none;border-top:0.5px solid #e2e8f0;padding:10px 12px;background:#f0fdf4;gap:8px;flex-direction:column}
-.act-complete-panel.open{display:flex}
-.act-complete-label{font-size:11px;font-weight:600;color:#15803d}
-.act-complete-textarea{width:100%;border:0.5px solid #bbf7d0;border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:none;height:60px;line-height:1.5;transition:border .15s}
-.act-complete-textarea:focus{border-color:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.1)}
-.act-complete-textarea::placeholder{color:#94a3b8}
-.act-complete-btns{display:flex;justify-content:flex-end;gap:8px}
-.act-cancel-btn{padding:6px 12px;background:#fff;border:0.5px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit}
-.act-cancel-btn:hover{background:#f1f5f9}
-.act-save-btn{padding:6px 14px;background:#16a34a;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
-.act-save-btn:hover:not(:disabled){background:#15803d}
-.act-save-btn:disabled{opacity:.5;cursor:not-allowed}
-.act-save-spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
-.act-save-btn.loading .act-save-spin{display:block}
-.act-save-btn.loading .act-save-lbl{display:none}
+.act-badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px}
+.act-badge.overdue{background:#fee2e2;color:#dc2626}
+.act-badge.today{background:#fef3c7;color:#b45309}
+.act-badge.upcoming{background:#dbeafe;color:#1d4ed8}
+.act-badge.no-date{background:#f1f5f9;color:#64748b}
+.act-panel{display:none;padding:10px 12px;border-top:0.5px solid #e2e8f0;background:#f0fdf4;flex-direction:column;gap:8px}
+.act-panel.open{display:flex}
+.act-panel-label{font-size:11px;font-weight:600;color:#15803d}
+.act-panel-note{width:100%;border:0.5px solid #bbf7d0;border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:none;height:62px;line-height:1.5}
+.act-panel-note:focus{border-color:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.1)}
+.act-panel-note::placeholder{color:#94a3b8}
+.act-panel-btns{display:flex;justify-content:flex-end;gap:8px}
+.act-cancel{padding:6px 12px;background:#fff;border:0.5px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit}
+.act-cancel:hover{background:#f1f5f9}
+.act-done{padding:6px 14px;background:#16a34a;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.act-done:hover:not(:disabled){background:#15803d}
+.act-done:disabled{opacity:.5;cursor:not-allowed}
+.act-done-spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.act-done.loading .act-done-spin{display:block}
+.act-done.loading .act-done-lbl{display:none}
 
 /* CREATE ACTIVITY */
 .tabs{display:flex;gap:6px;margin-bottom:12px}
@@ -130,7 +113,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .form.show{display:flex}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .field{display:flex;flex-direction:column;gap:4px}
-.field.full{grid-column:1/-1}
 .flabel{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
 .finput,.fselect,.ftextarea{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s}
 .finput:focus,.fselect:focus,.ftextarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
@@ -138,6 +120,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ftextarea{resize:vertical;min-height:64px;line-height:1.5}
 .form-footer{display:flex;justify-content:flex-end;gap:8px;padding-top:2px}
 
+/* TOAST & SUCCESS */
 .toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;pointer-events:none}
 .toast.ok{background:#15803d}.toast.er{background:#dc2626}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -287,15 +270,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="row">
           <div class="field">
             <label class="flabel">Subject *</label>
-            <div style="display:flex;gap:6px">
-              <select class="fselect" id="taskSubjectPick" style="flex:1" onchange="onTaskSubjectPick()">
-                <option value="">Select or type below...</option>
-                <option value="Follow-up">Follow-up</option>
-                <option value="Call Back Later">Call Back Later</option>
-                <option value="Schedule Discovery Call">Schedule Discovery Call</option>
-                <option value="Demo Needed">Demo Needed</option>
-              </select>
-            </div>
+            <select class="fselect" id="taskSubjectPick" onchange="onSubjectPick()">
+              <option value="">Select or type below...</option>
+              <option value="Follow-up">Follow-up</option>
+              <option value="Call Back Later">Call Back Later</option>
+              <option value="Schedule Discovery Call">Schedule Discovery Call</option>
+              <option value="Demo Needed">Demo Needed</option>
+            </select>
             <input type="text" class="finput" id="taskSubject" placeholder="Or type custom subject..." style="margin-top:5px"/>
           </div>
           <div class="field">
@@ -389,7 +370,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
   </div>
 
-</div><!-- /wrap -->
+</div>
 
 <div class="success-overlay" id="successOverlay">
   <div class="success-icon">
@@ -422,29 +403,23 @@ document.getElementById('todayPrefix').textContent = todayStr + ' -';
 ZOHO.embeddedApp.on("PageLoad", function(data) {
   var raw = data.EntityId;
   leadId = String(Array.isArray(raw) ? raw[0] : raw);
-  loadLead();
+  init();
 });
 ZOHO.embeddedApp.init();
 
-// ── LOAD LEAD ─────────────────────────────────────────────────────────
-function loadLead() {
-  ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId })
-    .then(function(res) {
-      if (res && res.data && res.data[0]) {
-        leadData = res.data[0];
-        populateUI();
-        loadNotes();
-        loadActivities();
-        loadUsers();
-      } else {
-        showToast('Failed to load lead data', 'er');
-        showMain();
-      }
-    }).catch(function(e) {
-      console.error("Load error:", e);
-      showToast('Error loading lead', 'er');
-      showMain();
-    });
+async function init() {
+  try {
+    var res = await ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId });
+    if (res && res.data && res.data[0]) {
+      leadData = res.data[0];
+      populateUI();
+    }
+  } catch(e) { console.error("getRecord error:", e); }
+
+  // Load all in parallel
+  loadNotes();
+  loadActivities();
+  loadUsers();
 }
 
 function showMain() {
@@ -462,19 +437,19 @@ function populateUI() {
   document.getElementById('leadName').textContent = name;
   var meta = [];
   if (d.Mobile) meta.push(d.Mobile);
-  if (d.Email) meta.push(d.Email);
+  if (d.Email)  meta.push(d.Email);
   if (d.Company) meta.push(d.Company);
   document.getElementById('leadMeta').textContent = meta.join(' · ');
   document.getElementById('statusSelect').value = d.Lead_Status || '';
   var req = document.getElementById('reqContent');
-  if (d.Requirement_Details) { req.className = 'readonly-content'; req.textContent = d.Requirement_Details; }
+  if (d.Requirement_Details) { req.className='readonly-content'; req.textContent=d.Requirement_Details; }
   var desc = document.getElementById('descContent');
-  if (d.Description) { desc.className = 'readonly-content'; desc.textContent = d.Description; }
+  if (d.Description) { desc.className='readonly-content'; desc.textContent=d.Description; }
 }
 
 // ── NOTES ─────────────────────────────────────────────────────────────
 function loadNotes() {
-  ZOHO.CRM.API.getRelatedRecords({ Entity: "Leads", RecordID: leadId, RelatedList: "Notes", page: 1, per_page: 10 })
+  ZOHO.CRM.API.getRelatedRecords({ Entity:"Leads", RecordID:leadId, RelatedList:"Notes", page:1, per_page:10 })
     .then(function(res) {
       var notes = (res && res.data) ? res.data : [];
       var el = document.getElementById('notesContent');
@@ -482,12 +457,12 @@ function loadNotes() {
       if (!notes.length) {
         el.innerHTML = '<div class="readonly-empty">No notes found.</div>';
       } else {
-        badge.textContent = notes.length; badge.style.display = '';
+        badge.textContent = notes.length; badge.style.display='';
         el.innerHTML = notes.map(function(n) {
           var d = n.Created_Time ? new Date(n.Created_Time) : null;
           return '<div class="note-item">' +
-            (d ? '<div class="note-date">' + esc(formatDate(d)) + '</div>' : '') +
-            '<div class="note-text">' + esc(n.Note_Content || n.Content || '') + '</div></div>';
+            (d ? '<div class="note-date">'+esc(formatDate(d))+'</div>' : '') +
+            '<div class="note-text">'+esc(n.Note_Content||n.Content||'')+'</div></div>';
         }).join('');
       }
       showMain();
@@ -495,18 +470,39 @@ function loadNotes() {
 }
 
 // ── OPEN ACTIVITIES ───────────────────────────────────────────────────
+// Use getRelatedRecords on Leads → Activities (open tasks linked via What_Id)
 function loadActivities() {
-  ZOHO.CRM.API.searchRecord({
-    Entity: "Tasks",
-    Type: "criteria",
-    Query: "((Who_Id:equals:" + leadId + ")and(Status:not_equal:Completed))"
+  ZOHO.CRM.API.getRelatedRecords({
+    Entity: "Leads",
+    RecordID: leadId,
+    RelatedList: "Activities",
+    page: 1,
+    per_page: 50
   }).then(function(res) {
-    openActs = (res && res.data) ? res.data : [];
+    console.log("Activities response:", JSON.stringify(res));
+    var all = (res && res.data) ? res.data : [];
+    // Filter only open (not completed) tasks
+    openActs = all.filter(function(t) {
+      var s = (t.Status || t.status || '').toLowerCase();
+      return s !== 'completed';
+    });
     renderActivities();
   }).catch(function(e) {
-    console.warn("Activities load error:", e);
-    openActs = [];
-    renderActivities();
+    console.warn("Activities getRelatedRecords failed:", e);
+    // Fallback: try searchRecord with Who_Id
+    ZOHO.CRM.API.searchRecord({
+      Entity: "Tasks",
+      Type: "criteria",
+      Query: "((Who_Id:equals:" + leadId + ")and(Status:not_equal:Completed))"
+    }).then(function(res2) {
+      console.log("Tasks fallback:", JSON.stringify(res2));
+      openActs = (res2 && res2.data) ? res2.data : [];
+      renderActivities();
+    }).catch(function(e2) {
+      console.warn("Tasks fallback also failed:", e2);
+      openActs = [];
+      renderActivities();
+    });
   });
 }
 
@@ -527,99 +523,124 @@ function fmtDue(ds) {
 }
 
 function renderActivities() {
-  var el = document.getElementById('actList');
+  var el    = document.getElementById('actList');
   var badge = document.getElementById('actsBadge');
+
   if (!openActs.length) {
     badge.style.display = 'none';
     el.innerHTML = '<div class="act-empty">No open activities found.</div>';
     return;
   }
+
   badge.style.display = 'inline-block';
-  badge.textContent = openActs.length;
+  badge.textContent   = openActs.length;
+
   // Auto-open accordion
   if (!openAccordions['acts']) {
     openAccordions['acts'] = true;
     document.getElementById('body-acts').classList.add('open');
     document.getElementById('arrow-acts').classList.add('open');
   }
+
   el.innerHTML = openActs.map(function(t, i) {
-    var st      = dueStatus(t.Due_Date || '');
-    var dueTxt  = st==='overdue'  ? '⚠ Overdue: ' + fmtDue(t.Due_Date)
-                : st==='today'    ? '📅 Due Today'
-                : st==='upcoming' ? '🗓 ' + fmtDue(t.Due_Date)
-                :                   '📌 No due date';
-    var owner   = t.Owner ? t.Owner.name || '' : '';
-    return '<div class="act-item ' + st + '" id="act-' + i + '">' +
-      // Main row: green checkbox + task info
-      '<div class="act-main-row">' +
-        '<div class="act-check" id="chk-' + i + '" onclick="toggleComplete(' + i + ')" title="Mark as completed">' +
-          '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-        '</div>' +
-        '<div class="act-info">' +
-          '<div class="act-subject">' + esc(t.Subject || 'Task') + '</div>' +
-          '<div class="act-meta">' +
-            (owner ? '<span class="act-owner">👤 ' + esc(owner) + '</span>' : '') +
-            '<span class="act-due ' + st + '">' + dueTxt + '</span>' +
+    var subj  = t.Subject || t.subject || 'Task';
+    var due   = t.Due_Date || t.due_date || '';
+    var st    = dueStatus(due);
+    var owner = t.Owner ? (t.Owner.name || '') : '';
+    var dueTxt = st==='overdue'  ? '⚠ Overdue: '+fmtDue(due)
+               : st==='today'    ? '📅 Due Today'
+               : st==='upcoming' ? '🗓 '+fmtDue(due)
+               :                   '📌 No due date';
+
+    return (
+      '<div class="act-item ' + st + '" id="act-' + i + '">' +
+        '<div class="act-main-row">' +
+          '<div class="act-check" id="chk-' + i + '" onclick="togglePanel(' + i + ')" title="Click to complete">' +
+            '<svg width="12" height="12" viewBox="0 0 12 12" fill="none">' +
+              '<path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '</svg>' +
+          '</div>' +
+          '<div class="act-info">' +
+            '<div class="act-subject">' + esc(subj) + '</div>' +
+            '<div class="act-meta">' +
+              (owner ? '<span class="act-owner">👤 ' + esc(owner) + '</span>' : '') +
+              '<span class="act-badge ' + st + '">' + dueTxt + '</span>' +
+            '</div>' +
           '</div>' +
         '</div>' +
-      '</div>' +
-      // Completion panel - hidden by default
-      '<div class="act-complete-panel" id="panel-' + i + '">' +
-        '<div class="act-complete-label">✏ Add a short note before completing</div>' +
-        '<textarea class="act-complete-textarea" id="note-' + i + '" placeholder="What was done? Any next steps?"></textarea>' +
-        '<div class="act-complete-btns">' +
-          '<button class="act-cancel-btn" onclick="cancelComplete(' + i + ')">Cancel</button>' +
-          '<button class="act-save-btn" id="savebtn-' + i + '" onclick="completeAct(' + i + ')">' +
-            '<div class="act-save-spin"></div>' +
-            '<span class="act-save-lbl">✓ Mark Complete</span>' +
-          '</button>' +
+        '<div class="act-panel" id="panel-' + i + '">' +
+          '<div class="act-panel-label">✏ Add a note before completing (optional)</div>' +
+          '<textarea class="act-panel-note" id="note-' + i + '" placeholder="What was done? Any next steps..."></textarea>' +
+          '<div class="act-panel-btns">' +
+            '<button class="act-cancel" onclick="cancelPanel(' + i + ')">Cancel</button>' +
+            '<button class="act-done" id="donebtn-' + i + '" onclick="completeAct(' + i + ')">' +
+              '<div class="act-done-spin"></div>' +
+              '<span class="act-done-lbl">✓ Mark Complete</span>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
-      '</div>' +
-    '</div>';
+      '</div>'
+    );
   }).join('');
 }
 
-function toggleComplete(i) {
-  var chk   = document.getElementById('chk-' + i);
+function togglePanel(i) {
   var panel = document.getElementById('panel-' + i);
+  var chk   = document.getElementById('chk-' + i);
   var isOpen = panel.classList.contains('open');
+  // Close all others first
+  openActs.forEach(function(_, j) {
+    if (j !== i) {
+      var p = document.getElementById('panel-' + j);
+      var c = document.getElementById('chk-' + j);
+      if (p) p.classList.remove('open');
+      if (c) c.classList.remove('active');
+    }
+  });
   if (isOpen) {
     panel.classList.remove('open');
-    chk.classList.remove('checking');
+    chk.classList.remove('active');
   } else {
     panel.classList.add('open');
-    chk.classList.add('checking');
-    setTimeout(function() { var ta = document.getElementById('note-' + i); if(ta) ta.focus(); }, 100);
+    chk.classList.add('active');
+    setTimeout(function() {
+      var ta = document.getElementById('note-' + i);
+      if (ta) ta.focus();
+    }, 150);
   }
 }
 
-function cancelComplete(i) {
+function cancelPanel(i) {
   document.getElementById('panel-' + i).classList.remove('open');
-  document.getElementById('chk-' + i).classList.remove('checking');
+  document.getElementById('chk-' + i).classList.remove('active');
   document.getElementById('note-' + i).value = '';
 }
 
 function completeAct(i) {
   var task = openActs[i];
   if (!task) return;
+
   var note = (document.getElementById('note-' + i).value || '').trim();
-  var btn  = document.getElementById('savebtn-' + i);
+  var btn  = document.getElementById('donebtn-' + i);
   btn.classList.add('loading'); btn.disabled = true;
 
-  var data = { id: task.id, Status: 'Completed' };
-  if (note) data.Description = (task.Description ? task.Description + '\n\n' : '') + '[' + todayStr + '] ' + note;
+  var updateData = { id: task.id, Status: 'Completed' };
+  if (note) {
+    updateData.Description = (task.Description ? task.Description + '\n\n' : '') +
+      '[' + todayStr + '] ' + note;
+  }
 
-  ZOHO.CRM.API.updateRecord({ Entity: 'Tasks', APIData: data })
+  ZOHO.CRM.API.updateRecord({ Entity: 'Tasks', APIData: updateData })
     .then(function(res) {
       var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
       if (ok) {
-        showToast('Task marked as completed! ✓', 'ok');
+        showToast('Task completed! ✓', 'ok');
         var item = document.getElementById('act-' + i);
-        if (item) { item.style.opacity = '0'; item.style.transition = 'opacity .3s'; }
-        setTimeout(loadActivities, 350);
+        if (item) { item.style.opacity='0'; item.style.transition='opacity .3s'; }
+        setTimeout(loadActivities, 400);
       } else {
         var d = res && res.data && res.data[0];
-        showToast('Error: ' + (d ? d.message || JSON.stringify(d) : 'Unknown'), 'er');
+        showToast('Error: ' + (d && d.message ? d.message : JSON.stringify(d||{}).substring(0,60)), 'er');
         btn.classList.remove('loading'); btn.disabled = false;
       }
     }).catch(function(e) {
@@ -628,10 +649,46 @@ function completeAct(i) {
     });
 }
 
+// ── LOAD USERS ────────────────────────────────────────────────────────
+function loadUsers() {
+  ZOHO.CRM.API.getUsers({ Type: 'ActiveUsers' })
+    .then(function(res) {
+      console.log("getUsers:", JSON.stringify(res));
+      var users = [];
+      if (res && res.users && res.users.length)       users = res.users;
+      else if (res && res.data && res.data.length)     users = res.data;
+      else if (Array.isArray(res) && res.length)       users = res;
+      fillOwners(users);
+    }).catch(function() {
+      ZOHO.CRM.API.getUsers({ Type: 'AllUsers' })
+        .then(function(res2) {
+          var users = [];
+          if (res2 && res2.users) users = res2.users;
+          else if (Array.isArray(res2)) users = res2;
+          fillOwners(users.filter(function(u){ return !u.status || u.status==='active'; }));
+        }).catch(function(){});
+    });
+}
+
+function fillOwners(users) {
+  var sel = document.getElementById('taskOwner');
+  sel.innerHTML = '<option value="">— Assign to me —</option>';
+  users.forEach(function(u) {
+    var name = u.full_name || u.name ||
+      ((u.first_name||'') + ' ' + (u.last_name||'')).trim() ||
+      u.email || String(u.id);
+    var opt = document.createElement('option');
+    opt.value = u.id;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  console.log("Owner dropdown:", users.length, "users");
+}
+
 // ── CREATE TASK ───────────────────────────────────────────────────────
-function onTaskSubjectPick() {
-  var pick = document.getElementById('taskSubjectPick').value;
-  if (pick) document.getElementById('taskSubject').value = pick;
+function onSubjectPick() {
+  var v = document.getElementById('taskSubjectPick').value;
+  if (v) document.getElementById('taskSubject').value = v;
 }
 
 function createTask() {
@@ -642,40 +699,41 @@ function createTask() {
   btn.classList.add('loading'); btn.disabled = true;
 
   var ownerId = document.getElementById('taskOwner').value;
+  var due     = document.getElementById('taskDueDate').value;
+  var desc    = document.getElementById('taskDesc').value.trim();
+
   var data = {
     Subject:    subj,
-    Status:     document.getElementById('taskStatus').value || 'Not Started',
-    Priority:   document.getElementById('taskPriority').value || 'Normal',
+    Status:     document.getElementById('taskStatus').value  || 'Not Started',
+    Priority:   document.getElementById('taskPriority').value|| 'Normal',
     $se_module: 'Leads',
     What_Id:    { id: leadId }
   };
-  if (ownerId) data.Owner = { id: ownerId };
-  var due  = document.getElementById('taskDueDate').value;
-  var desc = document.getElementById('taskDesc').value.trim();
-  if (due)  data.Due_Date    = due;
-  if (desc) data.Description = desc;
+  if (ownerId) data.Owner      = { id: ownerId };
+  if (due)     data.Due_Date   = due;
+  if (desc)    data.Description= desc;
 
-  // Auto-fill lead custom fields on task
+  // Auto-populate lead custom fields on task
   if (leadData) {
-    if (leadData.Mobile || leadData.Phone) data.Lead_Contact_Phone       = leadData.Mobile || leadData.Phone || '';
-    if (leadData.Email)                    data.Lead_Contact_Email       = leadData.Email;
-    if (leadData.Description)              data.Lead_Contact_Description = leadData.Description;
-    if (leadData.Requirement_Details)      data.Requirement_Details      = leadData.Requirement_Details;
+    if (leadData.Mobile||leadData.Phone) data.Lead_Contact_Phone       = leadData.Mobile||leadData.Phone;
+    if (leadData.Email)                  data.Lead_Contact_Email       = leadData.Email;
+    if (leadData.Description)            data.Lead_Contact_Description = leadData.Description;
+    if (leadData.Requirement_Details)    data.Requirement_Details      = leadData.Requirement_Details;
   }
 
   console.log("Creating task:", JSON.stringify(data));
-  ZOHO.CRM.API.insertRecord({ Entity: 'Tasks', APIData: data, Trigger: [] })
+  ZOHO.CRM.API.insertRecord({ Entity:'Tasks', APIData:data, Trigger:[] })
     .then(function(res) {
       btn.classList.remove('loading'); btn.disabled = false;
       console.log("Task result:", JSON.stringify(res));
       var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
       if (ok) {
-        showToast('Task created!', 'ok');
+        showToast('Task created successfully!', 'ok');
         clearForm('task');
         loadActivities();
       } else {
         var d = res && res.data && res.data[0];
-        showToast('Error: ' + (d ? d.message || JSON.stringify(d).substring(0,80) : 'Unknown'), 'er');
+        showToast('Error: ' + (d && d.message ? d.message : JSON.stringify(d||{}).substring(0,80)), 'er');
       }
     }).catch(function(e) {
       btn.classList.remove('loading'); btn.disabled = false;
@@ -691,9 +749,9 @@ function createCall() {
   var btn = document.getElementById('callBtn');
   btn.classList.add('loading'); btn.disabled = true;
 
-  var dt  = document.getElementById('callDateTime').value;
-  var dur = parseInt(document.getElementById('callDuration').value) || 0;
-  var desc= document.getElementById('callDesc').value.trim();
+  var dt   = document.getElementById('callDateTime').value;
+  var dur  = parseInt(document.getElementById('callDuration').value) || 0;
+  var desc = document.getElementById('callDesc').value.trim();
 
   var data = {
     Subject:         subj,
@@ -702,26 +760,23 @@ function createCall() {
     $se_module:      'Leads',
     What_Id:         { id: leadId }
   };
-
-  // Duration: Zoho expects "HH:MM" format
   if (dur > 0) {
-    var h = Math.floor(dur / 60), m = dur % 60;
+    var h = Math.floor(dur/60), m = dur%60;
     data.Call_Duration = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
   }
   if (desc) data.Description = desc;
 
   console.log("Creating call:", JSON.stringify(data));
-  ZOHO.CRM.API.insertRecord({ Entity: 'Calls', APIData: data, Trigger: [] })
+  ZOHO.CRM.API.insertRecord({ Entity:'Calls', APIData:data, Trigger:[] })
     .then(function(res) {
       btn.classList.remove('loading'); btn.disabled = false;
-      console.log("Call result:", JSON.stringify(res));
       var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
       if (ok) {
-        showToast('Call logged!', 'ok');
+        showToast('Call logged successfully!', 'ok');
         clearForm('call');
       } else {
         var d = res && res.data && res.data[0];
-        showToast('Error: ' + (d ? d.message || JSON.stringify(d).substring(0,80) : 'Unknown'), 'er');
+        showToast('Error: ' + (d && d.message ? d.message : JSON.stringify(d||{}).substring(0,80)), 'er');
       }
     }).catch(function(e) {
       btn.classList.remove('loading'); btn.disabled = false;
@@ -729,52 +784,20 @@ function createCall() {
     });
 }
 
+// ── ACCORDIONS ────────────────────────────────────────────────────────
+function toggleAcc(k) {
+  openAccordions[k] = !openAccordions[k];
+  var body  = document.getElementById('body-' + k);
+  var arrow = document.getElementById('arrow-' + k);
+  if (openAccordions[k]) { body.classList.add('open'); arrow.classList.add('open'); }
+  else { body.classList.remove('open'); arrow.classList.remove('open'); }
+}
+
 // ── TAB SWITCHER ──────────────────────────────────────────────────────
-function loadUsers() {
-  // Try getUsers first
-  ZOHO.CRM.API.getUsers({ Type: 'ActiveUsers' })
-    .then(function(res) {
-      console.log("getUsers response:", JSON.stringify(res));
-      var users = [];
-      if (res && res.users && res.users.length) users = res.users;
-      else if (res && res.data && res.data.length) users = res.data;
-      else if (Array.isArray(res) && res.length) users = res;
-      populateOwnerDropdown(users);
-    }).catch(function(e) {
-      console.warn('getUsers failed:', e);
-      // Fallback: try AllUsers
-      ZOHO.CRM.API.getUsers({ Type: 'AllUsers' })
-        .then(function(res2) {
-          var users2 = [];
-          if (res2 && res2.users) users2 = res2.users;
-          else if (Array.isArray(res2)) users2 = res2;
-          // Filter active only
-          users2 = users2.filter(function(u) { return !u.status || u.status === 'active'; });
-          populateOwnerDropdown(users2);
-        }).catch(function(e2) {
-          console.warn('getUsers AllUsers also failed:', e2);
-        });
-    });
-}
-
-function populateOwnerDropdown(users) {
-  var sel = document.getElementById('taskOwner');
-  sel.innerHTML = '<option value="">— Assign to me —</option>';
-  users.forEach(function(u) {
-    var name = u.full_name || u.name || (u.first_name ? u.first_name + ' ' + (u.last_name || '') : '') || u.email || u.id;
-    name = name.trim();
-    var opt = document.createElement('option');
-    opt.value = u.id;
-    opt.textContent = name;
-    sel.appendChild(opt);
-  });
-  console.log("Owner dropdown populated with", users.length, "users");
-}
-
 function switchTab(t) {
   ['task','call'].forEach(function(k) {
-    document.getElementById('tab-' + k).className = 'tab' + (k === t ? ' active' : '');
-    document.getElementById('form-' + k).className= 'form' + (k === t ? ' show' : '');
+    document.getElementById('tab-'+k).className  = 'tab'+(k===t?' active':'');
+    document.getElementById('form-'+k).className = 'form'+(k===t?' show':'');
   });
 }
 
@@ -796,45 +819,35 @@ function clearForm(t) {
   }
 }
 
-// ── ACCORDIONS ────────────────────────────────────────────────────────
-function toggleAcc(k) {
-  openAccordions[k] = !openAccordions[k];
-  var body  = document.getElementById('body-' + k);
-  var arrow = document.getElementById('arrow-' + k);
-  if (openAccordions[k]) { body.classList.add('open'); arrow.classList.add('open'); }
-  else { body.classList.remove('open'); arrow.classList.remove('open'); }
-}
-
 // ── DISCUSSION ────────────────────────────────────────────────────────
 function onInput() {
   var v = document.getElementById('discussionInput').value;
-  document.getElementById('charCount').textContent = v.length + ' character' + (v.length !== 1 ? 's' : '');
+  document.getElementById('charCount').textContent = v.length + ' character' + (v.length!==1?'s':'');
 }
-function clearDiscussion() { document.getElementById('discussionInput').value = ''; onInput(); }
+function clearDiscussion() { document.getElementById('discussionInput').value=''; onInput(); }
 
 // ── SAVE DISCUSSION ───────────────────────────────────────────────────
 function saveAll() {
   var disc = document.getElementById('discussionInput').value.trim();
   var stat = document.getElementById('statusSelect').value;
-  if (!disc) { showToast("Please enter today's discussion notes", 'er'); document.getElementById('discussionInput').focus(); return; }
+  if (!disc) { showToast("Please enter today's discussion notes",'er'); document.getElementById('discussionInput').focus(); return; }
 
   var btn = document.getElementById('saveBtn');
   btn.classList.add('loading'); btn.disabled = true;
 
-  var existing = (leadData && leadData.Description) ? leadData.Description : '';
-  var entry    = todayStr + ' - ' + disc;
-  var newDesc  = existing ? existing + '\n' + entry : entry;
+  var existing = leadData && leadData.Description ? leadData.Description : '';
+  var newDesc  = existing ? existing + '\n' + todayStr + ' - ' + disc : todayStr + ' - ' + disc;
   var payload  = { id: leadId, Description: newDesc };
   if (stat) payload.Lead_Status = stat;
 
-  ZOHO.CRM.API.updateRecord({ Entity: 'Leads', APIData: payload })
+  ZOHO.CRM.API.updateRecord({ Entity:'Leads', APIData:payload })
     .then(function(res) {
       btn.classList.remove('loading'); btn.disabled = false;
       if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
         leadData.Description = newDesc;
         if (stat) leadData.Lead_Status = stat;
         var el = document.getElementById('descContent');
-        el.className = 'readonly-content'; el.textContent = newDesc;
+        el.className='readonly-content'; el.textContent=newDesc;
         clearDiscussion();
         var parts = ['Discussion saved'];
         if (stat) parts.push('Status → ' + stat);
@@ -844,10 +857,10 @@ function saveAll() {
           document.getElementById('successOverlay').classList.remove('show');
           try { ZOHO.CRM.UI.Popup.closeReload(); } catch(e) {}
         }, 2000);
-      } else { showToast('Save failed. Please try again.', 'er'); }
-    }).catch(function(e) {
+      } else { showToast('Save failed. Please try again.','er'); }
+    }).catch(function() {
       btn.classList.remove('loading'); btn.disabled = false;
-      showToast('Error saving: ' + errMsg(e), 'er');
+      showToast('Error saving. Please try again.','er');
     });
 }
 
@@ -855,17 +868,17 @@ function saveAll() {
 function errMsg(e) {
   if (!e) return 'Unknown error';
   if (typeof e === 'string') return e;
-  if (e.message) return e.message;
-  return JSON.stringify(e).substring(0, 80);
+  if (e.message) return String(e.message).substring(0,80);
+  return JSON.stringify(e).substring(0,80);
 }
 function showToast(msg, type) {
   var t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast ' + (type || 'ok') + ' show';
-  setTimeout(function() { t.className = 'toast'; }, 3500);
+  t.className = 'toast '+(type||'ok')+' show';
+  setTimeout(function(){ t.className='toast'; }, 3500);
 }
 function esc(s) {
-  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 </script>
 </body>
