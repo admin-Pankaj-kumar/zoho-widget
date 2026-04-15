@@ -553,7 +553,7 @@ function createTask() {
     Status:     document.getElementById('taskStatus').value || 'Not Started',
     Priority:   document.getElementById('taskPriority').value || 'Normal',
     $se_module: 'Leads',
-    Who_Id:     { id: leadId }
+    Who_Id:     leadId
   };
   var due  = document.getElementById('taskDueDate').value;
   var desc = document.getElementById('taskDesc').value.trim();
@@ -605,7 +605,7 @@ function createCall() {
     Call_Type:       document.getElementById('callDirection').value || 'Outbound',
     Call_Start_Time: dt ? new Date(dt).toISOString() : new Date().toISOString(),
     $se_module:      'Leads',
-    Who_Id:          { id: leadId }
+    Who_Id:          leadId
   };
 
   // Duration: Zoho expects "HH:MM" format
