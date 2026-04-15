@@ -652,18 +652,44 @@ function createCall() {
 
 // ── TAB SWITCHER ──────────────────────────────────────────────────────
 function loadUsers() {
+  // Try getUsers first
   ZOHO.CRM.API.getUsers({ Type: 'ActiveUsers' })
     .then(function(res) {
-      var users = (res && res.users) ? res.users : [];
-      var sel = document.getElementById('taskOwner');
-      sel.innerHTML = '<option value="">— Assign to me —</option>';
-      users.forEach(function(u) {
-        var opt = document.createElement('option');
-        opt.value = u.id;
-        opt.textContent = u.full_name || u.name || u.email;
-        sel.appendChild(opt);
-      });
-    }).catch(function(e) { console.warn('loadUsers error:', e); });
+      console.log("getUsers response:", JSON.stringify(res));
+      var users = [];
+      if (res && res.users && res.users.length) users = res.users;
+      else if (res && res.data && res.data.length) users = res.data;
+      else if (Array.isArray(res) && res.length) users = res;
+      populateOwnerDropdown(users);
+    }).catch(function(e) {
+      console.warn('getUsers failed:', e);
+      // Fallback: try AllUsers
+      ZOHO.CRM.API.getUsers({ Type: 'AllUsers' })
+        .then(function(res2) {
+          var users2 = [];
+          if (res2 && res2.users) users2 = res2.users;
+          else if (Array.isArray(res2)) users2 = res2;
+          // Filter active only
+          users2 = users2.filter(function(u) { return !u.status || u.status === 'active'; });
+          populateOwnerDropdown(users2);
+        }).catch(function(e2) {
+          console.warn('getUsers AllUsers also failed:', e2);
+        });
+    });
+}
+
+function populateOwnerDropdown(users) {
+  var sel = document.getElementById('taskOwner');
+  sel.innerHTML = '<option value="">— Assign to me —</option>';
+  users.forEach(function(u) {
+    var name = u.full_name || u.name || (u.first_name ? u.first_name + ' ' + (u.last_name || '') : '') || u.email || u.id;
+    name = name.trim();
+    var opt = document.createElement('option');
+    opt.value = u.id;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  console.log("Owner dropdown populated with", users.length, "users");
 }
 
 function switchTab(t) {
