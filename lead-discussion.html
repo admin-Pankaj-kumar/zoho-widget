@@ -104,6 +104,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .act-done-spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
 .act-done.loading .act-done-spin{display:block}
 .act-done.loading .act-done-lbl{display:none}
+.act-desc-preview{font-size:11px;color:#64748b;margin-top:4px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
 
 /* CREATE ACTIVITY */
 .tabs{display:flex;gap:6px;margin-bottom:12px}
@@ -552,6 +553,7 @@ function renderActivities() {
                : st==='upcoming' ? '🗓 '+fmtDue(due)
                :                   '📌 No due date';
 
+    var desc = t.Description || '';
     return (
       '<div class="act-item ' + st + '" id="act-' + i + '">' +
         '<div class="act-main-row">' +
@@ -567,6 +569,7 @@ function renderActivities() {
               '<span class="act-badge ' + st + '">' + dueTxt + '</span>' +
             '</div>' +
           '</div>' +
+          (desc ? '<div class="act-desc-preview" title="' + esc(desc) + '">📝 ' + esc(desc) + '</div>' : '') +
         '</div>' +
         '<div class="act-panel" id="panel-' + i + '">' +
           '<div class="act-panel-label">✏ Add a note before completing (optional)</div>' +
