@@ -5,511 +5,522 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Lead Discussion</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#f5f7fa;color:#1a1f36;font-size:13px;min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1f36;font-size:13px}
 
-/* ── LAYOUT ── */
-.main-layout{display:flex;flex-direction:column;height:100vh;gap:0}
-.left-panel{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#f5f7fa;flex:1}
-.right-panel{display:none}
-
-/* ── LOADING ── */
-.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;color:#94a3b8}
-.loader-spin{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
+/* LOADING */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;color:#94a3b8}
+.loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── LEAD HEADER ── */
-.lead-header{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.lead-info{display:flex;align-items:center;gap:11px}
-.avatar{width:36px;height:36px;border-radius:50%;background:#eff6ff;color:#185FA5;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* MAIN */
+.wrap{padding:16px;display:flex;flex-direction:column;gap:10px;max-width:700px;margin:0 auto}
+
+/* LEAD HEADER */
+.lead-header{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lead-info{display:flex;align-items:center;gap:12px}
+.avatar{width:38px;height:38px;border-radius:50%;background:#eff6ff;color:#185FA5;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lead-name{font-size:14px;font-weight:600;color:#1a1f36}
 .lead-meta{font-size:11px;color:#64748b;margin-top:2px}
-.status-select{border:0.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#f8fafc;outline:none;cursor:pointer;max-width:160px}
+.status-select{border:0.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#f8fafc;outline:none;cursor:pointer}
 .status-select:focus{border-color:#3b82f6}
 
-/* ── ACCORDIONS ── */
+/* ACCORDION */
 .accordion{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;overflow:hidden}
-.acc-header{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s}
 .acc-header:hover{background:#fafbfc}
-.acc-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#1a1f36}
+.acc-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#1a1f36}
 .acc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
-.tag-ro{background:#f1f5f9;color:#475569}
+.tag-readonly{background:#f1f5f9;color:#475569}
 .tag-edit{background:#eff6ff;color:#185FA5}
-.acc-arrow{width:15px;height:15px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
+.tag-green{background:#dcfce7;color:#15803d}
+.tag-amber{background:#fef3c7;color:#b45309}
+.acc-arrow{width:16px;height:16px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
 .acc-arrow.open{transform:rotate(180deg)}
-.acc-body{padding:0 15px;max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease}
-.acc-body.open{padding:0 15px 13px;max-height:600px}
-.readonly-content{font-size:12px;color:#374151;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.acc-body{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s ease}
+.acc-body.open{padding:0 16px 14px;max-height:2000px}
+
+/* READ ONLY */
+.readonly-content{font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .readonly-empty{font-size:12px;color:#94a3b8;font-style:italic}
-.note-item{padding:8px 0;border-bottom:0.5px solid #f1f5f9}
+
+/* NOTES LIST */
+.note-item{padding:10px 0;border-bottom:0.5px solid #f1f5f9}
 .note-item:last-child{border-bottom:none}
-.note-date{font-size:11px;color:#94a3b8;margin-bottom:3px}
+.note-date{font-size:11px;color:#94a3b8;margin-bottom:4px}
 .note-text{font-size:12px;color:#374151;line-height:1.5}
 
-/* ── TODAY'S DISCUSSION ── */
-.today-prefix{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#185FA5;margin-bottom:8px;display:inline-block}
-.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:90px;transition:border .15s;line-height:1.6}
-.discussion-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
+/* EDIT - TODAY'S DISCUSSION */
+.today-label{font-size:11px;font-weight:600;color:#185FA5;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.today-date-prefix{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#185FA5}
+.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:100px;transition:border .15s,box-shadow .15s;line-height:1.6}
+.discussion-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
 .discussion-input::placeholder{color:#94a3b8}
-.disc-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+
+/* FOOTER */
+.footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:4px}
 .char-count{font-size:11px;color:#94a3b8}
-.save-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#3b82f6;border:none;border-radius:8px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
-.save-btn:hover:not(:disabled){background:#2563eb}
-.save-btn:disabled{opacity:.5;cursor:not-allowed}
-.save-spin{width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
-.save-btn.loading .save-spin{display:block}
-.save-btn.loading .save-lbl{display:none}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
+.btn-primary{background:#3b82f6;color:#fff}
+.btn-primary:hover:not(:disabled){background:#2563eb}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-green{background:#16a34a;color:#fff}
+.btn-green:hover:not(:disabled){background:#15803d}
+.btn-green:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:none;border:0.5px solid #e2e8f0;color:#64748b}
+.btn-ghost:hover{background:#f1f5f9}
+.spin-sm{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.btn-primary.loading .spin-sm,.btn-green.loading .spin-sm{display:block}
+.btn-primary.loading .lbl,.btn-green.loading .lbl{display:none}
 
-/* ── WHATSAPP PANEL (RIGHT) ── */
+/* ── OPEN ACTIVITIES ── */
+.act-list{display:flex;flex-direction:column;gap:8px}
+.act-empty{font-size:12px;color:#94a3b8;font-style:italic}
+.act-item{border-radius:8px;border:0.5px solid #e2e8f0;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:#f8fafc}
+.act-item.overdue{border-left:3px solid #ef4444;background:#fff5f5}
+.act-item.today{border-left:3px solid #f59e0b;background:#fffbeb}
+.act-item.upcoming{border-left:3px solid #3b82f6;background:#f0f9ff}
+.act-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.act-subject{font-size:12px;font-weight:600;color:#1a1f36}
+.act-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+.act-badge.overdue{background:#fee2e2;color:#dc2626}
+.act-badge.today{background:#fef3c7;color:#b45309}
+.act-badge.upcoming{background:#dbeafe;color:#1d4ed8}
+.act-badge.no-date{background:#f1f5f9;color:#64748b}
+.act-complete-row{display:flex;gap:8px;align-items:flex-start}
+.act-note{flex:1;border:0.5px solid #e2e8f0;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:none;height:34px;min-height:34px;line-height:1.5;transition:border .15s,height .15s}
+.act-note:focus{border-color:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.08);height:56px}
+.act-note::placeholder{color:#94a3b8}
+.act-btn{flex-shrink:0;padding:7px 12px;background:#16a34a;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.act-btn:hover:not(:disabled){background:#15803d}
+.act-btn:disabled{opacity:.4;cursor:not-allowed}
 
-.sent .delivered .read 
+/* ── CREATE ACTIVITY ── */
+.create-tabs{display:flex;gap:6px;margin-bottom:12px}
+.create-tab{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid #e2e8f0;background:#f8fafc;color:#64748b;transition:all .15s}
+.create-tab.active{background:#1a1f36;color:#fff;border-color:#1a1f36}
+.create-form{display:none;flex-direction:column;gap:10px}
+.create-form.show{display:flex}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.form-field.full{grid-column:1/-1}
+.form-label{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
+.form-input,.form-select,.form-textarea{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
+.form-select{cursor:pointer}
+.form-textarea{resize:vertical;min-height:64px;line-height:1.5}
+.form-footer{display:flex;justify-content:flex-end;gap:8px;padding-top:2px}
 
-30%{transform:translateY(-4px)}}
-
-/* FILE MESSAGES */
-
-/* ── TOAST ── */
+/* TOAST */
 .toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;pointer-events:none}
-.toast.ok{background:#15803d}.toast.er{background:#dc2626}.toast.info{background:#2563eb}
+.toast.ok{background:#15803d}.toast.er{background:#dc2626}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-/* ── SUCCESS OVERLAY ── */
-.success-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:99}
+/* SUCCESS */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.9);align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:99}
 .success-overlay.show{display:flex}
 .success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .success-overlay h3{font-size:15px;font-weight:600;color:#15803d}
-.success-overlay p{font-size:12px;color:#64748b}
+.success-overlay p{font-size:13px;color:#64748b}
 </style>
 </head>
 <body>
 
-<div class="loading-screen" id="loadingScreen">
-  <div class="loader-spin"></div>
+<div class="loading" id="loadingState">
+  <div class="loader"></div>
   <span>Loading lead details...</span>
 </div>
 
-<div class="main-layout" id="mainLayout" style="display:none">
+<div class="wrap" id="mainWrap" style="display:none">
 
-  <!-- ══ LEFT: LEAD DISCUSSION ══ -->
-  <div class="left-panel">
-
-    <!-- Lead Header -->
-    <div class="lead-header">
-      <div class="lead-info">
-        <div class="avatar" id="ldAvatar">?</div>
-        <div>
-          <div class="lead-name" id="ldName">Loading...</div>
-          <div class="lead-meta" id="ldMeta"></div>
-        </div>
-      </div>
-      <select class="status-select" id="ldStatus">
-        <option value="">-None-</option>
-        <option value="New">New</option>
-        <option value="Contact in Future">Contact in Future</option>
-        <option value="Contacted">Contacted</option>
-        <option value="Junk Lead">Junk Lead</option>
-        <option value="Future Prospect">Future Prospect</option>
-        <option value="Not Contacted">Not Contacted</option>
-        <option value="Discovery Call">Discovery Call</option>
-        <option value="Not Interested">Not Interested</option>
-        <option value="Not Qualified">Not Qualified</option>
-      </select>
-    </div>
-
-    <!-- Requirement Details -->
-    <div class="accordion">
-      <div class="acc-header" onclick="toggleAcc('req')">
-        <div class="acc-title">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#94a3b8" stroke-width="1.2"/><path d="M3.5 4.5h7M3.5 7h7M3.5 9.5h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Requirement Details
-          <span class="acc-tag tag-ro">Read Only</span>
-        </div>
-        <svg class="acc-arrow" id="arrow-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="acc-body" id="body-req">
-        <div id="reqContent" class="readonly-empty">No requirement details available.</div>
+  <!-- LEAD HEADER -->
+  <div class="lead-header">
+    <div class="lead-info">
+      <div class="avatar" id="avatar">?</div>
+      <div>
+        <div class="lead-name" id="leadName">Loading...</div>
+        <div class="lead-meta" id="leadMeta"></div>
       </div>
     </div>
+    <select class="status-select" id="statusSelect">
+      <option value="">-None-</option>
+      <option value="New">New</option>
+      <option value="Contact in Future">Contact in Future</option>
+      <option value="Contacted">Contacted</option>
+      <option value="Junk Lead">Junk Lead</option>
+      <option value="Future Prospect">Future Prospect</option>
+      <option value="Not Contacted">Not Contacted</option>
+      <option value="Discovery Call">Discovery Call</option>
+      <option value="Not Interested">Not Interested</option>
+      <option value="Not Qualified">Not Qualified</option>
+    </select>
+  </div>
 
-    <!-- Notes -->
-    <div class="accordion">
-      <div class="acc-header" onclick="toggleAcc('notes')">
-        <div class="acc-title">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2h10v8l-3 2H2V2z" stroke="#94a3b8" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 5h6M4 7h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Notes
-          <span class="acc-tag tag-ro">Read Only</span>
-          <span id="notesBadge" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600"></span>
-        </div>
-        <svg class="acc-arrow" id="arrow-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <!-- REQUIREMENT DETAILS -->
+  <div class="accordion">
+    <div class="acc-header" onclick="toggleAcc('req')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#94a3b8" stroke-width="1.2"/><path d="M3.5 4.5h7M3.5 7h7M3.5 9.5h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Requirement Details
+        <span class="acc-tag tag-readonly">Read Only</span>
       </div>
-      <div class="acc-body" id="body-notes">
-        <div id="notesContent" class="readonly-empty">No notes found.</div>
-      </div>
+      <svg class="acc-arrow" id="arrow-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-
-    <!-- Description -->
-    <div class="accordion">
-      <div class="acc-header" onclick="toggleAcc('desc')">
-        <div class="acc-title">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 6h10M2 9h6" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Description
-          <span class="acc-tag tag-ro">Read Only</span>
-        </div>
-        <svg class="acc-arrow" id="arrow-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="acc-body" id="body-desc">
-        <div id="descContent" class="readonly-empty">No description available.</div>
-      </div>
+    <div class="acc-body" id="body-req">
+      <div id="reqContent" class="readonly-empty">No requirement details available.</div>
     </div>
+  </div>
 
-    <!-- Today's Discussion -->
-    <div class="accordion">
-      <div class="acc-header" onclick="toggleAcc('today')">
-        <div class="acc-title">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="7" r="3" stroke="#185FA5" stroke-width="1.2"/></svg>
-          Today's Discussion
-          <span class="acc-tag tag-edit">Edit</span>
-        </div>
-        <svg class="acc-arrow open" id="arrow-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <!-- NOTES -->
+  <div class="accordion">
+    <div class="acc-header" onclick="toggleAcc('notes')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2h10v8l-3 2H2V2z" stroke="#94a3b8" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 10v2l2-2" stroke="#94a3b8" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 5h6M4 7h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Notes
+        <span class="acc-tag tag-readonly">Read Only</span>
+        <span id="notesBadge" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600"></span>
       </div>
-      <div class="acc-body open" id="body-today">
-        <span class="today-prefix" id="todayPrefix">12 Apr 2026 -</span>
-        <textarea class="discussion-input" id="discussionInput" placeholder="Enter today's discussion details..." oninput="onDiscInput()"></textarea>
-        <div class="disc-footer">
-          <span class="char-count" id="charCount">0 characters</span>
-          <button class="save-btn" id="saveDiscBtn" onclick="saveDiscussion()">
-            <div class="save-spin"></div>
-            <span class="save-lbl">Save</span>
+      <svg class="acc-arrow" id="arrow-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="acc-body" id="body-notes">
+      <div id="notesContent" class="readonly-empty">No notes found.</div>
+    </div>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="accordion">
+    <div class="acc-header" onclick="toggleAcc('desc')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 6h10M2 9h6" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Description
+        <span class="acc-tag tag-readonly">Read Only</span>
+      </div>
+      <svg class="acc-arrow" id="arrow-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="acc-body" id="body-desc">
+      <div id="descContent" class="readonly-empty">No description available.</div>
+    </div>
+  </div>
+
+  <!-- TODAY'S DISCUSSION -->
+  <div class="accordion">
+    <div class="acc-header" onclick="toggleAcc('today')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="7" r="3" stroke="#185FA5" stroke-width="1.2"/></svg>
+        Today's Discussion
+        <span class="acc-tag tag-edit">Edit</span>
+      </div>
+      <svg class="acc-arrow open" id="arrow-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="acc-body open" id="body-today">
+      <div class="today-label">
+        <span class="today-date-prefix" id="todayPrefix">—</span>
+        <span style="color:#64748b;font-weight:400">Type your discussion notes below</span>
+      </div>
+      <textarea class="discussion-input" id="discussionInput" placeholder="Enter today's discussion details, next steps, or any important notes..." oninput="onInput()"></textarea>
+      <div class="footer">
+        <span class="char-count" id="charCount">0 characters</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="clearDiscussion()">Clear</button>
+          <button class="btn btn-primary" id="saveBtn" onclick="saveAll()">
+            <div class="spin-sm"></div>
+            <span class="lbl">Save Changes</span>
           </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Open Activities -->
-    <div class="accordion">
-      <div class="acc-header" onclick="toggleAcc('activities')">
-        <div class="acc-title">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="11" rx="1.5" stroke="#f59e0b" stroke-width="1.2"/><path d="M4 1v2M10 1v2M1 5h12" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/><path d="M4 8h2M8 8h2M4 10.5h2" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Open Activities
-          <span class="acc-tag" id="activitiesBadge" style="background:#fef3c7;color:#b45309;display:none">0</span>
-        </div>
-        <svg class="acc-arrow" id="arrow-activities" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <!-- OPEN ACTIVITIES -->
+  <div class="accordion">
+    <div class="acc-header" onclick="toggleAcc('activities')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="11" rx="1.5" stroke="#f59e0b" stroke-width="1.2"/><path d="M4 1v2M10 1v2M1 5h12" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/><path d="M4 8h2M8 8h2M4 10.5h2" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Open Activities
+        <span id="actBadge" class="acc-tag tag-amber" style="display:none">0</span>
       </div>
-      <div class="acc-body" id="body-activities">
-        <div class="act-list" id="activityList">
-          <div class="act-loading"><div class="act-spin"></div>Loading activities...</div>
-        </div>
+      <svg class="acc-arrow" id="arrow-activities" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="acc-body" id="body-activities">
+      <div class="act-list" id="actList">
+        <div class="act-empty">Loading activities...</div>
       </div>
     </div>
+  </div>
 
-    <!-- Add Task -->
-    <div class="accordion">
-      <div class="acc-header" onclick="toggleAcc('task')">
-        <div class="acc-title">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#16a34a" stroke-width="1.2"/><path d="M4.5 7l2 2 3-3" stroke="#16a34a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Add Task
-          <span class="acc-tag" style="background:#dcfce7;color:#16a34a">New</span>
-        </div>
-        <svg class="acc-arrow" id="arrow-task" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <!-- CREATE ACTIVITY -->
+  <div class="accordion">
+    <div class="acc-header" onclick="toggleAcc('create')">
+      <div class="acc-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#15803d" stroke-width="1.2"/><path d="M7 4v6M4 7h6" stroke="#15803d" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Create Activity
+        <span class="acc-tag tag-green">New</span>
       </div>
-      <div class="acc-body" id="body-task">
-        <div class="task-form">
-          <div class="task-row">
-            <div class="task-field">
-              <label class="task-label">Subject *</label>
-              <select class="task-select" id="taskSubject">
-                <option value="">Select...</option>
-                <option value="Call">Call</option>
-                <option value="Email">Email</option>
-                <option value="Meeting">Meeting</option>
-                <option value="Send Letter">Send Letter</option>
-                <option value="Product Demo">Product Demo</option>
-              </select>
-            </div>
-            <div class="task-field">
-              <label class="task-label">Due Date</label>
-              <input type="date" class="task-input" id="taskDueDate"/>
-            </div>
-          </div>
-          <div class="task-row">
-            <div class="task-field">
-              <label class="task-label">Status</label>
-              <select class="task-select" id="taskStatus">
-                <option value="Not Started">Not Started</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Deferred">Deferred</option>
-                <option value="Waiting on someone else">Waiting for input</option>
-                <option value="Completed">Completed</option>
-              </select>
-            </div>
-            <div class="task-field">
-              <label class="task-label">Priority</label>
-              <select class="task-select" id="taskPriority">
-                <option value="Normal">Normal</option>
-                <option value="High">High</option>
-                <option value="Highest">Highest</option>
-                <option value="Low">Low</option>
-                <option value="Lowest">Lowest</option>
-              </select>
-            </div>
-          </div>
-          <div class="task-field full">
-            <label class="task-label">Description</label>
-            <textarea class="task-textarea" id="taskDescription" placeholder="Add task notes or context..."></textarea>
-          </div>
-          <div class="task-footer">
-            <button class="task-clear-btn" onclick="clearTaskForm()">Clear</button>
-            <button class="task-save-btn" id="taskSaveBtn" onclick="saveTask()">
-              <div class="task-spin"></div>
-              <span class="task-save-lbl">✓ Add Task</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <svg class="acc-arrow" id="arrow-create" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
+    <div class="acc-body" id="body-create">
 
+      <!-- Tabs: Task / Call -->
+      <div class="create-tabs">
+        <div class="create-tab active" id="tab-task" onclick="switchTab('task')">📋 Task</div>
+        <div class="create-tab" id="tab-call" onclick="switchTab('call')">📞 Call</div>
+      </div>
+
+      <!-- TASK FORM -->
+      <div class="create-form show" id="form-task">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">Subject *</label>
+            <select class="form-select" id="taskSubject">
+              <option value="">Select...</option>
+              <option value="Call">Call</option>
+              <option value="Email">Email</option>
+              <option value="Meeting">Meeting</option>
+              <option value="Send Letter">Send Letter</option>
+              <option value="Product Demo">Product Demo</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Due Date</label>
+            <input type="date" class="form-input" id="taskDueDate"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="taskStatus">
+              <option value="Not Started">Not Started</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Deferred">Deferred</option>
+              <option value="Waiting on someone else">Waiting for input</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Priority</label>
+            <select class="form-select" id="taskPriority">
+              <option value="Normal">Normal</option>
+              <option value="High">High</option>
+              <option value="Highest">Highest</option>
+              <option value="Low">Low</option>
+              <option value="Lowest">Lowest</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="taskDesc" placeholder="Add task notes or context..."></textarea>
+        </div>
+        <div class="form-footer">
+          <button class="btn btn-ghost" onclick="clearForm('task')">Clear</button>
+          <button class="btn btn-green" id="taskSaveBtn" onclick="createTask()">
+            <div class="spin-sm"></div>
+            <span class="lbl">✓ Add Task</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CALL LOG FORM -->
+      <div class="create-form" id="form-call">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">Subject *</label>
+            <select class="form-select" id="callSubject">
+              <option value="">Select...</option>
+              <option value="Introduction Call">Introduction Call</option>
+              <option value="Follow-up Call">Follow-up Call</option>
+              <option value="Demo Call">Demo Call</option>
+              <option value="Support Call">Support Call</option>
+              <option value="Outbound Call">Outbound Call</option>
+              <option value="Inbound Call">Inbound Call</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Call Date & Time</label>
+            <input type="datetime-local" class="form-input" id="callDateTime"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">Direction</label>
+            <select class="form-select" id="callDirection">
+              <option value="Outbound">Outbound</option>
+              <option value="Inbound">Inbound</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Duration (mins)</label>
+            <input type="number" class="form-input" id="callDuration" placeholder="e.g. 10" min="1"/>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Description / Call Notes</label>
+          <textarea class="form-textarea" id="callDesc" placeholder="What was discussed on the call?"></textarea>
+        </div>
+        <div class="form-footer">
+          <button class="btn btn-ghost" onclick="clearForm('call')">Clear</button>
+          <button class="btn btn-green" id="callSaveBtn" onclick="createCall()">
+            <div class="spin-sm"></div>
+            <span class="lbl">📞 Log Call</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
   </div>
 
 </div>
-
-<emoji-picker id="emoji-picker" style="position:fixed;display:none;z-index:100"></emoji-picker>
 
 <div class="success-overlay" id="successOverlay">
   <div class="success-icon">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
-  <h3 id="successMsg">Saved!</h3>
-  <p id="successSub"></p>
+  <h3>Saved Successfully!</h3>
+  <p id="savedSummary">Lead updated.</p>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
 <script>
-// ════════════════════════════════════════════
-// SHARED STATE
-// ════════════════════════════════════════════
-var leadId = null;
+var leadId   = null;
 var leadData = null;
+var openActivities = [];
 var openAccordions = { today: true };
 
-// Date helpers
+// ── DATE HELPERS ──────────────────────────────────────────────────────
 function formatDate(d) {
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var day = d.getDate();
   var suffix = day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
   return day + suffix + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
 }
-var today = new Date();
+var today    = new Date();
 var todayStr = formatDate(today);
 document.getElementById('todayPrefix').textContent = todayStr + ' -';
 
-function getCurrentTime() {
-  var now = new Date();
-  var h = now.getHours(), m = now.getMinutes();
-  var ampm = h >= 12 ? 'pm' : 'am';
-  h = h % 12 || 12;
-  return h + ':' + (m < 10 ? '0' + m : m) + ' ' + ampm;
-}
-
-// ════════════════════════════════════════════
-// ACCORDION (LEFT PANEL)
-// ════════════════════════════════════════════
-function toggleAcc(key) {
-  openAccordions[key] = !openAccordions[key];
-  var body = document.getElementById('body-' + key);
-  var arrow = document.getElementById('arrow-' + key);
-  if (openAccordions[key]) {
-    body.classList.add('open');
-    if (arrow) arrow.classList.add('open');
-  } else {
-    body.classList.remove('open');
-    if (arrow) arrow.classList.remove('open');
-  }
-}
-
-function onDiscInput() {
-  var val = document.getElementById('discussionInput').value;
-  document.getElementById('charCount').textContent = val.length + ' character' + (val.length !== 1 ? 's' : '');
-}
-
-// ════════════════════════════════════════════
-// ZOHO SDK INIT
-// ════════════════════════════════════════════
-ZOHO.embeddedApp.on("PageLoad", async function(data) {
-  pageLoadData = data;
+// ── INIT ──────────────────────────────────────────────────────────────
+ZOHO.embeddedApp.on("PageLoad", function(data) {
   var raw = data.EntityId;
   leadId = String(Array.isArray(raw) ? raw[0] : raw);
-  await fetchLeadDetails(data);
-  await loadAllMessages(data);
-  listofdata = data;
-  await fetchTemplates();
-  loadTemplates('load');
-  document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('mainLayout').style.display = 'grid';
-  loadOpenActivities();
+  loadLead();
 });
 ZOHO.embeddedApp.init();
 
-// ════════════════════════════════════════════
-// FETCH LEAD DETAILS
-// ════════════════════════════════════════════
-async function fetchLeadDetails(data) {
-  try {
-    var response = await ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId });
-    var details = response?.data?.[0];
-    if (!details) return;
-    leadData = details;
-    userName = details.Full_Name || details.First_Name || '...';
+// ── LOAD LEAD ─────────────────────────────────────────────────────────
+function loadLead() {
+  ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId })
+    .then(function(res) {
+      if (res && res.data && res.data[0]) {
+        leadData = res.data[0];
+        populateUI();
+        loadNotes();
+        loadActivities();
+      } else {
+        showToast('Failed to load lead data', 'er');
+        showMain();
+      }
+    })
+    .catch(function(err) {
+      console.error("Load error:", err);
+      showToast('Error loading lead', 'er');
+      showMain();
+    });
+}
 
-    // Update left panel header
-    var fn = details.First_Name || '';
-    var ln = details.Last_Name || '';
-    var initials = ((fn[0]||'') + (ln[0]||'')).toUpperCase() || '?';
-    var fullName = (fn + ' ' + ln).trim() || 'Unknown Lead';
-    document.getElementById('ldAvatar').textContent = initials;
-    document.getElementById('ldName').textContent = fullName;
-    var meta = [];
-    if (details.Phone) meta.push(details.Phone);
-    if (details.Mobile) meta.push(details.Mobile);
-    if (details.Email) meta.push(details.Email);
-    document.getElementById('ldMeta').textContent = meta.join(' · ');
-    document.getElementById('ldStatus').value = details.Lead_Status || '';
-
-    // WA Header
-    document.getElementById('waAvatar').textContent = initials;
-    document.getElementById('waName').textContent = fullName;
-    document.getElementById('waSubtitle').textContent = details.Phone || details.Mobile || 'No phone';
-
-    // Requirement Details
-    var req = document.getElementById('reqContent');
-    if (details.Requirement_Details) { req.className = 'readonly-content'; req.textContent = details.Requirement_Details; }
-    else { req.className = 'readonly-empty'; req.textContent = 'No requirement details available.'; }
-
-    // Description
-    var desc = document.getElementById('descContent');
-    if (details.Description) { desc.className = 'readonly-content'; desc.textContent = details.Description; }
-    else { desc.className = 'readonly-empty'; desc.textContent = 'No description available.'; }
-
-    // Check phone for WA
-    if (!details.Phone && !details.Mobile) {
-      document.getElementById('waFooter').style.display = 'none';
-      document.getElementById('waNoPhone').style.display = 'block';
-    }
-
-    // Load Notes
-    loadNotes();
-  } catch(e) {
-    console.error("fetchLeadDetails error:", e);
-  }
+function showMain() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('mainWrap').style.display = 'flex';
 }
 
 function loadNotes() {
-  ZOHO.CRM.API.getRelatedRecords({ Entity:"Leads", RecordID:leadId, RelatedList:"Notes", page:1, per_page:10 })
-    .then(function(res) {
-      var notes = (res && res.data) ? res.data : [];
-      var container = document.getElementById('notesContent');
-      var badge = document.getElementById('notesBadge');
-      if (!notes.length) { container.innerHTML = '<div class="readonly-empty">No notes found.</div>'; return; }
-      badge.textContent = notes.length; badge.style.display = '';
-      var html = '';
-      notes.forEach(function(n) {
+  ZOHO.CRM.API.getRelatedRecords({
+    Entity: "Leads", RecordID: leadId, RelatedList: "Notes", page: 1, per_page: 10
+  }).then(function(res) {
+    var notes = (res && res.data) ? res.data : [];
+    var container = document.getElementById('notesContent');
+    var badge = document.getElementById('notesBadge');
+    if (!notes.length) {
+      container.innerHTML = '<div class="readonly-empty">No notes found.</div>';
+    } else {
+      badge.textContent = notes.length;
+      badge.style.display = '';
+      container.innerHTML = notes.map(function(n) {
         var d = n.Created_Time ? new Date(n.Created_Time) : null;
-        html += '<div class="note-item">';
-        if (d) html += '<div class="note-date">' + esc(formatDate(d)) + '</div>';
-        html += '<div class="note-text">' + esc(n.Note_Content || '') + '</div></div>';
-      });
-      container.innerHTML = html;
-    }).catch(function() {});
+        return '<div class="note-item">' +
+          (d ? '<div class="note-date">' + esc(formatDate(d)) + '</div>' : '') +
+          '<div class="note-text">' + esc(n.Note_Content || n.Content || '') + '</div>' +
+        '</div>';
+      }).join('');
+    }
+    showMain();
+  }).catch(function() { showMain(); });
 }
 
-// ════════════════════════════════════════════
-// SAVE DISCUSSION (LEFT PANEL)
-// ════════════════════════════════════════════
-function saveDiscussion() {
-  var discussion = document.getElementById('discussionInput').value.trim();
-  var newStatus = document.getElementById('ldStatus').value;
-  if (!discussion) { showToast("Please enter today's discussion notes", 'er'); return; }
-  var btn = document.getElementById('saveDiscBtn');
-  btn.classList.add('loading'); btn.disabled = true;
-  var existingDesc = (leadData && leadData.Description) ? leadData.Description : '';
-  var newEntry = todayStr + ' - ' + discussion;
-  var newDescription = existingDesc ? existingDesc + '\n' + newEntry : newEntry;
-  var payload = { id: leadId, Description: newDescription };
-  if (newStatus) payload.Lead_Status = newStatus;
-  ZOHO.CRM.API.updateRecord({ Entity:'Leads', APIData:payload })
-    .then(function(res) {
-      btn.classList.remove('loading'); btn.disabled = false;
-      if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
-        leadData.Description = newDescription;
-        if (newStatus) leadData.Lead_Status = newStatus;
-        var desc = document.getElementById('descContent');
-        desc.className = 'readonly-content'; desc.textContent = newDescription;
-        document.getElementById('discussionInput').value = ''; onDiscInput();
-        showToast('Discussion saved!', 'ok');
-        // Also add a note
-        addNoteToLead('Discussion noted: ' + newEntry);
-      } else { showToast('Save failed. Try again.', 'er'); }
-    }).catch(function() { btn.classList.remove('loading'); btn.disabled = false; showToast('Error saving.', 'er'); });
+// ── POPULATE UI ───────────────────────────────────────────────────────
+function populateUI() {
+  var d = leadData;
+  var fn = d.First_Name || '', ln = d.Last_Name || '';
+  var fullName = (fn + ' ' + ln).trim() || 'Unknown Lead';
+  var initials = ((fn[0]||'') + (ln[0]||'')).toUpperCase() || '?';
+
+  document.getElementById('avatar').textContent = initials;
+  document.getElementById('leadName').textContent = fullName;
+
+  var meta = [];
+  if (d.Mobile) meta.push(d.Mobile);
+  if (d.Email) meta.push(d.Email);
+  if (d.Company) meta.push(d.Company);
+  document.getElementById('leadMeta').textContent = meta.join(' · ');
+
+  document.getElementById('statusSelect').value = d.Lead_Status || '';
+
+  var req = document.getElementById('reqContent');
+  if (d.Requirement_Details) { req.className = 'readonly-content'; req.textContent = d.Requirement_Details; }
+  else { req.className = 'readonly-empty'; req.textContent = 'No requirement details available.'; }
+
+  var desc = document.getElementById('descContent');
+  if (d.Description) { desc.className = 'readonly-content'; desc.textContent = d.Description; }
+  else { desc.className = 'readonly-empty'; desc.textContent = 'No description available.'; }
 }
 
-function addNoteToLead(noteContent) {
-  ZOHO.CRM.API.insertRecord({ Entity:'Notes', APIData:{ Note_Title:'Discussion', Note_Content:noteContent, Parent_Id:{ module:'Leads', id:leadId } } })
-    .then(function() { loadNotes(); }).catch(function(e) { console.error('Note error:', e); });
-}
-
-// ─── TOAST & HELPERS ───
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast ' + (type||'ok') + ' show';
-  setTimeout(function() { t.className = 'toast'; }, 3000);
-}
-function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ════════════════════════════════════════════
-// OPEN ACTIVITIES
-// ════════════════════════════════════════════
-var openActivities = [];
-
-async function loadOpenActivities() {
-  try {
-    var res = await ZOHO.CRM.API.searchRecord({
-      Entity: 'Tasks',
-      Type: 'criteria',
-      Query: '((Who_Id:equals:' + leadId + ')and(Status:not_equal:Completed))'
-    });
+// ── OPEN ACTIVITIES ───────────────────────────────────────────────────
+function loadActivities() {
+  ZOHO.CRM.API.searchRecord({
+    Entity: "Tasks",
+    Type: "criteria",
+    Query: "((Who_Id:equals:" + leadId + ")and(Status:not_equal:Completed))"
+  }).then(function(res) {
     openActivities = (res && res.data) ? res.data : [];
     renderActivities();
-  } catch(e) {
-    console.warn('loadOpenActivities error:', e);
+  }).catch(function(e) {
+    console.warn("Activities search error:", e);
     openActivities = [];
     renderActivities();
-  }
+  });
 }
 
-function getActivityDueStatus(dueDateStr) {
-  if (!dueDateStr) return 'no-date';
-  var due = new Date(dueDateStr);
+function dueStatus(dateStr) {
+  if (!dateStr) return 'no-date';
+  var due = new Date(dateStr);
   var now = new Date();
   var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  var todayEnd = new Date(todayStart.getTime() + 86400000);
+  var todayEnd   = new Date(todayStart.getTime() + 86400000);
   if (due < todayStart) return 'overdue';
-  if (due < todayEnd) return 'today';
+  if (due < todayEnd)   return 'today';
   return 'upcoming';
 }
 
-function formatDueDate(dueDateStr) {
-  if (!dueDateStr) return 'No due date';
-  var d = new Date(dueDateStr);
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+function fmtDue(dateStr) {
+  if (!dateStr) return 'No due date';
+  var d = new Date(dateStr);
+  var m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + ' ' + m[d.getMonth()] + ' ' + d.getFullYear();
 }
 
 function renderActivities() {
-  var el = document.getElementById('activityList');
-  var badge = document.getElementById('activitiesBadge');
+  var el = document.getElementById('actList');
+  var badge = document.getElementById('actBadge');
 
   if (!openActivities.length) {
     badge.style.display = 'none';
@@ -520,144 +531,249 @@ function renderActivities() {
   badge.style.display = 'inline-block';
   badge.textContent = openActivities.length;
 
-  // Auto-open accordion if there are activities
+  // Auto-open accordion
   if (!openAccordions['activities']) {
     openAccordions['activities'] = true;
     document.getElementById('body-activities').classList.add('open');
     document.getElementById('arrow-activities').classList.add('open');
   }
 
-  el.innerHTML = openActivities.map(function(task, idx) {
-    var subject = task.Subject || task.subject || 'Task';
-    var dueDate = task.Due_Date || task.due_date || '';
-    var status = getActivityDueStatus(dueDate);
-    var dueTxt = formatDueDate(dueDate);
-    var dueBadgeTxt = status === 'overdue' ? '⚠ Overdue: ' + dueTxt
-                    : status === 'today'   ? '📅 Due Today'
-                    : status === 'upcoming'? '🗓 ' + dueTxt
-                    :                       '📌 ' + dueTxt;
-    return '<div class="act-item ' + status + '" id="act-item-' + idx + '">' +
+  el.innerHTML = openActivities.map(function(t, i) {
+    var subj   = t.Subject || 'Task';
+    var status = dueStatus(t.Due_Date || '');
+    var dueTxt = status === 'overdue'  ? '⚠ Overdue: ' + fmtDue(t.Due_Date)
+               : status === 'today'    ? '📅 Due Today'
+               : status === 'upcoming' ? '🗓 ' + fmtDue(t.Due_Date)
+               :                         '📌 No due date';
+    return '<div class="act-item ' + status + '" id="act-' + i + '">' +
       '<div class="act-top">' +
-        '<span class="act-subject">📋 ' + esc(subject) + '</span>' +
-        '<span class="act-due ' + status + '">' + dueBadgeTxt + '</span>' +
+        '<span class="act-subject">📋 ' + esc(subj) + '</span>' +
+        '<span class="act-badge ' + status + '">' + dueTxt + '</span>' +
       '</div>' +
-      '<div class="act-desc-wrap">' +
-        '<textarea class="act-desc-input" id="act-desc-' + idx + '" placeholder="Add completion note (optional)..."></textarea>' +
-        '<button class="act-complete-btn" id="act-btn-' + idx + '" onclick="completeActivity(' + idx + ')">' +
-          '✓ Complete' +
-        '</button>' +
+      '<div class="act-complete-row">' +
+        '<textarea class="act-note" id="act-note-' + i + '" placeholder="Add completion note (optional)..."></textarea>' +
+        '<button class="act-btn" onclick="completeActivity(' + i + ')">✓ Complete</button>' +
       '</div>' +
     '</div>';
   }).join('');
 }
 
-async function completeActivity(idx) {
+function completeActivity(idx) {
   var task = openActivities[idx];
   if (!task) return;
+  var note   = (document.getElementById('act-note-' + idx).value || '').trim();
+  var btn    = document.querySelector('#act-' + idx + ' .act-btn');
+  btn.disabled = true; btn.textContent = '...';
 
-  var btn = document.getElementById('act-btn-' + idx);
-  var descEl = document.getElementById('act-desc-' + idx);
-  var note = descEl ? descEl.value.trim() : '';
+  var updateData = { id: task.id, Status: 'Completed' };
+  if (note) updateData.Description = (task.Description ? task.Description + '\n\n' : '') + '[' + todayStr + '] ' + note;
 
-  btn.disabled = true;
-  btn.textContent = '...';
-
-  try {
-    var updateData = { Status: 'Completed' };
-    if (note) updateData.Description = (task.Description ? task.Description + '\n\n' : '') + '[' + todayStr + '] ' + note;
-
-    var res = await ZOHO.CRM.API.updateRecord({
-      Entity: 'Tasks',
-      APIData: { id: task.id, ...updateData },
-      Trigger: []
+  ZOHO.CRM.API.updateRecord({ Entity: 'Tasks', APIData: updateData })
+    .then(function(res) {
+      var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
+      if (ok) {
+        showToast('Task marked as completed!', 'ok');
+        var item = document.getElementById('act-' + idx);
+        if (item) { item.style.opacity = '0'; item.style.transition = 'opacity .3s'; }
+        setTimeout(function() { loadActivities(); }, 350);
+      } else {
+        var msg = (res && res.data && res.data[0] && res.data[0].message) || 'Update failed';
+        showToast('Error: ' + msg, 'er');
+        btn.disabled = false; btn.textContent = '✓ Complete';
+      }
+    })
+    .catch(function(e) {
+      showToast('Error: ' + (e.message || String(e)), 'er');
+      btn.disabled = false; btn.textContent = '✓ Complete';
     });
+}
 
-    var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
-    if (ok) {
-      // Remove from list with fade
-      var item = document.getElementById('act-item-' + idx);
-      if (item) { item.style.opacity = '0'; item.style.transition = 'opacity .3s'; setTimeout(function(){ loadOpenActivities(); }, 300); }
-      showToast('Task marked as completed!', 'ok');
-    } else {
-      var msg = (res && res.data && res.data[0] && res.data[0].message) || 'Update failed';
-      showToast('Error: ' + msg, 'er');
-      btn.disabled = false;
-      btn.textContent = '✓ Complete';
-    }
-  } catch(e) {
-    showToast('Error: ' + (e.message || String(e)), 'er');
-    btn.disabled = false;
-    btn.textContent = '✓ Complete';
+// ── CREATE ACTIVITY ───────────────────────────────────────────────────
+var activeTab = 'task';
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tab-task').className  = 'create-tab' + (tab === 'task' ? ' active' : '');
+  document.getElementById('tab-call').className  = 'create-tab' + (tab === 'call' ? ' active' : '');
+  document.getElementById('form-task').className = 'create-form' + (tab === 'task' ? ' show' : '');
+  document.getElementById('form-call').className = 'create-form' + (tab === 'call' ? ' show' : '');
+}
+
+function clearForm(type) {
+  if (type === 'task') {
+    document.getElementById('taskSubject').value  = '';
+    document.getElementById('taskDueDate').value  = '';
+    document.getElementById('taskStatus').value   = 'Not Started';
+    document.getElementById('taskPriority').value = 'Normal';
+    document.getElementById('taskDesc').value     = '';
+  } else {
+    document.getElementById('callSubject').value   = '';
+    document.getElementById('callDateTime').value  = '';
+    document.getElementById('callDirection').value = 'Outbound';
+    document.getElementById('callDuration').value  = '';
+    document.getElementById('callDesc').value      = '';
   }
 }
 
-// ════════════════════════════════════════════
-// ADD TASK
-// ════════════════════════════════════════════
-function clearTaskForm() {
-  document.getElementById('taskSubject').value = '';
-  document.getElementById('taskDueDate').value = '';
-  document.getElementById('taskStatus').value = 'Not Started';
-  document.getElementById('taskPriority').value = 'Normal';
-  document.getElementById('taskDescription').value = '';
-}
-
-async function saveTask() {
+function createTask() {
   var subject = document.getElementById('taskSubject').value;
-  if (!subject) { showToast('Please select a Subject for the task.', 'er'); return; }
+  if (!subject) { showToast('Please select a Subject', 'er'); return; }
 
   var btn = document.getElementById('taskSaveBtn');
-  btn.classList.add('loading');
-  btn.disabled = true;
+  btn.classList.add('loading'); btn.disabled = true;
 
-  try {
-    var taskData = {
-      Subject: subject,
-      Status: document.getElementById('taskStatus').value || 'Not Started',
-      Priority: document.getElementById('taskPriority').value || 'Normal',
-      Who_Id: { id: leadId, module: 'Leads' }
-    };
+  var taskData = {
+    Subject:  subject,
+    Status:   document.getElementById('taskStatus').value   || 'Not Started',
+    Priority: document.getElementById('taskPriority').value || 'Normal',
+    Who_Id:   { id: leadId, module: 'Leads' }
+  };
+  var due  = document.getElementById('taskDueDate').value;
+  var desc = document.getElementById('taskDesc').value.trim();
+  if (due)  taskData.Due_Date    = due;
+  if (desc) taskData.Description = desc;
 
-    var dueDate = document.getElementById('taskDueDate').value;
-    if (dueDate) taskData.Due_Date = dueDate;
-
-    var desc = document.getElementById('taskDescription').value.trim();
-    if (desc) taskData.Description = desc;
-
-    // Auto-populate custom task fields from lead data
-    if (leadData) {
-      if (leadData.Phone || leadData.Mobile) taskData.Lead_Contact_Phone = leadData.Mobile || leadData.Phone || '';
-      if (leadData.Email) taskData.Lead_Contact_Email = leadData.Email || '';
-      if (leadData.Description) taskData.Lead_Contact_Description = leadData.Description || '';
-      if (leadData.Requirement_Details) taskData.Requirement_Details = leadData.Requirement_Details || '';
-    }
-
-    var res = await ZOHO.CRM.API.insertRecord({
-      Entity: 'Tasks',
-      APIData: taskData,
-      Trigger: []
-    });
-
-    var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
-    if (ok) {
-      showToast('Task added successfully!', 'ok');
-      clearTaskForm();
-      toggleAcc('task'); // collapse after save
-    } else {
-      var msg = (res && res.data && res.data[0] && res.data[0].message) || 'Failed to create task';
-      showToast('Error: ' + msg, 'er');
-    }
-  } catch(e) {
-    showToast('Error: ' + (e.message || String(e)), 'er');
-  } finally {
-    btn.classList.remove('loading');
-    btn.disabled = false;
+  // Copy lead custom fields
+  if (leadData) {
+    if (leadData.Mobile || leadData.Phone) taskData.Lead_Contact_Phone       = leadData.Mobile || leadData.Phone;
+    if (leadData.Email)                    taskData.Lead_Contact_Email       = leadData.Email;
+    if (leadData.Description)              taskData.Lead_Contact_Description = leadData.Description;
+    if (leadData.Requirement_Details)      taskData.Requirement_Details      = leadData.Requirement_Details;
   }
+
+  ZOHO.CRM.API.insertRecord({ Entity: 'Tasks', APIData: taskData, Trigger: [] })
+    .then(function(res) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
+      if (ok) {
+        showToast('Task created successfully!', 'ok');
+        clearForm('task');
+        loadActivities();
+      } else {
+        var msg = (res && res.data && res.data[0] && res.data[0].message) || 'Failed';
+        showToast('Error: ' + msg, 'er');
+      }
+    })
+    .catch(function(e) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      showToast('Error: ' + (e.message || String(e)), 'er');
+    });
 }
 
-// Polling — reload activities after task saved
-</script>
+function createCall() {
+  var subject = document.getElementById('callSubject').value;
+  if (!subject) { showToast('Please select a Subject', 'er'); return; }
 
-<!-- (WhatsApp removed) -->
+  var btn = document.getElementById('callSaveBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  var callData = {
+    Subject:         subject,
+    Call_Type:       document.getElementById('callDirection').value || 'Outbound',
+    Call_Purpose:    'Follow-up',
+    Who_Id:          { id: leadId, module: 'Leads' }
+  };
+  var dt   = document.getElementById('callDateTime').value;
+  var dur  = document.getElementById('callDuration').value;
+  var desc = document.getElementById('callDesc').value.trim();
+  if (dt)   callData.Call_Start_Time = new Date(dt).toISOString();
+  if (dur)  callData.Call_Duration   = dur;
+  if (desc) callData.Description     = desc;
+
+  ZOHO.CRM.API.insertRecord({ Entity: 'Calls', APIData: callData, Trigger: [] })
+    .then(function(res) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
+      if (ok) {
+        showToast('Call logged successfully!', 'ok');
+        clearForm('call');
+      } else {
+        var msg = (res && res.data && res.data[0] && res.data[0].message) || 'Failed';
+        showToast('Error: ' + msg, 'er');
+      }
+    })
+    .catch(function(e) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      showToast('Error: ' + (e.message || String(e)), 'er');
+    });
+}
+
+// ── ACCORDIONS ────────────────────────────────────────────────────────
+function toggleAcc(key) {
+  openAccordions[key] = !openAccordions[key];
+  var body  = document.getElementById('body-' + key);
+  var arrow = document.getElementById('arrow-' + key);
+  if (openAccordions[key]) { body.classList.add('open'); arrow.classList.add('open'); }
+  else { body.classList.remove('open'); arrow.classList.remove('open'); }
+}
+
+// ── DISCUSSION ────────────────────────────────────────────────────────
+function onInput() {
+  var val = document.getElementById('discussionInput').value;
+  document.getElementById('charCount').textContent = val.length + ' character' + (val.length !== 1 ? 's' : '');
+}
+function clearDiscussion() {
+  document.getElementById('discussionInput').value = '';
+  onInput();
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────
+function saveAll() {
+  var discussion = document.getElementById('discussionInput').value.trim();
+  var newStatus  = document.getElementById('statusSelect').value;
+
+  if (!discussion) {
+    showToast("Please enter today's discussion notes", 'er');
+    document.getElementById('discussionInput').focus();
+    return;
+  }
+
+  var btn = document.getElementById('saveBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  var existingDesc = (leadData && leadData.Description) ? leadData.Description : '';
+  var newEntry     = todayStr + ' - ' + discussion;
+  var newDesc      = existingDesc ? existingDesc + '\n' + newEntry : newEntry;
+
+  var payload = { id: leadId, Description: newDesc };
+  if (newStatus) payload.Lead_Status = newStatus;
+
+  ZOHO.CRM.API.updateRecord({ Entity: 'Leads', APIData: payload })
+    .then(function(res) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
+        leadData.Description = newDesc;
+        if (newStatus) leadData.Lead_Status = newStatus;
+        var desc = document.getElementById('descContent');
+        desc.className = 'readonly-content'; desc.textContent = newDesc;
+        clearDiscussion();
+        var parts = ['Discussion saved'];
+        if (newStatus) parts.push('Status → ' + newStatus);
+        document.getElementById('savedSummary').textContent = parts.join(' · ');
+        document.getElementById('successOverlay').classList.add('show');
+        setTimeout(function() {
+          document.getElementById('successOverlay').classList.remove('show');
+          try { ZOHO.CRM.UI.Popup.closeReload(); } catch(e) {}
+        }, 2000);
+      } else {
+        showToast('Save failed. Please try again.', 'er');
+      }
+    })
+    .catch(function(err) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      showToast('Error saving. Please try again.', 'er');
+    });
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'ok') + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 3000);
+}
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
 </body>
 </html>
