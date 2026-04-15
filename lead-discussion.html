@@ -246,14 +246,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="row">
           <div class="field">
             <label class="flabel">Subject *</label>
-            <select class="fselect" id="taskSubject">
-              <option value="">Select...</option>
-              <option value="Call">Call</option>
-              <option value="Email">Email</option>
-              <option value="Meeting">Meeting</option>
-              <option value="Send Letter">Send Letter</option>
-              <option value="Product Demo">Product Demo</option>
-            </select>
+            <div style="display:flex;gap:6px">
+              <select class="fselect" id="taskSubjectPick" style="flex:1" onchange="onTaskSubjectPick()">
+                <option value="">Select or type below...</option>
+                <option value="Follow-up">Follow-up</option>
+                <option value="Call Back Later">Call Back Later</option>
+                <option value="Schedule Discovery Call">Schedule Discovery Call</option>
+                <option value="Demo Needed">Demo Needed</option>
+              </select>
+            </div>
+            <input type="text" class="finput" id="taskSubject" placeholder="Or type custom subject..." style="margin-top:5px"/>
           </div>
           <div class="field">
             <label class="flabel">Due Date</label>
@@ -280,6 +282,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
               <option value="Lowest">Lowest</option>
             </select>
           </div>
+        </div>
+        <div class="field">
+          <label class="flabel">Task Owner</label>
+          <select class="fselect" id="taskOwner">
+            <option value="">— Assign to me —</option>
+          </select>
         </div>
         <div class="field">
           <label class="flabel">Description</label>
@@ -386,6 +394,7 @@ function loadLead() {
         populateUI();
         loadNotes();
         loadActivities();
+        loadUsers();
       } else {
         showToast('Failed to load lead data', 'er');
         showMain();
@@ -541,20 +550,27 @@ function completeAct(i) {
 }
 
 // ── CREATE TASK ───────────────────────────────────────────────────────
+function onTaskSubjectPick() {
+  var pick = document.getElementById('taskSubjectPick').value;
+  if (pick) document.getElementById('taskSubject').value = pick;
+}
+
 function createTask() {
-  var subj = document.getElementById('taskSubject').value;
-  if (!subj) { showToast('Please select a Subject', 'er'); return; }
+  var subj = document.getElementById('taskSubject').value.trim();
+  if (!subj) { showToast('Please enter or select a Subject', 'er'); document.getElementById('taskSubject').focus(); return; }
 
   var btn = document.getElementById('taskBtn');
   btn.classList.add('loading'); btn.disabled = true;
 
+  var ownerId = document.getElementById('taskOwner').value;
   var data = {
     Subject:    subj,
     Status:     document.getElementById('taskStatus').value || 'Not Started',
     Priority:   document.getElementById('taskPriority').value || 'Normal',
     $se_module: 'Leads',
-    Who_Id:     leadId
+    What_Id:    { id: leadId }
   };
+  if (ownerId) data.Owner = { id: ownerId };
   var due  = document.getElementById('taskDueDate').value;
   var desc = document.getElementById('taskDesc').value.trim();
   if (due)  data.Due_Date    = due;
@@ -605,7 +621,7 @@ function createCall() {
     Call_Type:       document.getElementById('callDirection').value || 'Outbound',
     Call_Start_Time: dt ? new Date(dt).toISOString() : new Date().toISOString(),
     $se_module:      'Leads',
-    Who_Id:          leadId
+    What_Id:         { id: leadId }
   };
 
   // Duration: Zoho expects "HH:MM" format
@@ -635,6 +651,21 @@ function createCall() {
 }
 
 // ── TAB SWITCHER ──────────────────────────────────────────────────────
+function loadUsers() {
+  ZOHO.CRM.API.getUsers({ Type: 'ActiveUsers' })
+    .then(function(res) {
+      var users = (res && res.users) ? res.users : [];
+      var sel = document.getElementById('taskOwner');
+      sel.innerHTML = '<option value="">— Assign to me —</option>';
+      users.forEach(function(u) {
+        var opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = u.full_name || u.name || u.email;
+        sel.appendChild(opt);
+      });
+    }).catch(function(e) { console.warn('loadUsers error:', e); });
+}
+
 function switchTab(t) {
   ['task','call'].forEach(function(k) {
     document.getElementById('tab-' + k).className = 'tab' + (k === t ? ' active' : '');
@@ -644,11 +675,13 @@ function switchTab(t) {
 
 function clearForm(t) {
   if (t === 'task') {
-    document.getElementById('taskSubject').value  = '';
-    document.getElementById('taskDueDate').value  = '';
-    document.getElementById('taskStatus').value   = 'Not Started';
-    document.getElementById('taskPriority').value = 'Normal';
-    document.getElementById('taskDesc').value     = '';
+    document.getElementById('taskSubjectPick').value = '';
+    document.getElementById('taskSubject').value     = '';
+    document.getElementById('taskDueDate').value     = '';
+    document.getElementById('taskStatus').value      = 'Not Started';
+    document.getElementById('taskPriority').value    = 'Normal';
+    document.getElementById('taskOwner').value       = '';
+    document.getElementById('taskDesc').value        = '';
   } else {
     document.getElementById('callSubject').value   = '';
     document.getElementById('callDateTime').value  = '';
