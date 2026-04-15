@@ -1,431 +1,1129 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Lead Discussion</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+<script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1f36;font-size:13px}
+body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1f36;font-size:13px;height:100vh;overflow:hidden}
 
-/* LOADING */
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;color:#94a3b8}
-.loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
+/* ── LAYOUT ── */
+.main-layout{display:grid;grid-template-columns:1fr 360px;height:100vh;gap:0}
+.left-panel{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#f5f7fa}
+.right-panel{display:flex;flex-direction:column;background:#fff;border-left:1px solid #e2e8f0;height:100vh}
+
+/* ── LOADING ── */
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;color:#94a3b8;grid-column:1/-1}
+.loader-spin{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* MAIN */
-.wrap{padding:16px;display:flex;flex-direction:column;gap:10px;max-width:700px;margin:0 auto}
-
-/* LEAD HEADER */
-.lead-header{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.lead-info{display:flex;align-items:center;gap:12px}
-.avatar{width:38px;height:38px;border-radius:50%;background:#eff6ff;color:#185FA5;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* ── LEAD HEADER ── */
+.lead-header{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.lead-info{display:flex;align-items:center;gap:11px}
+.avatar{width:36px;height:36px;border-radius:50%;background:#eff6ff;color:#185FA5;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lead-name{font-size:14px;font-weight:600;color:#1a1f36}
 .lead-meta{font-size:11px;color:#64748b;margin-top:2px}
-.status-select{border:0.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#f8fafc;outline:none;cursor:pointer}
+.status-select{border:0.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#f8fafc;outline:none;cursor:pointer;max-width:160px}
 .status-select:focus{border-color:#3b82f6}
 
-/* ACCORDION */
+/* ── ACCORDIONS ── */
 .accordion{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;overflow:hidden}
-.acc-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer;user-select:none;transition:background .15s}
 .acc-header:hover{background:#fafbfc}
-.acc-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#1a1f36}
+.acc-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#1a1f36}
 .acc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
-.tag-readonly{background:#f1f5f9;color:#475569}
+.tag-ro{background:#f1f5f9;color:#475569}
 .tag-edit{background:#eff6ff;color:#185FA5}
-.acc-arrow{width:16px;height:16px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
+.acc-arrow{width:15px;height:15px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
 .acc-arrow.open{transform:rotate(180deg)}
-.acc-body{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease}
-.acc-body.open{padding:0 16px 14px;max-height:800px}
-
-/* READ ONLY */
-.readonly-content{font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.acc-body{padding:0 15px;max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease}
+.acc-body.open{padding:0 15px 13px;max-height:600px}
+.readonly-content{font-size:12px;color:#374151;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .readonly-empty{font-size:12px;color:#94a3b8;font-style:italic}
-
-/* NOTES LIST */
-.note-item{padding:10px 0;border-bottom:0.5px solid #f1f5f9}
+.note-item{padding:8px 0;border-bottom:0.5px solid #f1f5f9}
 .note-item:last-child{border-bottom:none}
-.note-date{font-size:11px;color:#94a3b8;margin-bottom:4px}
+.note-date{font-size:11px;color:#94a3b8;margin-bottom:3px}
 .note-text{font-size:12px;color:#374151;line-height:1.5}
 
-/* EDIT - TODAY'S DISCUSSION */
-.today-label{font-size:11px;font-weight:600;color:#185FA5;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.today-date-prefix{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#185FA5}
-.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:100px;transition:border .15s,box-shadow .15s;line-height:1.6}
-.discussion-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+/* ── TODAY'S DISCUSSION ── */
+.today-prefix{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#185FA5;margin-bottom:8px;display:inline-block}
+.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:90px;transition:border .15s;line-height:1.6}
+.discussion-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
 .discussion-input::placeholder{color:#94a3b8}
-
-/* FOOTER */
-.footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:4px}
+.disc-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
 .char-count{font-size:11px;color:#94a3b8}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
-.btn-primary{background:#3b82f6;color:#fff}
-.btn-primary:hover:not(:disabled){background:#2563eb}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.btn-ghost{background:none;border:0.5px solid #e2e8f0;color:#64748b}
-.btn-ghost:hover{background:#f1f5f9}
-.spin-sm{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
-.btn-primary.loading .spin-sm{display:block}
-.btn-primary.loading .lbl{display:none}
+.save-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#3b82f6;border:none;border-radius:8px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+.save-btn:hover:not(:disabled){background:#2563eb}
+.save-btn:disabled{opacity:.5;cursor:not-allowed}
+.save-spin{width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.save-btn.loading .save-spin{display:block}
+.save-btn.loading .save-lbl{display:none}
 
-/* TOAST */
+/* ── WHATSAPP PANEL (RIGHT) ── */
+.wa-header{background:#075e54;color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.wa-header-left{display:flex;align-items:center;gap:10px}
+.wa-avatar{width:36px;height:36px;border-radius:50%;background:#128c7e;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+.wa-name{font-size:14px;font-weight:600}
+.wa-subtitle{font-size:11px;opacity:.8;margin-top:1px}
+.countdown{display:flex;column-gap:6px;align-items:center}
+.bloc-time{text-align:center}
+.count-title{display:block;font-size:9px;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:2px}
+.figure{position:relative;float:left;height:24px;width:22px;margin-right:2px;background:#fff;border-radius:4px}
+.figure span{position:absolute;left:0;right:0;margin:auto;font:normal 1.1em/24px 'Inter',sans-serif;font-weight:700;color:#075e54}
+.figure .top{z-index:3;background:#f7f7f7;transform-origin:50% 100%;border-radius:4px 4px 0 0}
+.figure .bottom{z-index:1}
+.figure .top-back{z-index:4;bottom:0;background:#fff;transform-origin:50% 0;transform:perspective(200px) rotateX(180deg);border-radius:0 0 4px 4px}
+.figure .top-back span{position:absolute;top:-100%;left:0;right:0;margin:auto}
+.figure .bottom-back{z-index:2;top:0;height:50%;overflow:hidden;background:#f7f7f7;border-radius:4px 4px 0 0}
+.figure .bottom-back span{position:absolute;top:0;left:0;right:0;margin:auto}
+.figure .top,.figure .top-back{height:50%;overflow:hidden;backface-visibility:hidden}
+
+.wa-body{flex:1;padding:12px 14px;overflow-y:auto;background:#e5ddd5;display:flex;flex-direction:column;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9b99a' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.wa-body::-webkit-scrollbar{width:4px}
+.wa-body::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}
+.bot-message,.user-message{max-width:78%;padding:8px 10px;border-radius:10px;margin-bottom:8px;word-wrap:break-word;position:relative;z-index:1;font-size:12px}
+.bot-message{background:#fff;align-self:flex-start}
+.user-message{background:#dcf8c6;align-self:flex-end}
+.bot-message::after,.user-message::after{content:attr(data-time);display:block;font-size:11px;color:#888;text-align:right;margin-top:4px;text-transform:lowercase}
+.user-message::after{padding-right:14px}
+.date-label{text-align:center;font-weight:400;background:#fff;margin:6px auto;font-size:11px;padding:2px 8px;display:block;border-radius:5px;color:gray;width:fit-content}
+.message-time{font-size:11px;text-align:right;color:#888;margin-top:3px}
+.ticks{position:absolute;right:8px;bottom:6px;display:inline-flex;gap:2px}
+.ticks.failed{position:relative;display:flex;margin:0;justify-content:flex-end;bottom:0;margin-top:4px}
+.ticks.delivered .tick:first-child,.ticks.read .tick:first-child{right:2px;bottom:4px;position:absolute}
+.tick{font-size:11px;transform:rotate(-10deg);display:inline-block;transition:color .3s}
+.sent .tick{color:grey}.delivered .tick{color:grey}.read .tick{color:#34b7f1}
+.retry-button{background:none;border:none;cursor:pointer;padding:0;color:#ef2f2f;display:flex;gap:2px;margin:0;font-size:11px}
+.typing-indicator{display:flex;justify-content:flex-start;margin-block:8px}
+.typing-dots{display:flex;padding:8px 12px;background:#fff;border-radius:18px}
+.typing-dots span{width:7px;height:7px;margin:0 2px;background:#667781;border-radius:50%;display:inline-block;animation:typing 1.4s infinite ease-in-out}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+/* FILE MESSAGES */
+.file-message-container{max-width:240px;border-radius:8px;overflow:hidden;position:relative;background:#fff}
+.image-message img{max-width:100%;padding:4px;max-height:180px;display:block;border-radius:8px 8px 0 0}
+.video-message video{max-width:100%;max-height:180px;display:block;background:#000;border-radius:8px 8px 0 0}
+.audio-message audio{width:100%;min-width:200px}
+.document-message{display:flex;align-items:center;padding:10px;gap:10px}
+.file-meta{padding:6px 10px;background:#f5f5f5;border-radius:0 0 8px 8px}
+.file-name{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-size{display:flex;font-size:10px;color:#666;margin-top:6px}
+.download-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.file-loader{display:flex;flex-direction:column;align-items:center;justify-content:center;width:200px;min-height:160px;opacity:.5}
+.spinner{width:36px;height:36px;border:4px solid rgba(0,0,0,.1);border-left-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:8px}
+.fa-solid,.fas{color:#d1caca}
+
+/* ── WA FOOTER ── */
+.wa-footer{padding:8px 10px 8px;background:#f0f2f5;border-top:1px solid #e2e8f0;flex-shrink:0}
+.tab-system{--active-color:#075e54;--inactive-color:#64748b}
+.tab-labels{display:flex;border-bottom:1px solid #e2e8f0;margin-bottom:6px}
+.tab-labels label{padding:4px 12px;cursor:pointer;color:var(--inactive-color);border-bottom:2px solid transparent;font-size:12px}
+#tab1:checked ~ .tab-labels label[for="tab1"],#tab2:checked ~ .tab-labels label[for="tab2"]{color:var(--active-color);border-bottom-color:var(--active-color)}
+input[type="radio"]:disabled + .tab-labels label[for="tab2"]{color:gray;cursor:not-allowed;opacity:.5}
+.footer-row{display:flex;align-items:flex-end;gap:6px}
+.smiley-emoji-icon{color:#a7a7a7;font-size:20px;cursor:pointer}
+.msg-input-wrap{flex:1}
+.dropdown{position:relative;width:100%}
+.dropdown input{width:100%;height:38px;padding:8px 12px;font-size:12px;border-radius:5px;background:#fff;border:0;font-family:inherit;outline:none}
+.dropdown-content{display:none;position:absolute;width:100%;background:#fff;border:1px solid #ccc;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.2);z-index:99;max-height:180px;overflow-y:auto;bottom:40px}
+.dropdown-content div{padding:8px 10px;cursor:pointer;border-bottom:1px solid #ddd2;font-size:12px}
+.dropdown-content div:hover{background:#f1f1f1}
+.dropdown .loader{display:none;width:18px;height:18px;border:2px solid #ccc;border-top:2px solid #007bff;border-radius:50%;animation:spin 1s linear infinite;position:absolute;right:8%;bottom:9px}
+.attach-icon{width:22px;height:22px;cursor:pointer}
+.send-btn-wa{background:transparent;border:none;cursor:pointer;padding:0}
+.send-btn-wa img{width:22px;height:22px}
+.wa-no-phone{padding:20px;text-align:center;color:#94a3b8;font-size:12px;font-style:italic}
+/* ── ADD TASK ── */
+.task-form{display:flex;flex-direction:column;gap:8px}
+.task-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.task-field{display:flex;flex-direction:column;gap:4px}
+.task-field.full{grid-column:1/-1}
+.task-label{font-size:11px;font-weight:500;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
+.task-input,.task-select,.task-textarea{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s}
+.task-input:focus,.task-select:focus,.task-textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
+.task-textarea{resize:vertical;min-height:60px;line-height:1.5}
+.task-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.task-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:2px}
+.task-clear-btn{padding:7px 14px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s}
+.task-clear-btn:hover{background:#e2e8f0}
+.task-save-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:#16a34a;border:none;border-radius:8px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+.task-save-btn:hover:not(:disabled){background:#15803d}
+.task-save-btn:disabled{opacity:.5;cursor:not-allowed}
+.task-spin{width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.task-save-btn.loading .task-spin{display:block}
+.task-save-btn.loading .task-save-lbl{display:none}
+
+
+/* ── TOAST ── */
 .toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;pointer-events:none}
-.toast.ok{background:#15803d}.toast.er{background:#dc2626}
+.toast.ok{background:#15803d}.toast.er{background:#dc2626}.toast.info{background:#2563eb}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-/* SUCCESS */
-.success-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.9);align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:99}
+/* ── SUCCESS OVERLAY ── */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:99}
 .success-overlay.show{display:flex}
 .success-icon{width:52px;height:52px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .success-overlay h3{font-size:15px;font-weight:600;color:#15803d}
-.success-overlay p{font-size:13px;color:#64748b}
+.success-overlay p{font-size:12px;color:#64748b}
 </style>
 </head>
 <body>
 
-<div class="loading" id="loadingState">
-  <div class="loader"></div>
+<div class="loading-screen" id="loadingScreen">
+  <div class="loader-spin"></div>
   <span>Loading lead details...</span>
 </div>
 
-<div class="wrap" id="mainWrap" style="display:none">
+<div class="main-layout" id="mainLayout" style="display:none">
 
-  <!-- LEAD HEADER -->
-  <div class="lead-header">
-    <div class="lead-info">
-      <div class="avatar" id="avatar">?</div>
-      <div>
-        <div class="lead-name" id="leadName">Loading...</div>
-        <div class="lead-meta" id="leadMeta"></div>
-      </div>
-    </div>
-    <select class="status-select" id="statusSelect">
-      <option value="">-None-</option>
-      <option value="New">New</option>
-      <option value="Contact in Future">Contact in Future</option>
-      <option value="Contacted">Contacted</option>
-      <option value="Junk Lead">Junk Lead</option>
-      <option value="Future Prospect">Future Prospect</option>
-      <option value="Not Contacted">Not Contacted</option>
-      <option value="Discovery Call">Discovery Call</option>
-      <option value="Not Interested">Not Interested</option>
-      <option value="Not Qualified">Not Qualified</option>
-    </select>
-  </div>
+  <!-- ══ LEFT: LEAD DISCUSSION ══ -->
+  <div class="left-panel">
 
-  <!-- REQUIREMENT DETAILS -->
-  <div class="accordion" id="acc-req">
-    <div class="acc-header" onclick="toggleAcc('req')">
-      <div class="acc-title">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#94a3b8" stroke-width="1.2"/><path d="M3.5 4.5h7M3.5 7h7M3.5 9.5h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Requirement Details
-        <span class="acc-tag tag-readonly">Read Only</span>
+    <!-- Lead Header -->
+    <div class="lead-header">
+      <div class="lead-info">
+        <div class="avatar" id="ldAvatar">?</div>
+        <div>
+          <div class="lead-name" id="ldName">Loading...</div>
+          <div class="lead-meta" id="ldMeta"></div>
+        </div>
       </div>
-      <svg class="acc-arrow" id="arrow-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <select class="status-select" id="ldStatus">
+        <option value="">-None-</option>
+        <option value="New">New</option>
+        <option value="Contact in Future">Contact in Future</option>
+        <option value="Contacted">Contacted</option>
+        <option value="Junk Lead">Junk Lead</option>
+        <option value="Future Prospect">Future Prospect</option>
+        <option value="Not Contacted">Not Contacted</option>
+        <option value="Discovery Call">Discovery Call</option>
+        <option value="Not Interested">Not Interested</option>
+        <option value="Not Qualified">Not Qualified</option>
+      </select>
     </div>
-    <div class="acc-body" id="body-req">
-      <div id="reqContent" class="readonly-empty">No requirement details available.</div>
-    </div>
-  </div>
 
-  <!-- NOTES -->
-  <div class="accordion" id="acc-notes">
-    <div class="acc-header" onclick="toggleAcc('notes')">
-      <div class="acc-title">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2h10v8l-3 2H2V2z" stroke="#94a3b8" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 10v2l2-2" stroke="#94a3b8" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 5h6M4 7h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Notes
-        <span class="acc-tag tag-readonly">Read Only</span>
-        <span id="notesBadge" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600"></span>
+    <!-- Requirement Details -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc('req')">
+        <div class="acc-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#94a3b8" stroke-width="1.2"/><path d="M3.5 4.5h7M3.5 7h7M3.5 9.5h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Requirement Details
+          <span class="acc-tag tag-ro">Read Only</span>
+        </div>
+        <svg class="acc-arrow" id="arrow-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <svg class="acc-arrow" id="arrow-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="acc-body" id="body-req">
+        <div id="reqContent" class="readonly-empty">No requirement details available.</div>
+      </div>
     </div>
-    <div class="acc-body" id="body-notes">
-      <div id="notesContent" class="readonly-empty">No notes found.</div>
-    </div>
-  </div>
 
-  <!-- DESCRIPTION -->
-  <div class="accordion" id="acc-desc">
-    <div class="acc-header" onclick="toggleAcc('desc')">
-      <div class="acc-title">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 6h10M2 9h6" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Description
-        <span class="acc-tag tag-readonly">Read Only</span>
+    <!-- Notes -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc('notes')">
+        <div class="acc-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2h10v8l-3 2H2V2z" stroke="#94a3b8" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 5h6M4 7h4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Notes
+          <span class="acc-tag tag-ro">Read Only</span>
+          <span id="notesBadge" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600"></span>
+        </div>
+        <svg class="acc-arrow" id="arrow-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <svg class="acc-arrow" id="arrow-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="acc-body" id="body-notes">
+        <div id="notesContent" class="readonly-empty">No notes found.</div>
+      </div>
     </div>
-    <div class="acc-body" id="body-desc">
-      <div id="descContent" class="readonly-empty">No description available.</div>
-    </div>
-  </div>
 
-  <!-- TODAY'S DISCUSSION -->
-  <div class="accordion" id="acc-today">
-    <div class="acc-header" onclick="toggleAcc('today')">
-      <div class="acc-title">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="7" r="3" stroke="#185FA5" stroke-width="1.2"/></svg>
-        Today's Discussion
-        <span class="acc-tag tag-edit">Edit</span>
+    <!-- Description -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc('desc')">
+        <div class="acc-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 6h10M2 9h6" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Description
+          <span class="acc-tag tag-ro">Read Only</span>
+        </div>
+        <svg class="acc-arrow" id="arrow-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <svg class="acc-arrow open" id="arrow-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="acc-body" id="body-desc">
+        <div id="descContent" class="readonly-empty">No description available.</div>
+      </div>
     </div>
-    <div class="acc-body open" id="body-today">
-      <div class="today-label">
-        <span class="today-date-prefix" id="todayPrefix">12 Apr 2026 -</span>
-        <span style="color:#64748b;font-weight:400">Type your discussion notes below</span>
+
+    <!-- Today's Discussion -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc('today')">
+        <div class="acc-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="7" r="3" stroke="#185FA5" stroke-width="1.2"/></svg>
+          Today's Discussion
+          <span class="acc-tag tag-edit">Edit</span>
+        </div>
+        <svg class="acc-arrow open" id="arrow-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <textarea class="discussion-input" id="discussionInput" placeholder="Enter today's discussion details, next steps, or any important notes..." oninput="onInput()"></textarea>
-      <div class="footer">
-        <span class="char-count" id="charCount">0 characters</span>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="clearDiscussion()">Clear</button>
-          <button class="btn btn-primary" id="saveBtn" onclick="saveAll()">
-            <div class="spin-sm"></div>
-            <span class="lbl">Save Changes</span>
+      <div class="acc-body open" id="body-today">
+        <span class="today-prefix" id="todayPrefix">12 Apr 2026 -</span>
+        <textarea class="discussion-input" id="discussionInput" placeholder="Enter today's discussion details..." oninput="onDiscInput()"></textarea>
+        <div class="disc-footer">
+          <span class="char-count" id="charCount">0 characters</span>
+          <button class="save-btn" id="saveDiscBtn" onclick="saveDiscussion()">
+            <div class="save-spin"></div>
+            <span class="save-lbl">Save</span>
           </button>
         </div>
       </div>
     </div>
+
+
+    <!-- Add Task -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc('task')">
+        <div class="acc-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#16a34a" stroke-width="1.2"/><path d="M4.5 7l2 2 3-3" stroke="#16a34a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Add Task
+          <span class="acc-tag" style="background:#dcfce7;color:#16a34a">New</span>
+        </div>
+        <svg class="acc-arrow" id="arrow-task" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="acc-body" id="body-task">
+        <div class="task-form">
+          <div class="task-row">
+            <div class="task-field">
+              <label class="task-label">Subject *</label>
+              <select class="task-select" id="taskSubject">
+                <option value="">Select...</option>
+                <option value="Call">Call</option>
+                <option value="Email">Email</option>
+                <option value="Meeting">Meeting</option>
+                <option value="Send Letter">Send Letter</option>
+                <option value="Product Demo">Product Demo</option>
+              </select>
+            </div>
+            <div class="task-field">
+              <label class="task-label">Due Date</label>
+              <input type="date" class="task-input" id="taskDueDate"/>
+            </div>
+          </div>
+          <div class="task-row">
+            <div class="task-field">
+              <label class="task-label">Status</label>
+              <select class="task-select" id="taskStatus">
+                <option value="Not Started">Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Deferred">Deferred</option>
+                <option value="Waiting on someone else">Waiting for input</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+            <div class="task-field">
+              <label class="task-label">Priority</label>
+              <select class="task-select" id="taskPriority">
+                <option value="Normal">Normal</option>
+                <option value="High">High</option>
+                <option value="Highest">Highest</option>
+                <option value="Low">Low</option>
+                <option value="Lowest">Lowest</option>
+              </select>
+            </div>
+          </div>
+          <div class="task-field full">
+            <label class="task-label">Description</label>
+            <textarea class="task-textarea" id="taskDescription" placeholder="Add task notes or context..."></textarea>
+          </div>
+          <div class="task-footer">
+            <button class="task-clear-btn" onclick="clearTaskForm()">Clear</button>
+            <button class="task-save-btn" id="taskSaveBtn" onclick="saveTask()">
+              <div class="task-spin"></div>
+              <span class="task-save-lbl">✓ Add Task</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
+  <!-- ══ RIGHT: WHATSAPP CHAT ══ -->
+  <div class="right-panel">
+
+    <!-- WA Header -->
+    <div class="wa-header">
+      <div class="wa-header-left">
+        <div class="wa-avatar" id="waAvatar">?</div>
+        <div>
+          <div class="wa-name" id="waName">WhatsApp</div>
+          <div class="wa-subtitle" id="waSubtitle">Loading...</div>
+        </div>
+      </div>
+      <div class="countdown">
+        <div class="bloc-time hours" data-init-value="00">
+          <span class="count-title">Hrs</span>
+          <div class="figure hours hours-1"><span class="top">2</span><span class="top-back"><span>2</span></span><span class="bottom">2</span><span class="bottom-back"><span>2</span></span></div>
+          <div class="figure hours hours-2"><span class="top">4</span><span class="top-back"><span>4</span></span><span class="bottom">4</span><span class="bottom-back"><span>4</span></span></div>
+        </div>
+        <div class="bloc-time min" data-init-value="0">
+          <span class="count-title">Min</span>
+          <div class="figure min min-1"><span class="top">0</span><span class="top-back"><span>0</span></span><span class="bottom">0</span><span class="bottom-back"><span>0</span></span></div>
+          <div class="figure min min-2"><span class="top">0</span><span class="top-back"><span>0</span></span><span class="bottom">0</span><span class="bottom-back"><span>0</span></span></div>
+        </div>
+        <div class="bloc-time sec" data-init-value="0">
+          <span class="count-title">Sec</span>
+          <div class="figure sec sec-1"><span class="top">0</span><span class="top-back"><span>0</span></span><span class="bottom">0</span><span class="bottom-back"><span>0</span></span></div>
+          <div class="figure sec sec-2"><span class="top">0</span><span class="top-back"><span>0</span></span><span class="bottom">0</span><span class="bottom-back"><span>0</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WA Body -->
+    <div class="wa-body" id="chatBody">
+      <div class="bot-message" data-time="" style="display:none">Hello! How can I help you today?</div>
+    </div>
+
+    <!-- WA No Phone Warning (shown if no phone) -->
+    <div class="wa-no-phone" id="waNoPhone" style="display:none">
+      No phone number found for this lead. WhatsApp messages cannot be sent.
+    </div>
+
+    <!-- WA Footer -->
+    <div class="wa-footer" id="waFooter">
+      <div class="tab-system" id="tab-section">
+        <input type="radio" id="tab1" name="tabs" value="templates" checked hidden>
+        <input type="radio" id="tab2" name="tabs" value="reply" hidden>
+        <div class="tab-labels">
+          <label for="tab1">Template</label>
+          <label for="tab2">Reply</label>
+        </div>
+      </div>
+      <div class="footer-row">
+        <label for="emoji-btn-wa" class="smiley-emoji-icon" style="pointer-events:none;opacity:.5">
+          <span id="emoji-btn">😊</span>
+        </label>
+        <div class="msg-input-wrap">
+          <div class="dropdown">
+            <input type="text" id="searchInput" placeholder="Select Template" onkeyup="filterTemplates()">
+            <div id="dropdownList" class="dropdown-content"></div>
+            <div id="loader" class="loader"></div>
+          </div>
+        </div>
+        <label for="fileInput">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#54656f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+        </label>
+        <input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(event)">
+        <button onclick="sendMessage()" class="send-btn-wa">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="#54656f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22 11 13 2 9l20-7z" stroke="#54656f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
 </div>
+
+<!-- Emoji Picker -->
+<emoji-picker id="emoji-picker" style="position:fixed;display:none;z-index:100"></emoji-picker>
 
 <div class="success-overlay" id="successOverlay">
   <div class="success-icon">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
-  <h3>Saved Successfully!</h3>
-  <p id="savedSummary">Lead updated.</p>
+  <h3 id="successMsg">Saved!</h3>
+  <p id="successSub"></p>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
 <script>
-var leadId   = null;
+// ════════════════════════════════════════════
+// SHARED STATE
+// ════════════════════════════════════════════
+var leadId = null;
 var leadData = null;
+var pageLoadData = null;
+var userName = '...';
 var openAccordions = { today: true };
 
-// Format today's date
+// Date helpers
 function formatDate(d) {
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var day = d.getDate();
-  var suffix = day === 1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
+  var suffix = day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
   return day + suffix + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
 }
-
 var today = new Date();
 var todayStr = formatDate(today);
-var todayPrefix = todayStr + ' -';
-document.getElementById('todayPrefix').textContent = todayPrefix;
+document.getElementById('todayPrefix').textContent = todayStr + ' -';
 
-// ═══ INIT ═══
-ZOHO.embeddedApp.on("PageLoad", function(data) {
-  var raw = data.EntityId;
-  leadId = String(Array.isArray(raw) ? raw[0] : raw);
-  console.log("Lead ID:", leadId);
-  loadLead();
-});
-ZOHO.embeddedApp.init();
-
-// ═══ LOAD LEAD ═══
-function loadLead() {
-  ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId })
-    .then(function(res) {
-      if (res && res.data && res.data[0]) {
-        leadData = res.data[0];
-        populateUI();
-        loadNotes();
-      } else {
-        showToast('Failed to load lead data', 'er');
-      }
-    })
-    .catch(function(err) {
-      console.error("Load error:", err);
-      showToast('Error loading lead', 'er');
-    });
+function getCurrentTime() {
+  var now = new Date();
+  var h = now.getHours(), m = now.getMinutes();
+  var ampm = h >= 12 ? 'pm' : 'am';
+  h = h % 12 || 12;
+  return h + ':' + (m < 10 ? '0' + m : m) + ' ' + ampm;
 }
 
-function loadNotes() {
-  ZOHO.CRM.API.getRelatedRecords({
-    Entity: "Leads",
-    RecordID: leadId,
-    RelatedList: "Notes",
-    page: 1,
-    per_page: 10
-  }).then(function(res) {
-    var notes = (res && res.data) ? res.data : [];
-    var container = document.getElementById('notesContent');
-    var badge = document.getElementById('notesBadge');
-
-    if (notes.length === 0) {
-      container.innerHTML = '<div class="readonly-empty">No notes found.</div>';
-    } else {
-      badge.textContent = notes.length;
-      badge.style.display = '';
-      var html = '';
-      notes.forEach(function(n) {
-        var d = n.Created_Time ? new Date(n.Created_Time) : null;
-        var dateStr = d ? formatDate(d) : '';
-        html += '<div class="note-item">';
-        if (dateStr) html += '<div class="note-date">' + esc(dateStr) + '</div>';
-        html += '<div class="note-text">' + esc(n.Note_Content || n.Content || '') + '</div>';
-        html += '</div>';
-      });
-      container.innerHTML = html;
-    }
-
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('mainWrap').style.display = 'flex';
-  })
-  .catch(function() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('mainWrap').style.display = 'flex';
-  });
-}
-
-function populateUI() {
-  var d = leadData;
-  var fn = d.First_Name || '';
-  var ln = d.Last_Name || '';
-  var fullName = (fn + ' ' + ln).trim() || 'Unknown Lead';
-  var initials = ((fn[0]||'') + (ln[0]||'')).toUpperCase() || '?';
-
-  document.getElementById('avatar').textContent = initials;
-  document.getElementById('leadName').textContent = fullName;
-
-  var meta = [];
-  if (d.Mobile) meta.push(d.Mobile);
-  if (d.Email) meta.push(d.Email);
-  if (d.Company) meta.push(d.Company);
-  document.getElementById('leadMeta').textContent = meta.join(' · ');
-
-  // Status
-  var sel = document.getElementById('statusSelect');
-  sel.value = d.Lead_Status || '';
-
-  // Requirement Details
-  var req = document.getElementById('reqContent');
-  if (d.Requirement_Details) {
-    req.className = 'readonly-content';
-    req.textContent = d.Requirement_Details;
-  } else {
-    req.className = 'readonly-empty';
-    req.textContent = 'No requirement details available.';
-  }
-
-  // Description
-  var desc = document.getElementById('descContent');
-  if (d.Description) {
-    desc.className = 'readonly-content';
-    desc.textContent = d.Description;
-  } else {
-    desc.className = 'readonly-empty';
-    desc.textContent = 'No description available.';
-  }
-}
-
-// ═══ ACCORDIONS ═══
+// ════════════════════════════════════════════
+// ACCORDION (LEFT PANEL)
+// ════════════════════════════════════════════
 function toggleAcc(key) {
   openAccordions[key] = !openAccordions[key];
-  var body  = document.getElementById('body-' + key);
+  var body = document.getElementById('body-' + key);
   var arrow = document.getElementById('arrow-' + key);
   if (openAccordions[key]) {
     body.classList.add('open');
-    arrow.classList.add('open');
+    if (arrow) arrow.classList.add('open');
   } else {
     body.classList.remove('open');
-    arrow.classList.remove('open');
+    if (arrow) arrow.classList.remove('open');
   }
 }
 
-// ═══ DISCUSSION INPUT ═══
-function onInput() {
+function onDiscInput() {
   var val = document.getElementById('discussionInput').value;
   document.getElementById('charCount').textContent = val.length + ' character' + (val.length !== 1 ? 's' : '');
 }
 
-function clearDiscussion() {
-  document.getElementById('discussionInput').value = '';
-  onInput();
+// ════════════════════════════════════════════
+// ZOHO SDK INIT
+// ════════════════════════════════════════════
+ZOHO.embeddedApp.on("PageLoad", async function(data) {
+  pageLoadData = data;
+  var raw = data.EntityId;
+  leadId = String(Array.isArray(raw) ? raw[0] : raw);
+  await fetchLeadDetails(data);
+  await loadAllMessages(data);
+  listofdata = data;
+  await fetchTemplates();
+  loadTemplates('load');
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('mainLayout').style.display = 'grid';
+});
+ZOHO.embeddedApp.init();
+
+// ════════════════════════════════════════════
+// FETCH LEAD DETAILS
+// ════════════════════════════════════════════
+async function fetchLeadDetails(data) {
+  try {
+    var response = await ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId });
+    var details = response?.data?.[0];
+    if (!details) return;
+    leadData = details;
+    userName = details.Full_Name || details.First_Name || '...';
+
+    // Update left panel header
+    var fn = details.First_Name || '';
+    var ln = details.Last_Name || '';
+    var initials = ((fn[0]||'') + (ln[0]||'')).toUpperCase() || '?';
+    var fullName = (fn + ' ' + ln).trim() || 'Unknown Lead';
+    document.getElementById('ldAvatar').textContent = initials;
+    document.getElementById('ldName').textContent = fullName;
+    var meta = [];
+    if (details.Phone) meta.push(details.Phone);
+    if (details.Mobile) meta.push(details.Mobile);
+    if (details.Email) meta.push(details.Email);
+    document.getElementById('ldMeta').textContent = meta.join(' · ');
+    document.getElementById('ldStatus').value = details.Lead_Status || '';
+
+    // WA Header
+    document.getElementById('waAvatar').textContent = initials;
+    document.getElementById('waName').textContent = fullName;
+    document.getElementById('waSubtitle').textContent = details.Phone || details.Mobile || 'No phone';
+
+    // Requirement Details
+    var req = document.getElementById('reqContent');
+    if (details.Requirement_Details) { req.className = 'readonly-content'; req.textContent = details.Requirement_Details; }
+    else { req.className = 'readonly-empty'; req.textContent = 'No requirement details available.'; }
+
+    // Description
+    var desc = document.getElementById('descContent');
+    if (details.Description) { desc.className = 'readonly-content'; desc.textContent = details.Description; }
+    else { desc.className = 'readonly-empty'; desc.textContent = 'No description available.'; }
+
+    // Check phone for WA
+    if (!details.Phone && !details.Mobile) {
+      document.getElementById('waFooter').style.display = 'none';
+      document.getElementById('waNoPhone').style.display = 'block';
+    }
+
+    // Load Notes
+    loadNotes();
+  } catch(e) {
+    console.error("fetchLeadDetails error:", e);
+  }
 }
 
-// ═══ SAVE ═══
-function saveAll() {
+function loadNotes() {
+  ZOHO.CRM.API.getRelatedRecords({ Entity:"Leads", RecordID:leadId, RelatedList:"Notes", page:1, per_page:10 })
+    .then(function(res) {
+      var notes = (res && res.data) ? res.data : [];
+      var container = document.getElementById('notesContent');
+      var badge = document.getElementById('notesBadge');
+      if (!notes.length) { container.innerHTML = '<div class="readonly-empty">No notes found.</div>'; return; }
+      badge.textContent = notes.length; badge.style.display = '';
+      var html = '';
+      notes.forEach(function(n) {
+        var d = n.Created_Time ? new Date(n.Created_Time) : null;
+        html += '<div class="note-item">';
+        if (d) html += '<div class="note-date">' + esc(formatDate(d)) + '</div>';
+        html += '<div class="note-text">' + esc(n.Note_Content || '') + '</div></div>';
+      });
+      container.innerHTML = html;
+    }).catch(function() {});
+}
+
+// ════════════════════════════════════════════
+// SAVE DISCUSSION (LEFT PANEL)
+// ════════════════════════════════════════════
+function saveDiscussion() {
   var discussion = document.getElementById('discussionInput').value.trim();
-  var newStatus  = document.getElementById('statusSelect').value;
+  var newStatus = document.getElementById('ldStatus').value;
+  if (!discussion) { showToast("Please enter today's discussion notes", 'er'); return; }
+  var btn = document.getElementById('saveDiscBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+  var existingDesc = (leadData && leadData.Description) ? leadData.Description : '';
+  var newEntry = todayStr + ' - ' + discussion;
+  var newDescription = existingDesc ? existingDesc + '\n' + newEntry : newEntry;
+  var payload = { id: leadId, Description: newDescription };
+  if (newStatus) payload.Lead_Status = newStatus;
+  ZOHO.CRM.API.updateRecord({ Entity:'Leads', APIData:payload })
+    .then(function(res) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
+        leadData.Description = newDescription;
+        if (newStatus) leadData.Lead_Status = newStatus;
+        var desc = document.getElementById('descContent');
+        desc.className = 'readonly-content'; desc.textContent = newDescription;
+        document.getElementById('discussionInput').value = ''; onDiscInput();
+        showToast('Discussion saved!', 'ok');
+        // Also add a note
+        addNoteToLead('Discussion noted: ' + newEntry);
+      } else { showToast('Save failed. Try again.', 'er'); }
+    }).catch(function() { btn.classList.remove('loading'); btn.disabled = false; showToast('Error saving.', 'er'); });
+}
 
-  if (!discussion) {
-    showToast("Please enter today's discussion notes", 'er');
-    document.getElementById('discussionInput').focus();
-    return;
+function addNoteToLead(noteContent) {
+  ZOHO.CRM.API.insertRecord({ Entity:'Notes', APIData:{ Note_Title:'Discussion', Note_Content:noteContent, Parent_Id:{ module:'Leads', id:leadId } } })
+    .then(function() { loadNotes(); }).catch(function(e) { console.error('Note error:', e); });
+}
+
+// ════════════════════════════════════════════
+// WHATSAPP SECTION (adapted from your script.js)
+// ════════════════════════════════════════════
+var dropdownList = document.getElementById("dropdownList");
+var searchInput = document.getElementById("searchInput");
+var loader = document.getElementById("loader");
+var tabSelcted = 'templates';
+var timerInterval;
+var lastRenderedTime = null;
+var listofdata = '';
+var templates = [];
+var currentTemplate = null;
+var templateContent = '';
+var customMessage = false;
+var fistLoad = true;
+var fistLoadData = [];
+var chatBody = document.getElementById("chatBody");
+var templateData = null;
+
+var fileLoader = '<div class="file-loader file-message-container"><div class="spinner"></div></div>';
+
+// Tab switching
+document.querySelectorAll('input[name="tabs"]').forEach(function(radio) {
+  radio.addEventListener('change', function() {
+    tabSelcted = this.value;
+    updateEmojiButton(this.value);
+    if (this.value === 'reply') {
+      searchInput.placeholder = 'Type a reply...';
+      searchInput.value = '';
+      currentTemplate = null;
+      dropdownList.style.display = 'none';
+    } else {
+      searchInput.placeholder = 'Select Template';
+      searchInput.value = '';
+    }
+  });
+});
+
+function updateEmojiButton(status) {
+  var btn = document.getElementById('emoji-btn');
+  if (!btn) return;
+  if (status !== 'reply') { btn.style.pointerEvents='none'; btn.style.opacity='0.5'; }
+  else { btn.style.pointerEvents='auto'; btn.style.opacity='1'; }
+}
+
+// Emoji picker
+var emojiBtn = document.getElementById("emoji-btn");
+var emojiPicker = document.getElementById("emoji-picker");
+if (emojiBtn) {
+  emojiBtn.addEventListener("click", function(e) {
+    var rect = emojiBtn.getBoundingClientRect();
+    var pickerHeight = 350;
+    var topPosition = rect.top + window.scrollY - pickerHeight;
+    emojiPicker.style.left = rect.left + window.scrollX + 'px';
+    emojiPicker.style.top = topPosition + 'px';
+    emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
+  });
+  emojiPicker.addEventListener("emoji-click", function(event) {
+    var emoji = event.detail.unicode;
+    var cursorPos = searchInput.selectionStart;
+    var text = searchInput.value;
+    searchInput.value = text.slice(0, cursorPos) + emoji + text.slice(cursorPos);
+    searchInput.focus();
+  });
+  document.addEventListener("click", function(e) {
+    if (!emojiPicker.contains(e.target) && !emojiBtn.contains(e.target)) emojiPicker.style.display = 'none';
+  });
+}
+
+// ─── AISENSY TOKEN ───
+var AISENSY_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhc3Npc3RhbnRJZCI6IjY2ZTAzMWNhYzEzMTY2MGI3ODc2NWFjNSIsImNsaWVudElkIjoiNjZlMDMxY2FjMTMxNjYwYjc4NzY1YWJmIiwiaWF0IjoxNzQzMTQyOTczfQ.fimSFx_BcZSgxxMS8Lq0J2BJGElf7MvwMO2w1jdYp9s';
+
+async function fetchTemplates() {
+  loader.style.display = "inline-block";
+  try {
+    var req_data = { parameters:{}, headers:{ "Authorization": "Bearer " + AISENSY_TOKEN }, method:"GET", url:"https://backend.aisensy.com/direct-apis/t1/get-templates" };
+    var aisensyData = await ZOHO.CRM.HTTP.get(req_data);
+    var parsedResponse = typeof aisensyData === "string" ? JSON.parse(aisensyData) : aisensyData;
+    templates = parsedResponse?.data?.map(function(template) {
+      var bodyComponent = template.components.find(function(comp) { return comp.type === "BODY"; });
+      return { id: template.id, name: template.name, body: bodyComponent ? bodyComponent.text : "" };
+    }) || [];
+  } catch(e) { console.error("fetchTemplates error:", e); }
+  finally { loader.style.display = "none"; }
+}
+
+function loadTemplates(loadTemp) {
+  if (tabSelcted === 'reply') return;
+  dropdownList.innerHTML = "";
+  templates.forEach(function(template) {
+    var item = document.createElement("div");
+    item.textContent = template.name;
+    item.onclick = function() { showTemplate(template); };
+    dropdownList.appendChild(item);
+  });
+  if (!loadTemp && templates.length) dropdownList.style.display = "block";
+}
+
+function filterTemplates() {
+  if (tabSelcted === 'reply') return;
+  var searchTerm = searchInput.value.toLowerCase();
+  dropdownList.innerHTML = "";
+  var filtered = templates.filter(function(t) { return t.name.toLowerCase().includes(searchTerm); });
+  if (!filtered.length) { currentTemplate = null; dropdownList.innerHTML = "<div>No results found</div>"; }
+  else {
+    filtered.forEach(function(template) {
+      var item = document.createElement("div");
+      item.textContent = template.name;
+      item.onclick = function() { showTemplate(template); };
+      dropdownList.appendChild(item);
+    });
+    dropdownList.style.display = "block";
   }
+}
 
-  var btn = document.getElementById('saveBtn');
+function showTemplate(template) {
+  currentTemplate = typeof template === "string" ? JSON.parse(template) : template;
+  searchInput.value = currentTemplate.body ? currentTemplate.body.replaceAll('{{1}}', userName) : currentTemplate.name;
+  templateContent = currentTemplate.body;
+  dropdownList.style.display = 'none';
+}
+
+searchInput.addEventListener("click", function() { if (tabSelcted !== 'reply') loadTemplates(); });
+searchInput.addEventListener("keyup", function() {
+  if (tabSelcted === 'reply') return;
+  if (!searchInput.value.trim()) { currentTemplate = null; loadTemplates(); }
+});
+searchInput.addEventListener("input", filterTemplates);
+document.addEventListener("click", function(event) {
+  if (!event.target.matches("#searchInput") && !dropdownList.contains(event.target)) dropdownList.style.display = "none";
+});
+
+// ─── SEND MESSAGE ───
+async function sendMessage() {
+  var msg = searchInput.value.trim();
+  if (!msg) return;
+  var time = getCurrentTime();
+  clearInterval(timerInterval);
+  var newMessage = { type:'Outbound', message:null, outboundDate:time };
+  if (!fistLoad) fistLoadData.push(newMessage);
+  appendMessage('<span>' + esc(msg) + '</span>', 'user', time, 'time-group', null, { status:'sent' });
+  searchInput.value = '';
+  await sendMessageToBackend(pageLoadData, '', '', time, '');
+  timerInterval = setInterval(function() { loadAllMessages(listofdata); }, 30000);
+}
+
+function sendMessageToBackend(data, file_type, media_id, time, media_name) {
+  var media_type = '';
+  var mediaFileType = ['image','video','audio'];
+  if (!mediaFileType.includes(file_type) && media_id !== '') media_type = 'document';
+  if (mediaFileType.includes(file_type) && media_id !== '') media_type = file_type;
+
+  return new Promise(function(resolve, reject) {
+    var func_name = "aisensypro__get_aisensy_template_details_for_detail_page";
+    var body_args = media_type === '' ? {
+      "arguments": JSON.stringify({
+        [tabSelcted === 'reply' ? "message" : "template"]: tabSelcted === 'reply' ? searchInput.value : currentTemplate,
+        "leadIds": data?.EntityId,
+        "outbound_date_time": time
+      })
+    } : {
+      "arguments": JSON.stringify({ media_type, media_id, media_name, "leadIds":data?.EntityId, "outbound_date_time":time })
+    };
+    ZOHO.CRM.FUNCTIONS.execute(func_name, body_args)
+      .then(function(response) {
+        console.log("sendMessage response:", response);
+        // Add note to lead recording the WhatsApp message sent
+        var noteText = '[WhatsApp Sent - ' + getCurrentTime() + ' ' + todayStr + ']\n';
+        if (currentTemplate) noteText += 'Template: ' + currentTemplate.name + '\n';
+        noteText += 'Message: ' + searchInput.value;
+        addNoteToLead(noteText);
+        resolve(response);
+      })
+      .catch(function(err) { console.error("sendMessage error:", err); reject(err); });
+  });
+}
+
+// ─── LOAD ALL MESSAGES ───
+async function loadAllMessages(data) {
+  try {
+    var func_name = "aisensypro__get_aisensy_messages_for_detail_page";
+    var req_data = { "arguments": JSON.stringify({ "leadIds": data?.EntityId }) };
+    var response = await ZOHO.CRM.FUNCTIONS.execute(func_name, req_data);
+    var parsedResponse = typeof response?.data === "string" ? JSON.parse(response.data) : response;
+    var details = typeof parsedResponse?.details === "string" ? JSON.parse(parsedResponse.details) : parsedResponse?.details;
+    var messageList = details?.output ? (typeof details.output === "string" ? JSON.parse(details.output) : details.output) : [];
+
+    if (fistLoad) {
+      fistLoadData = messageList;
+      fistLoad = false;
+      await renderMessages(fistLoadData, data);
+    } else {
+      var newMessages = messageList.filter(function(msg) {
+        return !fistLoadData.some(function(existing) { return existing.outboundDate === msg.outboundDate && existing.type === msg.type; });
+      });
+      if (newMessages.length > 0) { await renderMessages(newMessages, data); fistLoadData = [...fistLoadData, ...newMessages]; }
+    }
+
+    if (messageList.length > 0) {
+      var latestInbound = messageList.filter(function(m) { return m.type === 'Inbound'; }).sort(function(a,b) { return new Date(b.outboundDate) - new Date(a.outboundDate); })[0];
+      if (latestInbound && latestInbound.outboundDate) Countdown.init(new Date(latestInbound.outboundDate));
+    }
+  } catch(e) { console.error("loadAllMessages error:", e); }
+}
+
+async function renderMessages(messageList, data) {
+  for (var i = 0; i < messageList.length; i++) {
+    var msg = messageList[i];
+    var sender = msg.type === 'Inbound' ? 'bot' : 'user';
+    var time = msg.outboundDate ? formatMsgTime(msg.outboundDate) : getCurrentTime();
+    var dateLabel = msg.outboundDate ? formatMsgDate(msg.outboundDate) : '';
+
+    if (dateLabel && dateLabel !== lastRenderedTime) {
+      var dLabel = document.createElement('span');
+      dLabel.className = 'date-label'; dLabel.textContent = dateLabel;
+      chatBody.appendChild(dLabel);
+      lastRenderedTime = dateLabel;
+    }
+
+    var content = '';
+    if (msg.message && !msg.fileName) {
+      content = '<span>' + esc(msg.message) + '</span>';
+      await appendMessage(content, sender, time, 'time-group', null, msg);
+    } else if (msg.fileName && msg.message) {
+      var fileData = await GetFileFromAisensy(msg.message);
+      await dispalyFileToChat(fileData, sender, time, 'time-group', msg);
+    }
+  }
+}
+
+function formatMsgTime(dateStr) {
+  var d = new Date(dateStr);
+  var h = d.getHours(), m = d.getMinutes();
+  var ampm = h >= 12 ? 'pm' : 'am';
+  h = h % 12 || 12;
+  return h + ':' + (m < 10 ? '0' + m : m) + ' ' + ampm;
+}
+function formatMsgDate(dateStr) {
+  var d = new Date(dateStr);
+  return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+// ─── APPEND MESSAGE ───
+async function appendMessage(content, sender, time, timeGroup, msgId, item) {
+  var msgDiv = document.createElement('div');
+  msgDiv.className = (timeGroup || 'normal-group') + ' ' + (sender === 'bot' ? 'bot-message' : 'user-message');
+  msgDiv.setAttribute('data-time', time);
+  var status = item?.status || 'sent';
+  var tickHtml = '';
+  if (sender === 'user') {
+    if (status === 'failed') {
+      tickHtml = '<div class="ticks failed"><button class="retry-button" onclick="retrySend(this)">&#8635; Retry</button></div>';
+    } else {
+      var tickClass = status === 'read' ? 'read' : status === 'delivered' ? 'delivered' : 'sent';
+      tickHtml = '<div class="ticks ' + tickClass + '"><span class="tick">&#10003;</span>' + (status !== 'sent' ? '<span class="tick">&#10003;</span>' : '') + '</div>';
+    }
+  }
+  msgDiv.innerHTML = content + tickHtml;
+  chatBody.appendChild(msgDiv);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// ─── FILE HANDLING (from your script.js) ───
+async function getMimeTypeFromBuffer(bufferData) {
+  try {
+    var uint8Array = new Uint8Array(bufferData.data);
+    if (uint8Array[0]===0xFF && uint8Array[1]===0xD8) return 'image/jpeg';
+    if (uint8Array[0]===0x89 && uint8Array[1]===0x50 && uint8Array[2]===0x4E && uint8Array[3]===0x47) return 'image/png';
+    if (uint8Array[4]===0x66 && uint8Array[5]===0x74 && uint8Array[6]===0x79 && uint8Array[7]===0x70) return 'video/mp4';
+    if (uint8Array[0]===0x25 && uint8Array[1]===0x50 && uint8Array[2]===0x44 && uint8Array[3]===0x46) return 'application/pdf';
+    return 'application/octet-stream';
+  } catch(e) { return 'application/octet-stream'; }
+}
+
+function getFileCategory(file, mimeType) {
+  mimeType = mimeType || '';
+  if (['image/jpeg','image/png','image/gif','image/webp'].includes(mimeType)) return 'image';
+  if (['video/mp4','video/quicktime','video/x-msvideo','video/webm'].includes(mimeType)) return 'video';
+  if (['audio/mpeg','audio/wav','audio/ogg'].includes(mimeType)) return 'audio';
+  var ext = file?.name?.split('.')?.pop()?.toLowerCase();
+  if (['jpg','jpeg','png','gif','webp'].includes(ext)) return 'image';
+  if (['mp4','mov','avi','webm'].includes(ext)) return 'video';
+  if (['mp3','wav','ogg'].includes(ext)) return 'audio';
+  return 'document';
+}
+
+function formatFileSize(bytes) {
+  if (!bytes) return '0 Bytes';
+  var k = 1024, sizes = ['Bytes','KB','MB','GB'];
+  var i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function getFileIcon(mimeType, fileName) {
+  var ext = (fileName || '').split('.').pop().toLowerCase();
+  if (mimeType === 'application/pdf' || ext === 'pdf') return '<i class="fas fa-file-pdf fa-2x"></i>';
+  if (mimeType && mimeType.includes('word') || ['doc','docx'].includes(ext)) return '<i class="fas fa-file-word fa-2x"></i>';
+  if (mimeType && mimeType.includes('excel') || ['xls','xlsx'].includes(ext)) return '<i class="fas fa-file-excel fa-2x"></i>';
+  return '<i class="fas fa-file fa-2x"></i>';
+}
+
+async function dispalyFileToChat(bufferData, sender, msgTime, timeGroup, item) {
+  var fileName = item?.fileName || 'file';
+  var mimeFileType = await getMimeTypeFromBuffer(bufferData) || 'application/octet-stream';
+  var fileType = getFileCategory('', mimeFileType);
+  var uint8Array = new Uint8Array(bufferData.data);
+  var blob = new Blob([uint8Array], { type: mimeFileType });
+  var fileURL = URL.createObjectURL(blob);
+  var fileSize = formatFileSize(bufferData.data.length);
+  var content = '';
+  if (fileType === 'image') {
+    content = '<div class="file-message-container"><div class="file-message image-message"><img src="' + fileURL + '" alt="' + esc(fileName) + '" class="chat-image"><div class="file-meta"><span class="file-name">' + esc(fileName) + '</span><span class="file-size">' + fileSize + '</span></div></div></div>';
+  } else if (fileType === 'video') {
+    content = '<div class="file-message-container"><div class="file-message video-message"><video controls><source src="' + fileURL + '" type="' + mimeFileType + '"></video><div class="file-meta"><span class="file-name">' + esc(fileName) + '</span></div></div></div>';
+  } else {
+    var icon = getFileIcon(mimeFileType, fileName);
+    content = '<div class="file-message-container"><div class="file-message document-message"><div class="document-icon">' + icon + '</div><div class="document-info"><span class="file-name">' + esc(fileName) + '</span><span class="file-size">' + fileSize + '</span></div><a href="' + fileURL + '" download="' + esc(fileName) + '" class="download-btn"><i class="fas fa-download"></i></a></div></div>';
+  }
+  await appendMessage(content, sender, msgTime, timeGroup, null, item);
+}
+
+async function GetFileFromAisensy(mediaId) {
+  var response = await fetch('https://backend.aisensy.com/direct-apis/t1/get-media', {
+    method:'POST',
+    headers:{ 'Accept':'application/json', 'Content-Type':'application/json', 'Authorization':'Bearer ' + AISENSY_TOKEN },
+    body: JSON.stringify({ id: mediaId })
+  });
+  if (!response.ok) throw new Error('Get media failed: ' + response.status);
+  return await response.json();
+}
+
+async function uploadFileToAisensy(file) {
+  var formData = new FormData();
+  formData.append('file', file);
+  var response = await fetch('https://backend.aisensy.com/direct-apis/t1/media', {
+    method:'POST',
+    headers:{ 'Accept':'application/json', 'Authorization':'Bearer ' + AISENSY_TOKEN },
+    body: formData
+  });
+  if (!response.ok) throw new Error('Upload failed: ' + response.status);
+  return await response.json();
+}
+
+async function handleFileUpload(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  clearInterval(timerInterval);
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    var fileURL = e.target.result;
+    var fileName = file.name;
+    var fileSize = formatFileSize(file.size);
+    var fileType = file.type;
+    var fileCategory = getFileCategory(file, fileType);
+    var time = getCurrentTime();
+    var content = '';
+    if (fileCategory === 'image') {
+      content = '<div class="file-message-container"><div class="file-message image-message"><img src="' + fileURL + '" alt="' + esc(fileName) + '" class="chat-image"><div class="file-meta"><span class="file-name">' + esc(fileName) + '</span><span class="file-size">' + fileSize + '</span></div></div></div>';
+    } else {
+      var icon = getFileIcon(fileType, fileName);
+      content = '<div class="file-message-container"><div class="file-message document-message"><div class="document-icon">' + icon + '</div><div class="document-info"><span class="file-name">' + esc(fileName) + '</span><span class="file-size">' + fileSize + '</span></div></div></div>';
+    }
+    var newMessage = { type:'Outbound', message:null, outboundDate:time };
+    if (!fistLoad) fistLoadData.push(newMessage);
+    appendMessage(content, 'user', time, 'time-group', null, { status:'sent' });
+    var uploadedFile = await uploadFileToAisensy(file);
+    var doc = typeof uploadedFile === "string" ? JSON.parse(uploadedFile) : uploadedFile;
+    await sendMessageToBackend(pageLoadData, fileCategory, doc?.id, time, fileName);
+    timerInterval = setInterval(function() { loadAllMessages(listofdata); }, 30000);
+    event.target.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── TOAST & HELPERS ───
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + (type||'ok') + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 3000);
+}
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+
+// ════════════════════════════════════════════
+// ADD TASK
+// ════════════════════════════════════════════
+function clearTaskForm() {
+  document.getElementById('taskSubject').value = '';
+  document.getElementById('taskDueDate').value = '';
+  document.getElementById('taskStatus').value = 'Not Started';
+  document.getElementById('taskPriority').value = 'Normal';
+  document.getElementById('taskDescription').value = '';
+}
+
+async function saveTask() {
+  var subject = document.getElementById('taskSubject').value;
+  if (!subject) { showToast('Please select a Subject for the task.', 'er'); return; }
+
+  var btn = document.getElementById('taskSaveBtn');
   btn.classList.add('loading');
   btn.disabled = true;
 
-  // Build new Description = existing + newline + "Date - Discussion"
-  var existingDesc = (leadData && leadData.Description) ? leadData.Description : '';
-  var newEntry = todayPrefix + ' ' + discussion;
-  var newDescription = existingDesc
-    ? existingDesc + '\n' + newEntry
-    : newEntry;
+  try {
+    var taskData = {
+      Subject: subject,
+      Status: document.getElementById('taskStatus').value || 'Not Started',
+      Priority: document.getElementById('taskPriority').value || 'Normal',
+      Who_Id: { id: leadId, module: 'Leads' }
+    };
 
-  var payload = {
-    id: leadId,
-    Description: newDescription
-  };
-  if (newStatus) payload.Lead_Status = newStatus;
+    var dueDate = document.getElementById('taskDueDate').value;
+    if (dueDate) taskData.Due_Date = dueDate;
 
-  ZOHO.CRM.API.updateRecord({ Entity: 'Leads', APIData: payload })
-    .then(function(res) {
-      btn.classList.remove('loading');
-      btn.disabled = false;
+    var desc = document.getElementById('taskDescription').value.trim();
+    if (desc) taskData.Description = desc;
 
-      if (res && res.data && res.data[0] && res.data[0].code === 'SUCCESS') {
-        // Update local data
-        leadData.Description = newDescription;
-        if (newStatus) leadData.Lead_Status = newStatus;
-        // Refresh description accordion
-        var desc = document.getElementById('descContent');
-        desc.className = 'readonly-content';
-        desc.textContent = newDescription;
-        // Clear input
-        document.getElementById('discussionInput').value = '';
-        onInput();
+    // Auto-populate custom task fields from lead data
+    if (leadData) {
+      if (leadData.Phone || leadData.Mobile) taskData.Lead_Contact_Phone = leadData.Mobile || leadData.Phone || '';
+      if (leadData.Email) taskData.Lead_Contact_Email = leadData.Email || '';
+      if (leadData.Description) taskData.Lead_Contact_Description = leadData.Description || '';
+      if (leadData.Requirement_Details) taskData.Requirement_Details = leadData.Requirement_Details || '';
+    }
 
-        var parts = [];
-        parts.push('Discussion saved');
-        if (newStatus) parts.push('Status → ' + newStatus);
-        document.getElementById('savedSummary').textContent = parts.join(' · ');
-        document.getElementById('successOverlay').classList.add('show');
-        setTimeout(function() {
-          document.getElementById('successOverlay').classList.remove('show');
-          try { ZOHO.CRM.UI.Popup.closeReload(); } catch(e) {}
-        }, 2000);
-      } else {
-        showToast('Save failed. Please try again.', 'er');
-      }
-    })
-    .catch(function(err) {
-      btn.classList.remove('loading');
-      btn.disabled = false;
-      console.error("Save error:", err);
-      showToast('Error saving. Please try again.', 'er');
+    var res = await ZOHO.CRM.API.insertRecord({
+      Entity: 'Tasks',
+      APIData: taskData,
+      Trigger: []
     });
+
+    var ok = res && res.data && res.data[0] && res.data[0].code === 'SUCCESS';
+    if (ok) {
+      showToast('Task added successfully!', 'ok');
+      clearTaskForm();
+      toggleAcc('task'); // collapse after save
+    } else {
+      var msg = (res && res.data && res.data[0] && res.data[0].message) || 'Failed to create task';
+      showToast('Error: ' + msg, 'er');
+    }
+  } catch(e) {
+    showToast('Error: ' + (e.message || String(e)), 'er');
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
 }
 
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + (type || 'ok') + ' show';
-  setTimeout(function() { t.className = 'toast'; }, 3000);
-}
+// Polling
+timerInterval = setInterval(function() { loadAllMessages(listofdata); }, 30000);
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) { clearInterval(timerInterval); }
+  else { timerInterval = setInterval(function() { loadAllMessages(listofdata); }, 30000); }
+});
+</script>
 
-function esc(s) {
-  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+<!-- COUNTDOWN (same as your original) -->
+<script>
+var Countdown = {
+  $el: $('.countdown'),
+  countdown_interval: null,
+  total_seconds: 0,
+  init: function(startDateTime) {
+    clearInterval(this.countdown_interval);
+    this.$ = { hours:this.$el.find('.bloc-time.hours .figure'), minutes:this.$el.find('.bloc-time.min .figure'), seconds:this.$el.find('.bloc-time.sec .figure') };
+    document.getElementById("tab2").disabled = false;
+    var now = new Date();
+    var elapsedMs = now - startDateTime;
+    var totalMs = 24 * 60 * 60 * 1000;
+    var remainingMs = totalMs - elapsedMs;
+    if (remainingMs <= 0) { this.setZeroValues(); this.onComplete(); return; }
+    var totalSeconds = Math.floor(remainingMs / 1000);
+    this.values = { hours:Math.floor(totalSeconds/3600), minutes:Math.floor((totalSeconds%3600)/60), seconds:totalSeconds%60 };
+    this.total_seconds = totalSeconds;
+    this.count();
+  },
+  count: function() {
+    var that = this;
+    var $h1=this.$.hours.eq(0),$h2=this.$.hours.eq(1),$m1=this.$.minutes.eq(0),$m2=this.$.minutes.eq(1),$s1=this.$.seconds.eq(0),$s2=this.$.seconds.eq(1);
+    this.countdown_interval = setInterval(function() {
+      if (that.total_seconds > 0) {
+        --that.values.seconds;
+        if (that.values.minutes>=0 && that.values.seconds<0) { that.values.seconds=59; --that.values.minutes; }
+        if (that.values.hours>=0 && that.values.minutes<0) { that.values.minutes=59; --that.values.hours; }
+        that.checkHour(that.values.hours,$h1,$h2); that.checkHour(that.values.minutes,$m1,$m2); that.checkHour(that.values.seconds,$s1,$s2);
+        --that.total_seconds;
+      } else { clearInterval(that.countdown_interval); that.setZeroValues(); that.onComplete(); }
+    }, 1000);
+  },
+  setZeroValues: function() {
+    this.checkHour(0,this.$.hours.eq(0),this.$.hours.eq(1));
+    this.checkHour(0,this.$.minutes.eq(0),this.$.minutes.eq(1));
+    this.checkHour(0,this.$.seconds.eq(0),this.$.seconds.eq(1));
+  },
+  animateFigure: function($el, value) {
+    var $top=$el.find('.top'),$bottom=$el.find('.bottom'),$back_top=$el.find('.top-back'),$back_bottom=$el.find('.bottom-back');
+    $back_top.find('span').html(value); $back_bottom.find('span').html(value);
+    TweenMax.to($top, 0.8, { rotationX:'-180deg', transformPerspective:300, ease:Quart.easeOut, onComplete:function(){ $top.html(value); $bottom.html(value); TweenMax.set($top,{rotationX:0}); } });
+    TweenMax.to($back_top, 0.8, { rotationX:0, transformPerspective:300, ease:Quart.easeOut, clearProps:'all' });
+  },
+  checkHour: function(value, $el_1, $el_2) {
+    var val = value.toString().padStart(2,'0');
+    if ($el_1.find('.top').html() !== val.charAt(0)) this.animateFigure($el_1, val.charAt(0));
+    if ($el_2.find('.top').html() !== val.charAt(1)) this.animateFigure($el_2, val.charAt(1));
+  },
+  onComplete: function() {
+    console.log('Countdown finished!');
+    document.getElementById("tab1").checked = true;
+    document.getElementById("tab2").disabled = true;
+    searchInput.placeholder = 'Select Template';
+    tabSelcted = 'templates';
+  }
+};
 </script>
 </body>
 </html>
