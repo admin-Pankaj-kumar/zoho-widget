@@ -411,19 +411,25 @@ ZOHO.embeddedApp.on("PageLoad", function(data) {
 });
 ZOHO.embeddedApp.init();
 
-async function init() {
-  try {
-    var res = await ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId });
-    if (res && res.data && res.data[0]) {
-      leadData = res.data[0];
-      populateUI();
-    }
-  } catch(e) { console.error("getRecord error:", e); }
-
-  // Load all in parallel
-  loadNotes();
-  loadActivities();
-  loadUsers();
+function init() {
+  // Step 1: Always show main immediately, don't wait for anything
+  // This prevents frozen loading screen if any API call fails
+  ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId })
+    .then(function(res) {
+      if (res && res.data && res.data[0]) {
+        leadData = res.data[0];
+        populateUI();
+      }
+    })
+    .catch(function(e) { console.error("getRecord error:", e); })
+    .finally(function() {
+      // Always show UI regardless of success/failure
+      showMain();
+      // Load secondary data after UI is visible
+      loadNotes();
+      loadActivities();
+      loadUsers();
+    });
 }
 
 function showMain() {
@@ -469,8 +475,9 @@ function loadNotes() {
             '<div class="note-text">'+esc(stripHtml(n.Note_Content||n.Content||''))+'</div></div>';
         }).join('');
       }
-      showMain();
-    }).catch(function() { showMain(); });
+    }).catch(function(e) { 
+      console.warn("loadNotes error:", e); 
+    });
 }
 
 // ── OPEN ACTIVITIES ───────────────────────────────────────────────────
