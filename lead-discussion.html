@@ -295,12 +295,47 @@ function doneAct(i){
   var t=acts[i];if(!t)return;
   var note=(document.getElementById('note-'+i).value||'').trim();
   var btn=document.getElementById('doneBtn-'+i);btn.classList.add('ld');btn.disabled=true;
+
+  // Step 1: Mark task as Completed
   var upd={id:t.id,Status:'Completed'};
   if(note)upd.Description=(t.Description?t.Description+'\n\n':'')+'['+ts+'] '+note;
+
   ZOHO.CRM.API.updateRecord({Entity:'Tasks',APIData:upd})
-    .then(function(r){var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';if(ok){toast('Task completed!','ok');var el=document.getElementById('act-'+i);if(el)el.style.opacity='0';setTimeout(function(){ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50}).then(function(r2){var all=(r2&&r2.data)?r2.data:[];acts=all.filter(function(x){return (x.Status||'').toLowerCase()!=='completed';});renderActs();}).catch(function(){acts=[];renderActs();});},400);}
-    else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,60)),'er');btn.classList.remove('ld');btn.disabled=false;}
-  }).catch(function(e){toast('Error: '+em(e),'er');btn.classList.remove('ld');btn.disabled=false;});
+    .then(function(r){
+      var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';
+      if(!ok){
+        var d=r&&r.data&&r.data[0];
+        toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,60)),'er');
+        btn.classList.remove('ld');btn.disabled=false;return;
+      }
+
+      // Step 2: Also append entry to Lead Description
+      // Format: Date - "Activity Subject" - Note
+      if(note){
+        var subj=t.Subject||'Activity';
+        var entry=ts+' - "'+subj+'" - '+note;
+        var existing=ld&&ld.Description?ld.Description:'';
+        var newDesc=existing?existing+'\n'+entry:entry;
+        ZOHO.CRM.API.updateRecord({Entity:'Leads',APIData:{id:lid,Description:newDesc}})
+          .then(function(r2){
+            if(r2&&r2.data&&r2.data[0]&&r2.data[0].code==='SUCCESS'){
+              // Keep local leadData in sync
+              if(ld)ld.Description=newDesc;
+              var dc=document.getElementById('DC');
+              if(dc){dc.className='ro-content';dc.textContent=newDesc;}
+            }
+          }).catch(function(e){console.warn('Lead desc update failed:',e);});
+      }
+
+      // Step 3: Fade out task and refresh list
+      toast('Task completed!','ok');
+      var el=document.getElementById('act-'+i);if(el)el.style.opacity='0';
+      setTimeout(function(){
+        ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50})
+          .then(function(r2){var all=(r2&&r2.data)?r2.data:[];acts=all.filter(function(x){return (x.Status||'').toLowerCase()!=='completed';});renderActs();})
+          .catch(function(){acts=[];renderActs();});
+      },400);
+    }).catch(function(e){toast('Error: '+em(e),'er');btn.classList.remove('ld');btn.disabled=false;});
 }
 
 function onSP(){var v=document.getElementById('tSP').value;if(v)document.getElementById('tS').value=v;}
