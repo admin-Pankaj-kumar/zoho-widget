@@ -11,8 +11,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;color:#94a3b8}
 .loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
-.sk{border-radius:4px;background:linear-gradient(90deg,#f0f4f8 25%,#e2e8f0 50%,#f0f4f8 75%);background-size:800px 100%;animation:shimmer 1.2s infinite}
 .wrap{padding:12px;display:flex;flex-direction:column;gap:8px;max-width:700px;margin:0 auto}
 .lead-header{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .lead-info{display:flex;align-items:center;gap:12px}
@@ -189,69 +187,144 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
 <script>
 var lid=null,ld=null,acts=[],acc={today:true},ts='';
+
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function sh(html){if(!html)return '';return html.replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<\/li>/gi,'\n').replace(/<\/div>/gi,'\n').replace(/<li[^>]*>/gi,'- ').replace(/<[^>]+>/g,'').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/&#39;/gi,"'").replace(/\n{3,}/g,'\n\n').trim();}
-function em(e){if(!e)return 'Error';if(typeof e==='string')return e.substring(0,80);if(e.message)return String(e.message).substring(0,80);try{return JSON.stringify(e).substring(0,80);}catch(x){return 'Error';}}
-function toast(m,t){var el=document.getElementById('toast');el.textContent=m;el.className='toast '+(t||'ok')+' show';setTimeout(function(){el.className='toast';},3500);}
-function fd(d){var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],n=d.getDate(),s=n===1||n===21||n===31?'st':n===2||n===22?'nd':n===3||n===23?'rd':'th';return n+s+' '+M[d.getMonth()]+' '+d.getFullYear();}
-function fdu(ds){if(!ds)return 'No due date';var d=new Date(ds),M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();}
-function dst(ds){if(!ds)return 'no-date';var due=new Date(ds),now=new Date(),s=new Date(now.getFullYear(),now.getMonth(),now.getDate());return due<s?'overdue':due<new Date(s.getTime()+86400000)?'today':'upcoming';}
-function showUI(){document.getElementById('LS').style.display='none';document.getElementById('MW').style.display='flex';}
-function tog(k){acc[k]=!acc[k];var b=document.getElementById('bd-'+k),a=document.getElementById('ar-'+k);if(acc[k]){b.classList.add('open');a.classList.add('open');}else{b.classList.remove('open');a.classList.remove('open');}}
+
+function sh(h){
+  if(!h)return '';
+  var t=h;
+  t=t.replace(/<br[^>]*>/gi,'\n');
+  t=t.replace(/<[/]p>/gi,'\n');
+  t=t.replace(/<[/]li>/gi,'\n');
+  t=t.replace(/<[/]div>/gi,'\n');
+  t=t.replace(/<li[^>]*>/gi,'- ');
+  t=t.replace(/<[^>]+>/g,'');
+  t=t.replace(/&nbsp;/gi,' ');
+  t=t.replace(/&amp;/gi,'&');
+  t=t.replace(/&lt;/gi,'<');
+  t=t.replace(/&gt;/gi,'>');
+  t=t.replace(/&quot;/gi,'"');
+  t=t.replace(/[ \t]*\n[ \t]*/g,'\n');
+  t=t.replace(/\n\n\n+/g,'\n\n');
+  return t.trim();
+}
+
+function em(e){
+  if(!e)return 'Error';
+  if(typeof e==='string')return e.substring(0,80);
+  if(e.message)return String(e.message).substring(0,80);
+  try{return JSON.stringify(e).substring(0,80);}catch(x){return 'Error';}
+}
+
+function toast(m,t){
+  var el=document.getElementById('toast');
+  el.textContent=m;
+  el.className='toast '+(t||'ok')+' show';
+  setTimeout(function(){el.className='toast';},3500);
+}
+
+function fd(d){
+  var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var n=d.getDate();
+  var s=n===1||n===21||n===31?'st':n===2||n===22?'nd':n===3||n===23?'rd':'th';
+  return n+s+' '+M[d.getMonth()]+' '+d.getFullYear();
+}
+
+function fdu(ds){
+  if(!ds)return 'No due date';
+  var d=new Date(ds);
+  var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();
+}
+
+function dst(ds){
+  if(!ds)return 'no-date';
+  var due=new Date(ds),now=new Date();
+  var s=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  return due<s?'overdue':due<new Date(s.getTime()+86400000)?'today':'upcoming';
+}
+
+function showUI(){
+  document.getElementById('LS').style.display='none';
+  document.getElementById('MW').style.display='flex';
+}
+
+function tog(k){
+  acc[k]=!acc[k];
+  var b=document.getElementById('bd-'+k),a=document.getElementById('ar-'+k);
+  if(acc[k]){b.classList.add('open');a.classList.add('open');}
+  else{b.classList.remove('open');a.classList.remove('open');}
+}
 
 ZOHO.embeddedApp.on('PageLoad',function(data){
   var raw=data.EntityId;
   lid=String(Array.isArray(raw)?raw[0]:raw);
-  var now=new Date();ts=fd(now);
+  var now=new Date();
+  ts=fd(now);
   document.getElementById('TP').textContent=ts+' -';
 
-  // Fire all 4 calls in parallel - do not wait for one before starting others
   var pLead=ZOHO.CRM.API.getRecord({Entity:'Leads',RecordID:lid});
   var pActs=ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50});
   var pNotes=ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Notes',page:1,per_page:10});
   var pUsers=ZOHO.CRM.API.getUsers({Type:'ActiveUsers'});
 
-  // Show UI as soon as lead loads (fastest critical path)
   pLead.then(function(r){
     if(r&&r.data&&r.data[0]){ld=r.data[0];renderLead();}
     showUI();
   }).catch(function(e){console.warn('lead err',e);showUI();});
 
-  // Activities - open accordion when ready
   pActs.then(function(r){
     var all=(r&&r.data)?r.data:[];
     acts=all.filter(function(t){return (t.Status||'').toLowerCase()!=='completed';});
     renderActs();
   }).catch(function(){
-    // fallback
     ZOHO.CRM.API.searchRecord({Entity:'Tasks',Type:'criteria',Query:'((Who_Id:equals:'+lid+')and(Status:not_equal:Completed))'})
       .then(function(r2){acts=(r2&&r2.data)?r2.data:[];renderActs();})
       .catch(function(){acts=[];renderActs();});
   });
 
-  // Notes - render when ready
   pNotes.then(function(r){
     var notes=(r&&r.data)?r.data:[];
     var el=document.getElementById('NC');
     var badge=document.getElementById('NB');
-    if(!notes.length){el.innerHTML='<div class="ro-empty">No notes found.</div>';}
-    else{badge.textContent=notes.length;badge.style.display='inline-block';
-      el.innerHTML=notes.map(function(n){var dt=n.Created_Time?new Date(n.Created_Time):null;var txt=sh(n.Note_Content||n.Content||'');return '<div class="note-item">'+(dt?'<div class="note-date">'+esc(fd(dt))+'</div>':'')+'<div class="note-txt">'+esc(txt)+'</div></div>';}).join('');}
+    if(!notes.length){
+      el.innerHTML='<div class="ro-empty">No notes found.</div>';
+    } else {
+      badge.textContent=notes.length;
+      badge.style.display='inline-block';
+      el.innerHTML=notes.map(function(n){
+        var dt=n.Created_Time?new Date(n.Created_Time):null;
+        var txt=sh(n.Note_Content||n.Content||'');
+        return '<div class="note-item">'+(dt?'<div class="note-date">'+esc(fd(dt))+'</div>':'')+'<div class="note-txt">'+esc(txt)+'</div></div>';
+      }).join('');
+    }
   }).catch(function(){document.getElementById('NC').innerHTML='<div class="ro-empty">Could not load notes.</div>';});
 
-  // Users - populate owner dropdown when ready
   pUsers.then(function(r){
     var u=[];
     if(r&&r.users&&Array.isArray(r.users))u=r.users;
     else if(r&&r.data&&Array.isArray(r.data))u=r.data;
     else if(Array.isArray(r))u=r;
     u=u.filter(function(x){return !x.status||x.status==='active';});
-    if(u.length)fillOwners(u);
-    else return ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r2){var u2=[];if(r2&&r2.users)u2=r2.users;else if(Array.isArray(r2))u2=r2;fillOwners(u2.filter(function(x){return !x.status||x.status==='active';}));});
+    if(u.length){fillOwners(u);}
+    else{
+      ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r2){
+        var u2=[];
+        if(r2&&r2.users)u2=r2.users;
+        else if(Array.isArray(r2))u2=r2;
+        fillOwners(u2.filter(function(x){return !x.status||x.status==='active';}));
+      }).catch(function(){});
+    }
   }).catch(function(){
-    ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r){var u=[];if(r&&r.users)u=r.users;else if(Array.isArray(r))u=r;fillOwners(u.filter(function(x){return !x.status||x.status==='active';}));}).catch(function(){});
+    ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r){
+      var u=[];
+      if(r&&r.users)u=r.users;
+      else if(Array.isArray(r))u=r;
+      fillOwners(u.filter(function(x){return !x.status||x.status==='active';}));
+    }).catch(function(){});
   });
 });
+
 ZOHO.embeddedApp.init();
 
 function renderLead(){
@@ -259,7 +332,10 @@ function renderLead(){
   var name=(fn+' '+ln).trim()||'Unknown';
   document.getElementById('AV').textContent=((fn[0]||'')+(ln[0]||'')).toUpperCase()||'?';
   document.getElementById('LN').textContent=name;
-  var m=[];if(d.Mobile)m.push(d.Mobile);if(d.Email)m.push(d.Email);if(d.Company)m.push(d.Company);
+  var m=[];
+  if(d.Mobile)m.push(d.Mobile);
+  if(d.Email)m.push(d.Email);
+  if(d.Company)m.push(d.Company);
   document.getElementById('LM').textContent=m.join(' - ');
   document.getElementById('SS').value=d.Lead_Status||'';
   if(d.Requirement_Details){var r=document.getElementById('RC');r.className='ro-content';r.textContent=d.Requirement_Details;}
@@ -269,36 +345,109 @@ function renderLead(){
 function fillOwners(u){
   var sel=document.getElementById('tOW');
   sel.innerHTML='<option value="">-- Assign to me --</option>';
-  u.forEach(function(x){if(!x.id)return;var n=(x.full_name||'').trim()||(x.name||'').trim()||((x.first_name||'')+' '+(x.last_name||'')).trim()||x.email||String(x.id);var o=document.createElement('option');o.value=x.id;o.textContent=n;sel.appendChild(o);});
+  u.forEach(function(x){
+    if(!x.id)return;
+    var n=(x.full_name||'').trim()||(x.name||'').trim()||((x.first_name||'')+' '+(x.last_name||'')).trim()||x.email||String(x.id);
+    var o=document.createElement('option');
+    o.value=x.id;o.textContent=n;
+    sel.appendChild(o);
+  });
 }
 
 function renderActs(){
   var el=document.getElementById('AL'),badge=document.getElementById('AB');
-  if(!acts.length){badge.style.display='none';el.innerHTML='<div class="act-empty">No open activities found.</div>';return;}
+  if(!acts.length){
+    badge.style.display='none';
+    el.innerHTML='<div class="act-empty">No open activities found.</div>';
+    return;
+  }
   badge.style.display='inline-block';badge.textContent=acts.length;
-  if(!acc['acts']){acc['acts']=true;document.getElementById('bd-acts').classList.add('open');document.getElementById('ar-acts').classList.add('open');}
+  if(!acc['acts']){
+    acc['acts']=true;
+    document.getElementById('bd-acts').classList.add('open');
+    document.getElementById('ar-acts').classList.add('open');
+  }
   el.innerHTML=acts.map(function(t,i){
-    var subj=t.Subject||'Task',due=t.Due_Date||'',st=dst(due),own=t.Owner?t.Owner.name||'':'',desc=sh(t.Description||'');
+    var subj=t.Subject||'Task';
+    var due=t.Due_Date||'';
+    var st=dst(due);
+    var own=t.Owner?t.Owner.name||'':'';
+    var desc=sh(t.Description||'');
     var dueTxt=st==='overdue'?'Overdue: '+fdu(due):st==='today'?'Due Today':st==='upcoming'?fdu(due):'No due date';
-    return '<div class="act-item '+st+'" id="act-'+i+'"><div class="act-main"><div class="act-left"><div class="act-chk" id="chk-'+i+'" onclick="togP('+i+')" title="Complete"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="act-info"><div class="act-subj">'+esc(subj)+'</div><div class="act-meta">'+(own?'<span class="act-own">'+esc(own)+'</span>':'')+'<span class="act-badge '+st+'">'+dueTxt+'</span></div></div></div><div class="act-right">'+(desc?'<div class="act-desc">'+esc(desc)+'</div>':'<div class="act-desc-empty">No description</div>')+'</div></div><div class="act-panel" id="pan-'+i+'"><div class="act-panel-lbl">Add a note before completing (optional)</div><textarea class="act-panel-note" id="note-'+i+'" placeholder="What was done? Next steps..."></textarea><div class="act-panel-btns"><button class="act-cancel" onclick="canP('+i+')">Cancel</button><button class="act-done" id="doneBtn-'+i+'" onclick="doneAct('+i+')"><div class="act-done-sp"></div><span class="act-done-lb">Mark Complete</span></button></div></div></div>';
+    return (
+      '<div class="act-item '+st+'" id="act-'+i+'">'+
+        '<div class="act-main">'+
+          '<div class="act-left">'+
+            '<div class="act-chk" id="chk-'+i+'" onclick="togP('+i+')" title="Complete">'+
+              '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+            '</div>'+
+            '<div class="act-info">'+
+              '<div class="act-subj">'+esc(subj)+'</div>'+
+              '<div class="act-meta">'+
+                (own?'<span class="act-own">'+esc(own)+'</span>':'')+
+                '<span class="act-badge '+st+'">'+dueTxt+'</span>'+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="act-right">'+
+            (desc?'<div class="act-desc">'+esc(desc)+'</div>':'<div class="act-desc-empty">No description</div>')+
+          '</div>'+
+        '</div>'+
+        '<div class="act-panel" id="pan-'+i+'">'+
+          '<div class="act-panel-lbl">Add a note before completing (optional)</div>'+
+          '<textarea class="act-panel-note" id="note-'+i+'" placeholder="What was done? Next steps..."></textarea>'+
+          '<div class="act-panel-btns">'+
+            '<button class="act-cancel" onclick="canP('+i+')">Cancel</button>'+
+            '<button class="act-done" id="doneBtn-'+i+'" onclick="doneAct('+i+')">'+
+              '<div class="act-done-sp"></div><span class="act-done-lb">Mark Complete</span>'+
+            '</button>'+
+          '</div>'+
+        '</div>'+
+      '</div>'
+    );
   }).join('');
 }
 
 function togP(i){
-  var p=document.getElementById('pan-'+i),c=document.getElementById('chk-'+i),open=p.classList.contains('open');
-  acts.forEach(function(_,j){if(j!==i){var pp=document.getElementById('pan-'+j),cc=document.getElementById('chk-'+j);if(pp)pp.classList.remove('open');if(cc)cc.classList.remove('on');}});
+  var p=document.getElementById('pan-'+i),c=document.getElementById('chk-'+i);
+  var open=p.classList.contains('open');
+  acts.forEach(function(_,j){
+    if(j!==i){
+      var pp=document.getElementById('pan-'+j),cc=document.getElementById('chk-'+j);
+      if(pp)pp.classList.remove('open');
+      if(cc)cc.classList.remove('on');
+    }
+  });
   if(open){p.classList.remove('open');c.classList.remove('on');}
-  else{p.classList.add('open');c.classList.add('on');setTimeout(function(){var ta=document.getElementById('note-'+i);if(ta)ta.focus();},120);}
+  else{
+    p.classList.add('open');c.classList.add('on');
+    setTimeout(function(){var ta=document.getElementById('note-'+i);if(ta)ta.focus();},120);
+  }
 }
-function canP(i){document.getElementById('pan-'+i).classList.remove('open');document.getElementById('chk-'+i).classList.remove('on');document.getElementById('note-'+i).value='';}
+
+function canP(i){
+  document.getElementById('pan-'+i).classList.remove('open');
+  document.getElementById('chk-'+i).classList.remove('on');
+  document.getElementById('note-'+i).value='';
+}
+
+function refreshActs(){
+  ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50})
+    .then(function(r){
+      var all=(r&&r.data)?r.data:[];
+      acts=all.filter(function(x){return (x.Status||'').toLowerCase()!=='completed';});
+      renderActs();
+    }).catch(function(){acts=[];renderActs();});
+}
+
 function doneAct(i){
   var t=acts[i];if(!t)return;
   var note=(document.getElementById('note-'+i).value||'').trim();
-  var btn=document.getElementById('doneBtn-'+i);btn.classList.add('ld');btn.disabled=true;
+  var btn=document.getElementById('doneBtn-'+i);
+  btn.classList.add('ld');btn.disabled=true;
 
-  // Step 1: Mark task as Completed
   var upd={id:t.id,Status:'Completed'};
-  if(note)upd.Description=(t.Description?t.Description+'\n\n':'')+'['+ts+'] '+note;
+  if(note){upd.Description=(t.Description?t.Description+'\n\n':'')+'['+ts+'] '+note;}
 
   ZOHO.CRM.API.updateRecord({Entity:'Tasks',APIData:upd})
     .then(function(r){
@@ -306,11 +455,9 @@ function doneAct(i){
       if(!ok){
         var d=r&&r.data&&r.data[0];
         toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,60)),'er');
-        btn.classList.remove('ld');btn.disabled=false;return;
+        btn.classList.remove('ld');btn.disabled=false;
+        return;
       }
-
-      // Step 2: Also append entry to Lead Description
-      // Format: Date - "Activity Subject" - Note
       if(note){
         var subj=t.Subject||'Activity';
         var entry=ts+' - "'+subj+'" - '+note;
@@ -319,65 +466,107 @@ function doneAct(i){
         ZOHO.CRM.API.updateRecord({Entity:'Leads',APIData:{id:lid,Description:newDesc}})
           .then(function(r2){
             if(r2&&r2.data&&r2.data[0]&&r2.data[0].code==='SUCCESS'){
-              // Keep local leadData in sync
               if(ld)ld.Description=newDesc;
               var dc=document.getElementById('DC');
               if(dc){dc.className='ro-content';dc.textContent=newDesc;}
             }
-          }).catch(function(e){console.warn('Lead desc update failed:',e);});
+          }).catch(function(e){console.warn('Lead desc err:',e);});
       }
-
-      // Step 3: Fade out task and refresh list
       toast('Task completed!','ok');
-      var el=document.getElementById('act-'+i);if(el)el.style.opacity='0';
-      setTimeout(function(){
-        ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50})
-          .then(function(r2){var all=(r2&&r2.data)?r2.data:[];acts=all.filter(function(x){return (x.Status||'').toLowerCase()!=='completed';});renderActs();})
-          .catch(function(){acts=[];renderActs();});
-      },400);
-    }).catch(function(e){toast('Error: '+em(e),'er');btn.classList.remove('ld');btn.disabled=false;});
+      var el=document.getElementById('act-'+i);
+      if(el)el.style.opacity='0';
+      setTimeout(refreshActs,400);
+    }).catch(function(e){
+      toast('Error: '+em(e),'er');
+      btn.classList.remove('ld');btn.disabled=false;
+    });
 }
 
 function onSP(){var v=document.getElementById('tSP').value;if(v)document.getElementById('tS').value=v;}
+
 function mkTask(){
   var subj=document.getElementById('tS').value.trim();
   if(!subj){toast('Please enter or select a Subject','er');document.getElementById('tS').focus();return;}
   var due=document.getElementById('tD').value;
   if(!due){toast('Due Date is mandatory','er');document.getElementById('tD').focus();return;}
   var btn=document.getElementById('tBtn');btn.classList.add('ld');btn.disabled=true;
-  var ow=document.getElementById('tOW').value,desc=document.getElementById('tDE').value.trim();
+  var ow=document.getElementById('tOW').value;
+  var desc=document.getElementById('tDE').value.trim();
   var data={Subject:subj,Status:document.getElementById('tST').value||'Not Started',Priority:document.getElementById('tPR').value||'Normal',$se_module:'Leads',What_Id:{id:lid},Due_Date:due};
-  if(ow)data.Owner={id:ow};if(desc)data.Description=desc;
+  if(ow)data.Owner={id:ow};
+  if(desc)data.Description=desc;
   if(ld){if(ld.Mobile||ld.Phone)data.Lead_Contact_Phone=ld.Mobile||ld.Phone;if(ld.Email)data.Lead_Contact_Email=ld.Email;}
   ZOHO.CRM.API.insertRecord({Entity:'Tasks',APIData:data,Trigger:[]})
-    .then(function(r){btn.classList.remove('ld');btn.disabled=false;var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';if(ok){toast('Task created!','ok');clrFrm('task');ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50}).then(function(r2){var all=(r2&&r2.data)?r2.data:[];acts=all.filter(function(x){return (x.Status||'').toLowerCase()!=='completed';});renderActs();}).catch(function(){});} else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}})
-    .catch(function(e){btn.classList.remove('ld');btn.disabled=false;toast('Error: '+em(e),'er');});
+    .then(function(r){
+      btn.classList.remove('ld');btn.disabled=false;
+      var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';
+      if(ok){toast('Task created!','ok');clrFrm('task');refreshActs();}
+      else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}
+    }).catch(function(e){btn.classList.remove('ld');btn.disabled=false;toast('Error: '+em(e),'er');});
 }
+
 function mkCall(){
-  var subj=document.getElementById('cS').value;if(!subj){toast('Please select a Subject','er');return;}
+  var subj=document.getElementById('cS').value;
+  if(!subj){toast('Please select a Subject','er');return;}
   var btn=document.getElementById('cBtn');btn.classList.add('ld');btn.disabled=true;
-  var dt=document.getElementById('cDT').value,dur=parseInt(document.getElementById('cDU').value)||0,desc=document.getElementById('cDE').value.trim();
+  var dt=document.getElementById('cDT').value;
+  var dur=parseInt(document.getElementById('cDU').value)||0;
+  var desc=document.getElementById('cDE').value.trim();
   var data={Subject:subj,Call_Type:document.getElementById('cDR').value||'Outbound',Call_Start_Time:dt?new Date(dt).toISOString():new Date().toISOString(),$se_module:'Leads',What_Id:{id:lid}};
   if(dur>0){var h=Math.floor(dur/60),m=dur%60;data.Call_Duration=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
   if(desc)data.Description=desc;
   ZOHO.CRM.API.insertRecord({Entity:'Calls',APIData:data,Trigger:[]})
-    .then(function(r){btn.classList.remove('ld');btn.disabled=false;var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';if(ok){toast('Call logged!','ok');clrFrm('call');}else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}})
-    .catch(function(e){btn.classList.remove('ld');btn.disabled=false;toast('Error: '+em(e),'er');});
+    .then(function(r){
+      btn.classList.remove('ld');btn.disabled=false;
+      var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';
+      if(ok){toast('Call logged!','ok');clrFrm('call');}
+      else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}
+    }).catch(function(e){btn.classList.remove('ld');btn.disabled=false;toast('Error: '+em(e),'er');});
 }
+
 function onInp(){var v=document.getElementById('DI').value;document.getElementById('CC').textContent=v.length+' character'+(v.length!==1?'s':'');}
 function clrDisc(){document.getElementById('DI').value='';onInp();}
+
 function saveDisc(){
-  var disc=document.getElementById('DI').value.trim(),stat=document.getElementById('SS').value;
+  var disc=document.getElementById('DI').value.trim();
+  var stat=document.getElementById('SS').value;
   if(!disc){toast("Please enter today's notes",'er');document.getElementById('DI').focus();return;}
   var btn=document.getElementById('SB');btn.classList.add('ld');btn.disabled=true;
-  var ex=ld&&ld.Description?ld.Description:'',nd=ex?ex+'\n'+ts+' - '+disc:ts+' - '+disc;
-  var p={id:lid,Description:nd};if(stat)p.Lead_Status=stat;
+  var ex=ld&&ld.Description?ld.Description:'';
+  var nd=ex?ex+'\n'+ts+' - '+disc:ts+' - '+disc;
+  var p={id:lid,Description:nd};
+  if(stat)p.Lead_Status=stat;
   ZOHO.CRM.API.updateRecord({Entity:'Leads',APIData:p})
-    .then(function(r){btn.classList.remove('ld');btn.disabled=false;if(r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS'){if(ld){ld.Description=nd;if(stat)ld.Lead_Status=stat;}var el=document.getElementById('DC');el.className='ro-content';el.textContent=nd;clrDisc();toast('Saved!','ok');setTimeout(function(){try{ZOHO.CRM.UI.Popup.closeReload();}catch(e){}},1500);}else{toast('Save failed.','er');}})
-    .catch(function(){btn.classList.remove('ld');btn.disabled=false;toast('Error saving.','er');});
+    .then(function(r){
+      btn.classList.remove('ld');btn.disabled=false;
+      if(r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS'){
+        if(ld){ld.Description=nd;if(stat)ld.Lead_Status=stat;}
+        var el=document.getElementById('DC');el.className='ro-content';el.textContent=nd;
+        clrDisc();toast('Saved!','ok');
+        setTimeout(function(){try{ZOHO.CRM.UI.Popup.closeReload();}catch(e){}},1500);
+      }else{toast('Save failed.','er');}
+    }).catch(function(){btn.classList.remove('ld');btn.disabled=false;toast('Error saving.','er');});
 }
-function swTab(t){['task','call'].forEach(function(k){document.getElementById('tb-'+k).className='tab'+(k===t?' on':'');document.getElementById('frm-'+k).className='frm'+(k===t?' show':'');});}
-function clrFrm(t){if(t==='task'){document.getElementById('tSP').value='';document.getElementById('tS').value='';document.getElementById('tD').value='';document.getElementById('tST').value='Not Started';document.getElementById('tPR').value='Normal';document.getElementById('tOW').value='';document.getElementById('tDE').value='';}else{document.getElementById('cS').value='';document.getElementById('cDT').value='';document.getElementById('cDR').value='Outbound';document.getElementById('cDU').value='';document.getElementById('cDE').value='';}}
+
+function swTab(t){
+  ['task','call'].forEach(function(k){
+    document.getElementById('tb-'+k).className='tab'+(k===t?' on':'');
+    document.getElementById('frm-'+k).className='frm'+(k===t?' show':'');
+  });
+}
+
+function clrFrm(t){
+  if(t==='task'){
+    document.getElementById('tSP').value='';document.getElementById('tS').value='';
+    document.getElementById('tD').value='';document.getElementById('tST').value='Not Started';
+    document.getElementById('tPR').value='Normal';document.getElementById('tOW').value='';
+    document.getElementById('tDE').value='';
+  }else{
+    document.getElementById('cS').value='';document.getElementById('cDT').value='';
+    document.getElementById('cDR').value='Outbound';document.getElementById('cDU').value='';
+    document.getElementById('cDE').value='';
+  }
+}
 </script>
 </body>
 </html>
