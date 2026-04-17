@@ -138,8 +138,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <body>
 
 <div class="loading" id="loadingState">
-  <div class="loader"></div>
-  <span>Loading lead details...</span>
+  <div class="loader" id="loadingSpinner"></div>
+  <span id="loadingText">Loading lead details...</span>
 </div>
 
 <div class="wrap" id="mainWrap" style="display:none">
@@ -405,30 +405,48 @@ document.getElementById('todayPrefix').textContent = todayStr + ' -';
 
 // ── INIT ──────────────────────────────────────────────────────────────
 ZOHO.embeddedApp.on("PageLoad", function(data) {
+  console.log("PageLoad fired:", JSON.stringify(data));
+  document.getElementById('loadingText').textContent = 'Loading lead data...';
   var raw = data.EntityId;
   leadId = String(Array.isArray(raw) ? raw[0] : raw);
   init();
 });
 ZOHO.embeddedApp.init();
 
+// If PageLoad never fires after 8s, show error
+setTimeout(function() {
+  if (!leadId) {
+    document.getElementById('loadingText').textContent = 'Error: Widget not initialized. Please close and reopen.';
+    document.getElementById('loadingSpinner').style.display = 'none';
+  }
+}, 8000);
+
 function init() {
-  // Step 1: Always show main immediately, don't wait for anything
-  // This prevents frozen loading screen if any API call fails
+  // Safety net: always show UI after 3s no matter what
+  var shown = false;
+  function safeShow() {
+    if (!shown) {
+      shown = true;
+      showMain();
+      loadNotes();
+      loadActivities();
+      loadUsers();
+    }
+  }
+  setTimeout(safeShow, 3000);
+
+  // Try to load lead record
   ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: leadId })
     .then(function(res) {
       if (res && res.data && res.data[0]) {
         leadData = res.data[0];
         populateUI();
       }
+      safeShow();
     })
-    .catch(function(e) { console.error("getRecord error:", e); })
-    .finally(function() {
-      // Always show UI regardless of success/failure
-      showMain();
-      // Load secondary data after UI is visible
-      loadNotes();
-      loadActivities();
-      loadUsers();
+    .catch(function(e) {
+      console.error("getRecord error:", e);
+      safeShow();
     });
 }
 
