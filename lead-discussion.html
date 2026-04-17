@@ -11,114 +11,111 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;color:#94a3b8}
 .loader{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.wrap{padding:16px;display:flex;flex-direction:column;gap:10px;max-width:700px;margin:0 auto}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.sk{border-radius:4px;background:linear-gradient(90deg,#f0f4f8 25%,#e2e8f0 50%,#f0f4f8 75%);background-size:800px 100%;animation:shimmer 1.2s infinite}
+.wrap{padding:12px;display:flex;flex-direction:column;gap:8px;max-width:700px;margin:0 auto}
 .lead-header{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .lead-info{display:flex;align-items:center;gap:12px}
-.avatar{width:38px;height:38px;border-radius:50%;background:#eff6ff;color:#185FA5;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.avatar{width:36px;height:36px;border-radius:50%;background:#eff6ff;color:#185FA5;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lead-name{font-size:14px;font-weight:600;color:#1a1f36}
 .lead-meta{font-size:11px;color:#64748b;margin-top:2px}
-.status-select{border:0.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#f8fafc;outline:none;cursor:pointer}
-.accordion{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;overflow:hidden}
-.acc-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none}
-.acc-header:hover{background:#fafbfc}
-.acc-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#1a1f36}
-.acc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
-.tag-ro{background:#f1f5f9;color:#475569}.tag-edit{background:#eff6ff;color:#185FA5}
-.tag-green{background:#dcfce7;color:#15803d}.tag-amber{background:#fef3c7;color:#b45309}
-.acc-arrow{width:16px;height:16px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
+.status-select{border:0.5px solid #e2e8f0;border-radius:8px;padding:6px 8px;font-size:12px;font-family:inherit;color:#1a1f36;background:#f8fafc;outline:none;cursor:pointer;max-width:160px}
+.acc{background:#fff;border:0.5px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.acc-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;user-select:none}
+.acc-hdr:hover{background:#fafbfc}
+.acc-ttl{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#1a1f36}
+.acc-tag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:20px}
+.tag-ro{background:#f1f5f9;color:#475569}
+.tag-edit{background:#eff6ff;color:#185FA5}
+.tag-green{background:#dcfce7;color:#15803d}
+.tag-amber{background:#fef3c7;color:#b45309}
+.acc-arrow{width:14px;height:14px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
 .acc-arrow.open{transform:rotate(180deg)}
-.acc-body{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s ease}
-.acc-body.open{padding:0 16px 14px;max-height:2000px}
-.readonly-content{font-size:12px;color:#374151;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-.readonly-empty{font-size:12px;color:#94a3b8;font-style:italic}
-.note-item{padding:8px 0;border-bottom:0.5px solid #f1f5f9}
+.acc-body{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .2s ease}
+.acc-body.open{padding:0 14px 12px;max-height:1800px}
+.ro-content{font-size:12px;color:#374151;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.ro-empty{font-size:12px;color:#94a3b8;font-style:italic}
+.note-item{padding:7px 0;border-bottom:0.5px solid #f1f5f9}
 .note-item:last-child{border-bottom:none}
-.note-date{font-size:11px;color:#94a3b8;margin-bottom:3px}
-.note-text{font-size:12px;color:#374151;line-height:1.5;white-space:pre-wrap}
-.today-prefix{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#185FA5}
-.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:80px;line-height:1.6}
-.discussion-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-.disc-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px}
-.char-count{font-size:11px;color:#94a3b8}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none}
-.btn-primary{background:#3b82f6;color:#fff}.btn-primary:hover:not(:disabled){background:#2563eb}
-.btn-green{background:#16a34a;color:#fff}.btn-green:hover:not(:disabled){background:#15803d}
-.btn-primary:disabled,.btn-green:disabled{opacity:.5;cursor:not-allowed}
-.btn-ghost{background:none;border:0.5px solid #e2e8f0;color:#64748b;padding:7px 14px}
-.btn-ghost:hover{background:#f1f5f9}
-.spin-sm{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
-.btn-primary.loading .spin-sm,.btn-green.loading .spin-sm{display:block}
-.btn-primary.loading .lbl,.btn-green.loading .lbl{display:none}
-.act-list{display:flex;flex-direction:column;gap:8px}
+.note-date{font-size:10px;color:#94a3b8;margin-bottom:2px}
+.note-txt{font-size:12px;color:#374151;line-height:1.5;white-space:pre-wrap}
+.today-pfx{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:600;color:#185FA5}
+.disc-in{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:75px;line-height:1.6}
+.disc-in:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.09)}
+.disc-ft{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:5px}
+.char-ct{font-size:11px;color:#94a3b8}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none}
+.btn-p{background:#3b82f6;color:#fff}.btn-p:hover:not(:disabled){background:#2563eb}
+.btn-g{background:#16a34a;color:#fff}.btn-g:hover:not(:disabled){background:#15803d}
+.btn-p:disabled,.btn-g:disabled{opacity:.5;cursor:not-allowed}
+.btn-gh{background:none;border:0.5px solid #e2e8f0;color:#64748b;padding:6px 12px}
+.btn-gh:hover{background:#f1f5f9}
+.sp{width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.btn-p.ld .sp,.btn-g.ld .sp{display:block}
+.btn-p.ld .lb,.btn-g.ld .lb{display:none}
+.act-list{display:flex;flex-direction:column;gap:7px}
 .act-empty{font-size:12px;color:#94a3b8;font-style:italic}
 .act-item{border-radius:8px;border:0.5px solid #e2e8f0;background:#f8fafc;overflow:hidden;transition:opacity .3s}
 .act-item.overdue{border-left:3px solid #ef4444}
 .act-item.today{border-left:3px solid #f59e0b}
 .act-item.upcoming{border-left:3px solid #3b82f6}
-.act-main-row{display:flex;align-items:stretch}
-.act-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:10px 12px}
-.act-right{width:200px;flex-shrink:0;border-left:1px solid #e2e8f0;padding:10px;display:flex;align-items:center}
-.act-check{width:22px;height:22px;border-radius:50%;border:2px solid #16a34a;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
-.act-check:hover{background:#dcfce7}
-.act-check.active{background:#16a34a;border-color:#16a34a}
-.act-check svg{opacity:0}.act-check.active svg{opacity:1}
+.act-main{display:flex;align-items:stretch}
+.act-left{display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding:9px 11px}
+.act-right{width:190px;flex-shrink:0;border-left:1px solid #e2e8f0;padding:8px 10px;display:flex;align-items:center}
+.act-chk{width:20px;height:20px;border-radius:50%;border:2px solid #16a34a;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.act-chk:hover{background:#dcfce7}
+.act-chk.on{background:#16a34a;border-color:#16a34a}
+.act-chk svg{opacity:0}.act-chk.on svg{opacity:1}
 .act-info{flex:1;min-width:0}
-.act-subject{font-size:12px;font-weight:600;color:#1a1f36}
-.act-meta{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap}
-.act-owner{font-size:11px;color:#64748b}
-.act-badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px}
+.act-subj{font-size:12px;font-weight:600;color:#1a1f36}
+.act-meta{display:flex;align-items:center;gap:6px;margin-top:2px;flex-wrap:wrap}
+.act-own{font-size:11px;color:#64748b}
+.act-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px}
 .act-badge.overdue{background:#fee2e2;color:#dc2626}
 .act-badge.today{background:#fef3c7;color:#b45309}
 .act-badge.upcoming{background:#dbeafe;color:#1d4ed8}
 .act-badge.no-date{background:#f1f5f9;color:#64748b}
-.act-desc-box{font-size:11px;color:#64748b;line-height:1.4;word-break:break-word;overflow-y:auto;max-height:52px;width:100%}
+.act-desc{font-size:11px;color:#64748b;line-height:1.4;word-break:break-word;overflow-y:auto;max-height:48px;width:100%}
 .act-desc-empty{font-size:11px;color:#cbd5e1;font-style:italic}
-.act-panel{display:none;padding:10px 12px;border-top:0.5px solid #e2e8f0;background:#f0fdf4;flex-direction:column;gap:8px}
+.act-panel{display:none;padding:9px 11px;border-top:0.5px solid #e2e8f0;background:#f0fdf4;flex-direction:column;gap:7px}
 .act-panel.open{display:flex}
-.act-panel-label{font-size:11px;font-weight:600;color:#15803d}
-.act-panel-note{width:100%;border:0.5px solid #bbf7d0;border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:none;height:60px;line-height:1.5}
+.act-panel-lbl{font-size:11px;font-weight:600;color:#15803d}
+.act-panel-note{width:100%;border:0.5px solid #bbf7d0;border-radius:6px;padding:6px 9px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:none;height:56px;line-height:1.5}
 .act-panel-note:focus{border-color:#16a34a}
-.act-panel-btns{display:flex;justify-content:flex-end;gap:8px}
-.act-cancel{padding:6px 12px;background:#fff;border:0.5px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit}
-.act-done{padding:6px 14px;background:#16a34a;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.act-panel-btns{display:flex;justify-content:flex-end;gap:7px}
+.act-cancel{padding:5px 11px;background:#fff;border:0.5px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit}
+.act-done{padding:5px 13px;background:#16a34a;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
 .act-done:hover:not(:disabled){background:#15803d}
 .act-done:disabled{opacity:.5;cursor:not-allowed}
-.act-done-spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
-.act-done.loading .act-done-spin{display:block}
-.act-done.loading .act-done-lbl{display:none}
-.tabs{display:flex;gap:6px;margin-bottom:12px}
-.tab{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid #e2e8f0;background:#f8fafc;color:#64748b}
-.tab.active{background:#1a1f36;color:#fff;border-color:#1a1f36}
-.form{display:none;flex-direction:column;gap:10px}
-.form.show{display:flex}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.field{display:flex;flex-direction:column;gap:4px}
-.flabel{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
-.finput,.fselect,.ftextarea{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none}
-.finput:focus,.fselect:focus,.ftextarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
-.fselect{cursor:pointer}
-.ftextarea{resize:vertical;min-height:64px;line-height:1.5}
-.form-footer{display:flex;justify-content:flex-end;gap:8px;padding-top:2px}
-.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:500;z-index:999;transition:transform .25s,opacity .25s;opacity:0;color:#fff;pointer-events:none;max-width:90%}
+.act-done-sp{width:10px;height:10px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.act-done.ld .act-done-sp{display:block}
+.act-done.ld .act-done-lb{display:none}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid #e2e8f0;background:#f8fafc;color:#64748b}
+.tab.on{background:#1a1f36;color:#fff;border-color:#1a1f36}
+.frm{display:none;flex-direction:column;gap:9px}
+.frm.show{display:flex}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fld{display:flex;flex-direction:column;gap:3px}
+.flbl{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
+.fin,.fsel,.fta{width:100%;border:0.5px solid #e2e8f0;border-radius:7px;padding:6px 9px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none}
+.fin:focus,.fsel:focus,.fta:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.08)}
+.fsel{cursor:pointer}.fta{resize:vertical;min-height:58px;line-height:1.5}
+.frm-ft{display:flex;justify-content:flex-end;gap:7px;padding-top:2px}
+.toast{position:fixed;bottom:12px;left:50%;transform:translateX(-50%) translateY(60px);border-radius:8px;padding:8px 15px;font-size:12px;font-weight:500;z-index:999;transition:transform .2s,opacity .2s;opacity:0;color:#fff;pointer-events:none;max-width:90%}
 .toast.ok{background:#15803d}.toast.er{background:#dc2626}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
 </head>
 <body>
-<div class="loading" id="loadingState">
-  <div class="loader"></div>
-  <span id="loadingText">Initializing widget...</span>
-</div>
-<div class="wrap" id="mainWrap" style="display:none">
+<div class="loading" id="LS"><div class="loader"></div><span>Loading...</span></div>
+<div class="wrap" id="MW" style="display:none">
   <div class="lead-header">
     <div class="lead-info">
-      <div class="avatar" id="avatar">?</div>
-      <div>
-        <div class="lead-name" id="leadName">-</div>
-        <div class="lead-meta" id="leadMeta"></div>
-      </div>
+      <div class="avatar" id="AV">?</div>
+      <div><div class="lead-name" id="LN">-</div><div class="lead-meta" id="LM"></div></div>
     </div>
-    <select class="status-select" id="statusSelect">
+    <select class="status-select" id="SS">
       <option value="">-None-</option>
       <option value="New">New</option>
       <option value="Contact in Future">Contact in Future</option>
@@ -131,166 +128,59 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <option value="Not Qualified">Not Qualified</option>
     </select>
   </div>
-  <div class="accordion">
-    <div class="acc-header" onclick="toggleAcc('req')">
-      <div class="acc-title">Requirement Details <span class="acc-tag tag-ro">Read Only</span></div>
-      <svg class="acc-arrow" id="arrow-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <div class="acc-body" id="body-req">
-      <div id="reqContent" class="readonly-empty">No requirement details.</div>
-    </div>
-  </div>
-  <div class="accordion">
-    <div class="acc-header" onclick="toggleAcc('notes')">
-      <div class="acc-title">Notes <span class="acc-tag tag-ro">Read Only</span> <span id="notesBadge" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600"></span></div>
-      <svg class="acc-arrow" id="arrow-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <div class="acc-body" id="body-notes">
-      <div id="notesContent" class="readonly-empty">Loading notes...</div>
-    </div>
-  </div>
-  <div class="accordion">
-    <div class="acc-header" onclick="toggleAcc('desc')">
-      <div class="acc-title">Description <span class="acc-tag tag-ro">Read Only</span></div>
-      <svg class="acc-arrow" id="arrow-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <div class="acc-body" id="body-desc">
-      <div id="descContent" class="readonly-empty">No description.</div>
-    </div>
-  </div>
-  <div class="accordion">
-    <div class="acc-header" onclick="toggleAcc('today')">
-      <div class="acc-title">Today's Discussion <span class="acc-tag tag-edit">Edit</span></div>
-      <svg class="acc-arrow open" id="arrow-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <div class="acc-body open" id="body-today">
-      <div style="margin-bottom:8px"><span class="today-prefix" id="todayPrefix">-</span> <span style="font-size:11px;color:#64748b">Type your notes below</span></div>
-      <textarea class="discussion-input" id="discussionInput" placeholder="Enter today's discussion, next steps, or any important notes..." oninput="onInput()"></textarea>
-      <div class="disc-footer">
-        <span class="char-count" id="charCount">0 characters</span>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="clearDiscussion()">Clear</button>
-          <button class="btn btn-primary" id="saveBtn" onclick="saveDiscussion()">
-            <div class="spin-sm"></div><span class="lbl">Save Changes</span>
-          </button>
+  <div class="acc"><div class="acc-hdr" onclick="tog('req')"><div class="acc-ttl">Requirement Details <span class="acc-tag tag-ro">Read Only</span></div><svg class="acc-arrow" id="ar-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="acc-body" id="bd-req"><div id="RC" class="ro-empty">No requirement details.</div></div></div>
+  <div class="acc"><div class="acc-hdr" onclick="tog('notes')"><div class="acc-ttl">Notes <span class="acc-tag tag-ro">Read Only</span><span id="NB" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 5px;border-radius:20px;font-weight:600;margin-left:4px"></span></div><svg class="acc-arrow" id="ar-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="acc-body" id="bd-notes"><div id="NC" class="ro-empty">Loading...</div></div></div>
+  <div class="acc"><div class="acc-hdr" onclick="tog('desc')"><div class="acc-ttl">Description <span class="acc-tag tag-ro">Read Only</span></div><svg class="acc-arrow" id="ar-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="acc-body" id="bd-desc"><div id="DC" class="ro-empty">No description.</div></div></div>
+  <div class="acc">
+    <div class="acc-hdr" onclick="tog('today')"><div class="acc-ttl">Today's Discussion <span class="acc-tag tag-edit">Edit</span></div><svg class="acc-arrow open" id="ar-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="acc-body open" id="bd-today">
+      <div style="margin-bottom:7px"><span class="today-pfx" id="TP">-</span> <span style="font-size:11px;color:#64748b">Type your notes below</span></div>
+      <textarea class="disc-in" id="DI" placeholder="Enter today's discussion, next steps, or important notes..." oninput="onInp()"></textarea>
+      <div class="disc-ft">
+        <span class="char-ct" id="CC">0 characters</span>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-gh" onclick="clrDisc()">Clear</button>
+          <button class="btn btn-p" id="SB" onclick="saveDisc()"><div class="sp"></div><span class="lb">Save Changes</span></button>
         </div>
       </div>
     </div>
   </div>
-  <div class="accordion">
-    <div class="acc-header" onclick="toggleAcc('acts')">
-      <div class="acc-title">Open Activities <span id="actsBadge" class="acc-tag tag-amber" style="display:none">0</span></div>
-      <svg class="acc-arrow" id="arrow-acts" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <div class="acc-body" id="body-acts">
-      <div class="act-list" id="actList"><div class="act-empty">Loading...</div></div>
-    </div>
+  <div class="acc">
+    <div class="acc-hdr" onclick="tog('acts')"><div class="acc-ttl">Open Activities <span id="AB" class="acc-tag tag-amber" style="display:none">0</span></div><svg class="acc-arrow" id="ar-acts" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="acc-body" id="bd-acts"><div class="act-list" id="AL"><div class="act-empty">Loading...</div></div></div>
   </div>
-  <div class="accordion">
-    <div class="acc-header" onclick="toggleAcc('create')">
-      <div class="acc-title">Create Activity <span class="acc-tag tag-green">New</span></div>
-      <svg class="acc-arrow" id="arrow-create" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <div class="acc-body" id="body-create">
-      <div class="tabs">
-        <div class="tab active" id="tab-task" onclick="switchTab('task')">Task</div>
-        <div class="tab" id="tab-call" onclick="switchTab('call')">Call</div>
+  <div class="acc">
+    <div class="acc-hdr" onclick="tog('create')"><div class="acc-ttl">Create Activity <span class="acc-tag tag-green">New</span></div><svg class="acc-arrow" id="ar-create" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="acc-body" id="bd-create">
+      <div class="tabs"><div class="tab on" id="tb-task" onclick="swTab('task')">Task</div><div class="tab" id="tb-call" onclick="swTab('call')">Call</div></div>
+      <div class="frm show" id="frm-task">
+        <div class="row2">
+          <div class="fld">
+            <label class="flbl">Subject *</label>
+            <select class="fsel" id="tSP" onchange="onSP()"><option value="">Select or type below...</option><option value="Follow-up">Follow-up</option><option value="Call Back Later">Call Back Later</option><option value="Schedule Discovery Call">Schedule Discovery Call</option><option value="Demo Needed">Demo Needed</option></select>
+            <input type="text" class="fin" id="tS" placeholder="Or type custom subject..." style="margin-top:5px"/>
+          </div>
+          <div class="fld"><label class="flbl">Due Date *</label><input type="date" class="fin" id="tD"/></div>
+        </div>
+        <div class="row2">
+          <div class="fld"><label class="flbl">Status</label><select class="fsel" id="tST"><option value="Not Started">Not Started</option><option value="In Progress">In Progress</option><option value="Deferred">Deferred</option><option value="Waiting on someone else">Waiting for input</option></select></div>
+          <div class="fld"><label class="flbl">Priority</label><select class="fsel" id="tPR"><option value="Normal">Normal</option><option value="High">High</option><option value="Highest">Highest</option><option value="Low">Low</option></select></div>
+        </div>
+        <div class="fld"><label class="flbl">Task Owner</label><select class="fsel" id="tOW"><option value="">-- Assign to me --</option></select></div>
+        <div class="fld"><label class="flbl">Description</label><textarea class="fta" id="tDE" placeholder="Add task notes..."></textarea></div>
+        <div class="frm-ft"><button class="btn btn-gh" onclick="clrFrm('task')">Clear</button><button class="btn btn-g" id="tBtn" onclick="mkTask()"><div class="sp"></div><span class="lb">Add Task</span></button></div>
       </div>
-      <div class="form show" id="form-task">
-        <div class="row">
-          <div class="field">
-            <label class="flabel">Subject *</label>
-            <select class="fselect" id="taskSubjectPick" onchange="onSubjectPick()">
-              <option value="">Select or type below...</option>
-              <option value="Follow-up">Follow-up</option>
-              <option value="Call Back Later">Call Back Later</option>
-              <option value="Schedule Discovery Call">Schedule Discovery Call</option>
-              <option value="Demo Needed">Demo Needed</option>
-            </select>
-            <input type="text" class="finput" id="taskSubject" placeholder="Or type custom subject..." style="margin-top:5px"/>
-          </div>
-          <div class="field">
-            <label class="flabel">Due Date *</label>
-            <input type="date" class="finput" id="taskDueDate"/>
-          </div>
+      <div class="frm" id="frm-call">
+        <div class="row2">
+          <div class="fld"><label class="flbl">Subject *</label><select class="fsel" id="cS"><option value="">Select...</option><option value="Introduction Call">Introduction Call</option><option value="Follow-up Call">Follow-up Call</option><option value="Demo Call">Demo Call</option><option value="Support Call">Support Call</option><option value="Outbound Call">Outbound Call</option><option value="Inbound Call">Inbound Call</option></select></div>
+          <div class="fld"><label class="flbl">Call Date &amp; Time</label><input type="datetime-local" class="fin" id="cDT"/></div>
         </div>
-        <div class="row">
-          <div class="field">
-            <label class="flabel">Status</label>
-            <select class="fselect" id="taskStatus">
-              <option value="Not Started">Not Started</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Deferred">Deferred</option>
-              <option value="Waiting on someone else">Waiting for input</option>
-            </select>
-          </div>
-          <div class="field">
-            <label class="flabel">Priority</label>
-            <select class="fselect" id="taskPriority">
-              <option value="Normal">Normal</option>
-              <option value="High">High</option>
-              <option value="Highest">Highest</option>
-              <option value="Low">Low</option>
-            </select>
-          </div>
+        <div class="row2">
+          <div class="fld"><label class="flbl">Direction</label><select class="fsel" id="cDR"><option value="Outbound">Outbound</option><option value="Inbound">Inbound</option></select></div>
+          <div class="fld"><label class="flbl">Duration (mins)</label><input type="number" class="fin" id="cDU" placeholder="e.g. 10" min="1"/></div>
         </div>
-        <div class="field">
-          <label class="flabel">Task Owner</label>
-          <select class="fselect" id="taskOwner"><option value="">-- Assign to me --</option></select>
-        </div>
-        <div class="field">
-          <label class="flabel">Description</label>
-          <textarea class="ftextarea" id="taskDesc" placeholder="Add task notes..."></textarea>
-        </div>
-        <div class="form-footer">
-          <button class="btn btn-ghost" onclick="clearForm('task')">Clear</button>
-          <button class="btn btn-green" id="taskBtn" onclick="createTask()">
-            <div class="spin-sm"></div><span class="lbl">Add Task</span>
-          </button>
-        </div>
-      </div>
-      <div class="form" id="form-call">
-        <div class="row">
-          <div class="field">
-            <label class="flabel">Subject *</label>
-            <select class="fselect" id="callSubject">
-              <option value="">Select...</option>
-              <option value="Introduction Call">Introduction Call</option>
-              <option value="Follow-up Call">Follow-up Call</option>
-              <option value="Demo Call">Demo Call</option>
-              <option value="Support Call">Support Call</option>
-              <option value="Outbound Call">Outbound Call</option>
-              <option value="Inbound Call">Inbound Call</option>
-            </select>
-          </div>
-          <div class="field">
-            <label class="flabel">Call Date &amp; Time</label>
-            <input type="datetime-local" class="finput" id="callDateTime"/>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label class="flabel">Direction</label>
-            <select class="fselect" id="callDirection">
-              <option value="Outbound">Outbound</option>
-              <option value="Inbound">Inbound</option>
-            </select>
-          </div>
-          <div class="field">
-            <label class="flabel">Duration (mins)</label>
-            <input type="number" class="finput" id="callDuration" placeholder="e.g. 10" min="1"/>
-          </div>
-        </div>
-        <div class="field">
-          <label class="flabel">Call Notes</label>
-          <textarea class="ftextarea" id="callDesc" placeholder="What was discussed?"></textarea>
-        </div>
-        <div class="form-footer">
-          <button class="btn btn-ghost" onclick="clearForm('call')">Clear</button>
-          <button class="btn btn-green" id="callBtn" onclick="createCall()">
-            <div class="spin-sm"></div><span class="lbl">Log Call</span>
-          </button>
-        </div>
+        <div class="fld"><label class="flbl">Call Notes</label><textarea class="fta" id="cDE" placeholder="What was discussed?"></textarea></div>
+        <div class="frm-ft"><button class="btn btn-gh" onclick="clrFrm('call')">Clear</button><button class="btn btn-g" id="cBtn" onclick="mkCall()"><div class="sp"></div><span class="lb">Log Call</span></button></div>
       </div>
     </div>
   </div>
@@ -298,313 +188,161 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="toast" id="toast"></div>
 <script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
 <script>
-var leadId = null, leadData = null, openActs = [], openAccs = { today: true }, todayStr = '';
+var lid=null,ld=null,acts=[],acc={today:true},ts='';
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function sh(html){if(!html)return '';return html.replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<\/li>/gi,'\n').replace(/<\/div>/gi,'\n').replace(/<li[^>]*>/gi,'- ').replace(/<[^>]+>/g,'').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/&#39;/gi,"'").replace(/\n{3,}/g,'\n\n').trim();}
+function em(e){if(!e)return 'Error';if(typeof e==='string')return e.substring(0,80);if(e.message)return String(e.message).substring(0,80);try{return JSON.stringify(e).substring(0,80);}catch(x){return 'Error';}}
+function toast(m,t){var el=document.getElementById('toast');el.textContent=m;el.className='toast '+(t||'ok')+' show';setTimeout(function(){el.className='toast';},3500);}
+function fd(d){var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],n=d.getDate(),s=n===1||n===21||n===31?'st':n===2||n===22?'nd':n===3||n===23?'rd':'th';return n+s+' '+M[d.getMonth()]+' '+d.getFullYear();}
+function fdu(ds){if(!ds)return 'No due date';var d=new Date(ds),M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();}
+function dst(ds){if(!ds)return 'no-date';var due=new Date(ds),now=new Date(),s=new Date(now.getFullYear(),now.getMonth(),now.getDate());return due<s?'overdue':due<new Date(s.getTime()+86400000)?'today':'upcoming';}
+function showUI(){document.getElementById('LS').style.display='none';document.getElementById('MW').style.display='flex';}
+function tog(k){acc[k]=!acc[k];var b=document.getElementById('bd-'+k),a=document.getElementById('ar-'+k);if(acc[k]){b.classList.add('open');a.classList.add('open');}else{b.classList.remove('open');a.classList.remove('open');}}
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function stripHtml(html) {
-  if (!html) return '';
-  return html
-    .replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<\/li>/gi,'\n')
-    .replace(/<\/div>/gi,'\n').replace(/<li[^>]*>/gi,'- ')
-    .replace(/<[^>]+>/g,'')
-    .replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<')
-    .replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/&#39;/gi,"'")
-    .replace(/\n{3,}/g,'\n\n').trim();
-}
-
-function errMsg(e) {
-  if (!e) return 'Unknown error';
-  if (typeof e === 'string') return e.substring(0,80);
-  if (e.message) return String(e.message).substring(0,80);
-  try { return JSON.stringify(e).substring(0,80); } catch(x) { return 'Error'; }
-}
-
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast '+(type||'ok')+' show';
-  setTimeout(function(){ t.className='toast'; }, 3500);
-}
-
-function fmtDate(d) {
-  var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var n=d.getDate(), s=n===1||n===21||n===31?'st':n===2||n===22?'nd':n===3||n===23?'rd':'th';
-  return n+s+' '+M[d.getMonth()]+' '+d.getFullYear();
-}
-
-function fmtDue(ds) {
-  if (!ds) return 'No due date';
-  var d=new Date(ds), M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();
-}
-
-function dueStatus(ds) {
-  if (!ds) return 'no-date';
-  var due=new Date(ds), now=new Date();
-  var s=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  return due<s?'overdue':due<new Date(s.getTime()+86400000)?'today':'upcoming';
-}
-
-function showMain() {
-  document.getElementById('loadingState').style.display='none';
-  document.getElementById('mainWrap').style.display='flex';
-}
-
-function toggleAcc(k) {
-  openAccs[k]=!openAccs[k];
-  var b=document.getElementById('body-'+k), a=document.getElementById('arrow-'+k);
-  if(openAccs[k]){b.classList.add('open');a.classList.add('open');}
-  else{b.classList.remove('open');a.classList.remove('open');}
-}
-
-ZOHO.embeddedApp.on('PageLoad', function(data) {
-  document.getElementById('loadingText').textContent='Loading lead...';
+ZOHO.embeddedApp.on('PageLoad',function(data){
   var raw=data.EntityId;
-  leadId=String(Array.isArray(raw)?raw[0]:raw);
-  var today=new Date();
-  todayStr=fmtDate(today);
-  document.getElementById('todayPrefix').textContent=todayStr+' -';
-  ZOHO.CRM.API.getRecord({Entity:'Leads',RecordID:leadId})
-    .then(function(res){
-      if(res&&res.data&&res.data[0]){leadData=res.data[0];renderLead();}
-      showMain();
-      loadNotes();
-      loadActivities();
-      loadUsers();
-    })
-    .catch(function(e){
-      console.error('getRecord error:',e);
-      showMain();
-      loadActivities();
-      loadUsers();
-    });
+  lid=String(Array.isArray(raw)?raw[0]:raw);
+  var now=new Date();ts=fd(now);
+  document.getElementById('TP').textContent=ts+' -';
+
+  // Fire all 4 calls in parallel - do not wait for one before starting others
+  var pLead=ZOHO.CRM.API.getRecord({Entity:'Leads',RecordID:lid});
+  var pActs=ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50});
+  var pNotes=ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Notes',page:1,per_page:10});
+  var pUsers=ZOHO.CRM.API.getUsers({Type:'ActiveUsers'});
+
+  // Show UI as soon as lead loads (fastest critical path)
+  pLead.then(function(r){
+    if(r&&r.data&&r.data[0]){ld=r.data[0];renderLead();}
+    showUI();
+  }).catch(function(e){console.warn('lead err',e);showUI();});
+
+  // Activities - open accordion when ready
+  pActs.then(function(r){
+    var all=(r&&r.data)?r.data:[];
+    acts=all.filter(function(t){return (t.Status||'').toLowerCase()!=='completed';});
+    renderActs();
+  }).catch(function(){
+    // fallback
+    ZOHO.CRM.API.searchRecord({Entity:'Tasks',Type:'criteria',Query:'((Who_Id:equals:'+lid+')and(Status:not_equal:Completed))'})
+      .then(function(r2){acts=(r2&&r2.data)?r2.data:[];renderActs();})
+      .catch(function(){acts=[];renderActs();});
+  });
+
+  // Notes - render when ready
+  pNotes.then(function(r){
+    var notes=(r&&r.data)?r.data:[];
+    var el=document.getElementById('NC');
+    var badge=document.getElementById('NB');
+    if(!notes.length){el.innerHTML='<div class="ro-empty">No notes found.</div>';}
+    else{badge.textContent=notes.length;badge.style.display='inline-block';
+      el.innerHTML=notes.map(function(n){var dt=n.Created_Time?new Date(n.Created_Time):null;var txt=sh(n.Note_Content||n.Content||'');return '<div class="note-item">'+(dt?'<div class="note-date">'+esc(fd(dt))+'</div>':'')+'<div class="note-txt">'+esc(txt)+'</div></div>';}).join('');}
+  }).catch(function(){document.getElementById('NC').innerHTML='<div class="ro-empty">Could not load notes.</div>';});
+
+  // Users - populate owner dropdown when ready
+  pUsers.then(function(r){
+    var u=[];
+    if(r&&r.users&&Array.isArray(r.users))u=r.users;
+    else if(r&&r.data&&Array.isArray(r.data))u=r.data;
+    else if(Array.isArray(r))u=r;
+    u=u.filter(function(x){return !x.status||x.status==='active';});
+    if(u.length)fillOwners(u);
+    else return ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r2){var u2=[];if(r2&&r2.users)u2=r2.users;else if(Array.isArray(r2))u2=r2;fillOwners(u2.filter(function(x){return !x.status||x.status==='active';}));});
+  }).catch(function(){
+    ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r){var u=[];if(r&&r.users)u=r.users;else if(Array.isArray(r))u=r;fillOwners(u.filter(function(x){return !x.status||x.status==='active';}));}).catch(function(){});
+  });
 });
 ZOHO.embeddedApp.init();
 
-function renderLead() {
-  var d=leadData;
-  var fn=d.First_Name||'', ln=d.Last_Name||'';
-  var name=(fn+' '+ln).trim()||'Unknown Lead';
-  document.getElementById('avatar').textContent=((fn[0]||'')+(ln[0]||'')).toUpperCase()||'?';
-  document.getElementById('leadName').textContent=name;
-  var meta=[];
-  if(d.Mobile) meta.push(d.Mobile);
-  if(d.Email) meta.push(d.Email);
-  if(d.Company) meta.push(d.Company);
-  document.getElementById('leadMeta').textContent=meta.join(' - ');
-  document.getElementById('statusSelect').value=d.Lead_Status||'';
-  if(d.Requirement_Details){var r=document.getElementById('reqContent');r.className='readonly-content';r.textContent=d.Requirement_Details;}
-  if(d.Description){var dc=document.getElementById('descContent');dc.className='readonly-content';dc.textContent=d.Description;}
+function renderLead(){
+  var d=ld,fn=d.First_Name||'',ln=d.Last_Name||'';
+  var name=(fn+' '+ln).trim()||'Unknown';
+  document.getElementById('AV').textContent=((fn[0]||'')+(ln[0]||'')).toUpperCase()||'?';
+  document.getElementById('LN').textContent=name;
+  var m=[];if(d.Mobile)m.push(d.Mobile);if(d.Email)m.push(d.Email);if(d.Company)m.push(d.Company);
+  document.getElementById('LM').textContent=m.join(' - ');
+  document.getElementById('SS').value=d.Lead_Status||'';
+  if(d.Requirement_Details){var r=document.getElementById('RC');r.className='ro-content';r.textContent=d.Requirement_Details;}
+  if(d.Description){var dc=document.getElementById('DC');dc.className='ro-content';dc.textContent=d.Description;}
 }
 
-function loadNotes() {
-  ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:leadId,RelatedList:'Notes',page:1,per_page:10})
-    .then(function(res){
-      var notes=(res&&res.data)?res.data:[];
-      var el=document.getElementById('notesContent');
-      var badge=document.getElementById('notesBadge');
-      if(!notes.length){el.innerHTML='<div class="readonly-empty">No notes found.</div>';}
-      else{
-        badge.textContent=notes.length;badge.style.display='';
-        el.innerHTML=notes.map(function(n){
-          var dt=n.Created_Time?new Date(n.Created_Time):null;
-          var txt=stripHtml(n.Note_Content||n.Content||'');
-          return '<div class="note-item">'+(dt?'<div class="note-date">'+esc(fmtDate(dt))+'</div>':'')+'<div class="note-text">'+esc(txt)+'</div></div>';
-        }).join('');
-      }
-    }).catch(function(e){console.warn('loadNotes:',e);document.getElementById('notesContent').innerHTML='<div class="readonly-empty">Could not load notes.</div>';});
+function fillOwners(u){
+  var sel=document.getElementById('tOW');
+  sel.innerHTML='<option value="">-- Assign to me --</option>';
+  u.forEach(function(x){if(!x.id)return;var n=(x.full_name||'').trim()||(x.name||'').trim()||((x.first_name||'')+' '+(x.last_name||'')).trim()||x.email||String(x.id);var o=document.createElement('option');o.value=x.id;o.textContent=n;sel.appendChild(o);});
 }
 
-function loadActivities() {
-  ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:leadId,RelatedList:'Activities',page:1,per_page:50})
-    .then(function(res){
-      var all=(res&&res.data)?res.data:[];
-      openActs=all.filter(function(t){return (t.Status||'').toLowerCase()!=='completed';});
-      renderActivities();
-    }).catch(function(){
-      ZOHO.CRM.API.searchRecord({Entity:'Tasks',Type:'criteria',Query:'((Who_Id:equals:'+leadId+')and(Status:not_equal:Completed))'})
-        .then(function(r){openActs=(r&&r.data)?r.data:[];renderActivities();})
-        .catch(function(){openActs=[];renderActivities();});
-    });
-}
-
-function renderActivities() {
-  var el=document.getElementById('actList');
-  var badge=document.getElementById('actsBadge');
-  if(!openActs.length){
-    badge.style.display='none';
-    el.innerHTML='<div class="act-empty">No open activities found.</div>';return;
-  }
-  badge.style.display='inline-block';badge.textContent=openActs.length;
-  if(!openAccs['acts']){
-    openAccs['acts']=true;
-    document.getElementById('body-acts').classList.add('open');
-    document.getElementById('arrow-acts').classList.add('open');
-  }
-  el.innerHTML=openActs.map(function(t,i){
-    var subj=t.Subject||'Task';
-    var due=t.Due_Date||'';
-    var st=dueStatus(due);
-    var owner=t.Owner?t.Owner.name||'':'';
-    var desc=stripHtml(t.Description||'');
-    var dueTxt=st==='overdue'?'Overdue: '+fmtDue(due):st==='today'?'Due Today':st==='upcoming'?fmtDue(due):'No due date';
-    return '<div class="act-item '+st+'" id="act-'+i+'">'+
-      '<div class="act-main-row">'+
-        '<div class="act-left">'+
-          '<div class="act-check" id="chk-'+i+'" onclick="togglePanel('+i+')" title="Click to complete">'+
-            '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-          '</div>'+
-          '<div class="act-info">'+
-            '<div class="act-subject">'+esc(subj)+'</div>'+
-            '<div class="act-meta">'+
-              (owner?'<span class="act-owner">'+esc(owner)+'</span>':'')+
-              '<span class="act-badge '+st+'">'+dueTxt+'</span>'+
-            '</div>'+
-          '</div>'+
-        '</div>'+
-        '<div class="act-right">'+
-          (desc?'<div class="act-desc-box">'+esc(desc)+'</div>':'<div class="act-desc-empty">No description</div>')+
-        '</div>'+
-      '</div>'+
-      '<div class="act-panel" id="panel-'+i+'">'+
-        '<div class="act-panel-label">Add a note before completing (optional)</div>'+
-        '<textarea class="act-panel-note" id="note-'+i+'" placeholder="What was done? Any next steps..."></textarea>'+
-        '<div class="act-panel-btns">'+
-          '<button class="act-cancel" onclick="cancelPanel('+i+')">Cancel</button>'+
-          '<button class="act-done" id="donebtn-'+i+'" onclick="completeAct('+i+')">'+
-            '<div class="act-done-spin"></div><span class="act-done-lbl">Mark Complete</span>'+
-          '</button>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
+function renderActs(){
+  var el=document.getElementById('AL'),badge=document.getElementById('AB');
+  if(!acts.length){badge.style.display='none';el.innerHTML='<div class="act-empty">No open activities found.</div>';return;}
+  badge.style.display='inline-block';badge.textContent=acts.length;
+  if(!acc['acts']){acc['acts']=true;document.getElementById('bd-acts').classList.add('open');document.getElementById('ar-acts').classList.add('open');}
+  el.innerHTML=acts.map(function(t,i){
+    var subj=t.Subject||'Task',due=t.Due_Date||'',st=dst(due),own=t.Owner?t.Owner.name||'':'',desc=sh(t.Description||'');
+    var dueTxt=st==='overdue'?'Overdue: '+fdu(due):st==='today'?'Due Today':st==='upcoming'?fdu(due):'No due date';
+    return '<div class="act-item '+st+'" id="act-'+i+'"><div class="act-main"><div class="act-left"><div class="act-chk" id="chk-'+i+'" onclick="togP('+i+')" title="Complete"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="act-info"><div class="act-subj">'+esc(subj)+'</div><div class="act-meta">'+(own?'<span class="act-own">'+esc(own)+'</span>':'')+'<span class="act-badge '+st+'">'+dueTxt+'</span></div></div></div><div class="act-right">'+(desc?'<div class="act-desc">'+esc(desc)+'</div>':'<div class="act-desc-empty">No description</div>')+'</div></div><div class="act-panel" id="pan-'+i+'"><div class="act-panel-lbl">Add a note before completing (optional)</div><textarea class="act-panel-note" id="note-'+i+'" placeholder="What was done? Next steps..."></textarea><div class="act-panel-btns"><button class="act-cancel" onclick="canP('+i+')">Cancel</button><button class="act-done" id="doneBtn-'+i+'" onclick="doneAct('+i+')"><div class="act-done-sp"></div><span class="act-done-lb">Mark Complete</span></button></div></div></div>';
   }).join('');
 }
 
-function togglePanel(i) {
-  var panel=document.getElementById('panel-'+i);
-  var chk=document.getElementById('chk-'+i);
-  var isOpen=panel.classList.contains('open');
-  openActs.forEach(function(_,j){if(j!==i){var p=document.getElementById('panel-'+j);var c=document.getElementById('chk-'+j);if(p)p.classList.remove('open');if(c)c.classList.remove('active');}});
-  if(isOpen){panel.classList.remove('open');chk.classList.remove('active');}
-  else{panel.classList.add('open');chk.classList.add('active');setTimeout(function(){var ta=document.getElementById('note-'+i);if(ta)ta.focus();},150);}
+function togP(i){
+  var p=document.getElementById('pan-'+i),c=document.getElementById('chk-'+i),open=p.classList.contains('open');
+  acts.forEach(function(_,j){if(j!==i){var pp=document.getElementById('pan-'+j),cc=document.getElementById('chk-'+j);if(pp)pp.classList.remove('open');if(cc)cc.classList.remove('on');}});
+  if(open){p.classList.remove('open');c.classList.remove('on');}
+  else{p.classList.add('open');c.classList.add('on');setTimeout(function(){var ta=document.getElementById('note-'+i);if(ta)ta.focus();},120);}
 }
-
-function cancelPanel(i) {
-  document.getElementById('panel-'+i).classList.remove('open');
-  document.getElementById('chk-'+i).classList.remove('active');
-  document.getElementById('note-'+i).value='';
-}
-
-function completeAct(i) {
-  var task=openActs[i];if(!task)return;
+function canP(i){document.getElementById('pan-'+i).classList.remove('open');document.getElementById('chk-'+i).classList.remove('on');document.getElementById('note-'+i).value='';}
+function doneAct(i){
+  var t=acts[i];if(!t)return;
   var note=(document.getElementById('note-'+i).value||'').trim();
-  var btn=document.getElementById('donebtn-'+i);
-  btn.classList.add('loading');btn.disabled=true;
-  var upd={id:task.id,Status:'Completed'};
-  if(note) upd.Description=(task.Description?task.Description+'\n\n':'')+'['+todayStr+'] '+note;
+  var btn=document.getElementById('doneBtn-'+i);btn.classList.add('ld');btn.disabled=true;
+  var upd={id:t.id,Status:'Completed'};
+  if(note)upd.Description=(t.Description?t.Description+'\n\n':'')+'['+ts+'] '+note;
   ZOHO.CRM.API.updateRecord({Entity:'Tasks',APIData:upd})
-    .then(function(res){
-      var ok=res&&res.data&&res.data[0]&&res.data[0].code==='SUCCESS';
-      if(ok){showToast('Task completed!','ok');var item=document.getElementById('act-'+i);if(item)item.style.opacity='0';setTimeout(loadActivities,400);}
-      else{var d=res&&res.data&&res.data[0];showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,60)),'er');btn.classList.remove('loading');btn.disabled=false;}
-    }).catch(function(e){showToast('Error: '+errMsg(e),'er');btn.classList.remove('loading');btn.disabled=false;});
+    .then(function(r){var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';if(ok){toast('Task completed!','ok');var el=document.getElementById('act-'+i);if(el)el.style.opacity='0';setTimeout(function(){ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50}).then(function(r2){var all=(r2&&r2.data)?r2.data:[];acts=all.filter(function(x){return (x.Status||'').toLowerCase()!=='completed';});renderActs();}).catch(function(){acts=[];renderActs();});},400);}
+    else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,60)),'er');btn.classList.remove('ld');btn.disabled=false;}
+  }).catch(function(e){toast('Error: '+em(e),'er');btn.classList.remove('ld');btn.disabled=false;});
 }
 
-function loadUsers() {
-  ZOHO.CRM.API.getUsers({Type:'ActiveUsers'})
-    .then(function(res){
-      var users=[];
-      if(res&&res.users&&Array.isArray(res.users)) users=res.users;
-      else if(res&&res.data&&Array.isArray(res.data)) users=res.data;
-      else if(Array.isArray(res)) users=res;
-      users=users.filter(function(u){return !u.status||u.status==='active';});
-      if(users.length) fillOwners(users);
-      else return ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r2){var u2=[];if(r2&&r2.users)u2=r2.users;else if(Array.isArray(r2))u2=r2;fillOwners(u2.filter(function(u){return !u.status||u.status==='active';}));});
-    }).catch(function(){ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r){var u=[];if(r&&r.users)u=r.users;else if(Array.isArray(r))u=r;fillOwners(u.filter(function(x){return !x.status||x.status==='active';}));}).catch(function(){});});
-}
-
-function fillOwners(users) {
-  var sel=document.getElementById('taskOwner');
-  sel.innerHTML='<option value="">-- Assign to me --</option>';
-  users.forEach(function(u){
-    if(!u.id) return;
-    var name=(u.full_name||'').trim()||(u.name||'').trim()||((u.first_name||'')+' '+(u.last_name||'')).trim()||u.email||String(u.id);
-    var opt=document.createElement('option');opt.value=u.id;opt.textContent=name;sel.appendChild(opt);
-  });
-}
-
-function onSubjectPick(){var v=document.getElementById('taskSubjectPick').value;if(v)document.getElementById('taskSubject').value=v;}
-
-function createTask() {
-  var subj=document.getElementById('taskSubject').value.trim();
-  if(!subj){showToast('Please enter or select a Subject','er');document.getElementById('taskSubject').focus();return;}
-  var due=document.getElementById('taskDueDate').value;
-  if(!due){showToast('Due Date is mandatory','er');document.getElementById('taskDueDate').focus();return;}
-  var btn=document.getElementById('taskBtn');btn.classList.add('loading');btn.disabled=true;
-  var ownerId=document.getElementById('taskOwner').value;
-  var desc=document.getElementById('taskDesc').value.trim();
-  var data={Subject:subj,Status:document.getElementById('taskStatus').value||'Not Started',Priority:document.getElementById('taskPriority').value||'Normal',$se_module:'Leads',What_Id:{id:leadId},Due_Date:due};
-  if(ownerId) data.Owner={id:ownerId};
-  if(desc) data.Description=desc;
-  if(leadData){if(leadData.Mobile||leadData.Phone)data.Lead_Contact_Phone=leadData.Mobile||leadData.Phone;if(leadData.Email)data.Lead_Contact_Email=leadData.Email;}
+function onSP(){var v=document.getElementById('tSP').value;if(v)document.getElementById('tS').value=v;}
+function mkTask(){
+  var subj=document.getElementById('tS').value.trim();
+  if(!subj){toast('Please enter or select a Subject','er');document.getElementById('tS').focus();return;}
+  var due=document.getElementById('tD').value;
+  if(!due){toast('Due Date is mandatory','er');document.getElementById('tD').focus();return;}
+  var btn=document.getElementById('tBtn');btn.classList.add('ld');btn.disabled=true;
+  var ow=document.getElementById('tOW').value,desc=document.getElementById('tDE').value.trim();
+  var data={Subject:subj,Status:document.getElementById('tST').value||'Not Started',Priority:document.getElementById('tPR').value||'Normal',$se_module:'Leads',What_Id:{id:lid},Due_Date:due};
+  if(ow)data.Owner={id:ow};if(desc)data.Description=desc;
+  if(ld){if(ld.Mobile||ld.Phone)data.Lead_Contact_Phone=ld.Mobile||ld.Phone;if(ld.Email)data.Lead_Contact_Email=ld.Email;}
   ZOHO.CRM.API.insertRecord({Entity:'Tasks',APIData:data,Trigger:[]})
-    .then(function(res){
-      btn.classList.remove('loading');btn.disabled=false;
-      var ok=res&&res.data&&res.data[0]&&res.data[0].code==='SUCCESS';
-      if(ok){showToast('Task created!','ok');clearForm('task');loadActivities();}
-      else{var d=res&&res.data&&res.data[0];showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}
-    }).catch(function(e){btn.classList.remove('loading');btn.disabled=false;showToast('Error: '+errMsg(e),'er');});
+    .then(function(r){btn.classList.remove('ld');btn.disabled=false;var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';if(ok){toast('Task created!','ok');clrFrm('task');ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50}).then(function(r2){var all=(r2&&r2.data)?r2.data:[];acts=all.filter(function(x){return (x.Status||'').toLowerCase()!=='completed';});renderActs();}).catch(function(){});} else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}})
+    .catch(function(e){btn.classList.remove('ld');btn.disabled=false;toast('Error: '+em(e),'er');});
 }
-
-function createCall() {
-  var subj=document.getElementById('callSubject').value;
-  if(!subj){showToast('Please select a Subject','er');return;}
-  var btn=document.getElementById('callBtn');btn.classList.add('loading');btn.disabled=true;
-  var dt=document.getElementById('callDateTime').value;
-  var dur=parseInt(document.getElementById('callDuration').value)||0;
-  var desc=document.getElementById('callDesc').value.trim();
-  var data={Subject:subj,Call_Type:document.getElementById('callDirection').value||'Outbound',Call_Start_Time:dt?new Date(dt).toISOString():new Date().toISOString(),$se_module:'Leads',What_Id:{id:leadId}};
+function mkCall(){
+  var subj=document.getElementById('cS').value;if(!subj){toast('Please select a Subject','er');return;}
+  var btn=document.getElementById('cBtn');btn.classList.add('ld');btn.disabled=true;
+  var dt=document.getElementById('cDT').value,dur=parseInt(document.getElementById('cDU').value)||0,desc=document.getElementById('cDE').value.trim();
+  var data={Subject:subj,Call_Type:document.getElementById('cDR').value||'Outbound',Call_Start_Time:dt?new Date(dt).toISOString():new Date().toISOString(),$se_module:'Leads',What_Id:{id:lid}};
   if(dur>0){var h=Math.floor(dur/60),m=dur%60;data.Call_Duration=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
-  if(desc) data.Description=desc;
+  if(desc)data.Description=desc;
   ZOHO.CRM.API.insertRecord({Entity:'Calls',APIData:data,Trigger:[]})
-    .then(function(res){
-      btn.classList.remove('loading');btn.disabled=false;
-      var ok=res&&res.data&&res.data[0]&&res.data[0].code==='SUCCESS';
-      if(ok){showToast('Call logged!','ok');clearForm('call');}
-      else{var d=res&&res.data&&res.data[0];showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}
-    }).catch(function(e){btn.classList.remove('loading');btn.disabled=false;showToast('Error: '+errMsg(e),'er');});
+    .then(function(r){btn.classList.remove('ld');btn.disabled=false;var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';if(ok){toast('Call logged!','ok');clrFrm('call');}else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}})
+    .catch(function(e){btn.classList.remove('ld');btn.disabled=false;toast('Error: '+em(e),'er');});
 }
-
-function onInput(){var v=document.getElementById('discussionInput').value;document.getElementById('charCount').textContent=v.length+' character'+(v.length!==1?'s':'');}
-function clearDiscussion(){document.getElementById('discussionInput').value='';onInput();}
-
-function saveDiscussion() {
-  var disc=document.getElementById('discussionInput').value.trim();
-  var stat=document.getElementById('statusSelect').value;
-  if(!disc){showToast("Please enter today's discussion notes",'er');document.getElementById('discussionInput').focus();return;}
-  var btn=document.getElementById('saveBtn');btn.classList.add('loading');btn.disabled=true;
-  var existing=leadData&&leadData.Description?leadData.Description:'';
-  var newDesc=existing?existing+'\n'+todayStr+' - '+disc:todayStr+' - '+disc;
-  var payload={id:leadId,Description:newDesc};
-  if(stat) payload.Lead_Status=stat;
-  ZOHO.CRM.API.updateRecord({Entity:'Leads',APIData:payload})
-    .then(function(res){
-      btn.classList.remove('loading');btn.disabled=false;
-      if(res&&res.data&&res.data[0]&&res.data[0].code==='SUCCESS'){
-        if(leadData){leadData.Description=newDesc;if(stat)leadData.Lead_Status=stat;}
-        var el=document.getElementById('descContent');el.className='readonly-content';el.textContent=newDesc;
-        clearDiscussion();showToast('Saved successfully!','ok');
-        setTimeout(function(){try{ZOHO.CRM.UI.Popup.closeReload();}catch(e){}},1500);
-      }else{showToast('Save failed.','er');}
-    }).catch(function(){btn.classList.remove('loading');btn.disabled=false;showToast('Error saving.','er');});
+function onInp(){var v=document.getElementById('DI').value;document.getElementById('CC').textContent=v.length+' character'+(v.length!==1?'s':'');}
+function clrDisc(){document.getElementById('DI').value='';onInp();}
+function saveDisc(){
+  var disc=document.getElementById('DI').value.trim(),stat=document.getElementById('SS').value;
+  if(!disc){toast("Please enter today's notes",'er');document.getElementById('DI').focus();return;}
+  var btn=document.getElementById('SB');btn.classList.add('ld');btn.disabled=true;
+  var ex=ld&&ld.Description?ld.Description:'',nd=ex?ex+'\n'+ts+' - '+disc:ts+' - '+disc;
+  var p={id:lid,Description:nd};if(stat)p.Lead_Status=stat;
+  ZOHO.CRM.API.updateRecord({Entity:'Leads',APIData:p})
+    .then(function(r){btn.classList.remove('ld');btn.disabled=false;if(r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS'){if(ld){ld.Description=nd;if(stat)ld.Lead_Status=stat;}var el=document.getElementById('DC');el.className='ro-content';el.textContent=nd;clrDisc();toast('Saved!','ok');setTimeout(function(){try{ZOHO.CRM.UI.Popup.closeReload();}catch(e){}},1500);}else{toast('Save failed.','er');}})
+    .catch(function(){btn.classList.remove('ld');btn.disabled=false;toast('Error saving.','er');});
 }
-
-function switchTab(t){['task','call'].forEach(function(k){document.getElementById('tab-'+k).className='tab'+(k===t?' active':'');document.getElementById('form-'+k).className='form'+(k===t?' show':'');});}
-
-function clearForm(t){
-  if(t==='task'){document.getElementById('taskSubjectPick').value='';document.getElementById('taskSubject').value='';document.getElementById('taskDueDate').value='';document.getElementById('taskStatus').value='Not Started';document.getElementById('taskPriority').value='Normal';document.getElementById('taskOwner').value='';document.getElementById('taskDesc').value='';}
-  else{document.getElementById('callSubject').value='';document.getElementById('callDateTime').value='';document.getElementById('callDirection').value='Outbound';document.getElementById('callDuration').value='';document.getElementById('callDesc').value='';}
-}
+function swTab(t){['task','call'].forEach(function(k){document.getElementById('tb-'+k).className='tab'+(k===t?' on':'');document.getElementById('frm-'+k).className='frm'+(k===t?' show':'');});}
+function clrFrm(t){if(t==='task'){document.getElementById('tSP').value='';document.getElementById('tS').value='';document.getElementById('tD').value='';document.getElementById('tST').value='Not Started';document.getElementById('tPR').value='Normal';document.getElementById('tOW').value='';document.getElementById('tDE').value='';}else{document.getElementById('cS').value='';document.getElementById('cDT').value='';document.getElementById('cDR').value='Outbound';document.getElementById('cDU').value='';document.getElementById('cDE').value='';}}
 </script>
 </body>
 </html>
