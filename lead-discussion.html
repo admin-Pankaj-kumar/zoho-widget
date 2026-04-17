@@ -106,7 +106,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </style>
 </head>
 <body>
-<div class="loading" id="LS"><div class="loader"></div><span>Loading...</span></div>
+<div class="loading" id="LS"><div class="loader"></div><span id="LST">SDK Initializing...</span></div>
 <div class="wrap" id="MW" style="display:none">
   <div class="lead-header">
     <div class="lead-info">
@@ -257,11 +257,14 @@ function tog(k){
 }
 
 ZOHO.embeddedApp.on('PageLoad',function(data){
+  document.getElementById('LST').textContent='PageLoad fired - loading lead...';
   var raw=data.EntityId;
   lid=String(Array.isArray(raw)?raw[0]:raw);
   var now=new Date();
   ts=fd(now);
   document.getElementById('TP').textContent=ts+' -';
+
+  document.getElementById('LST').textContent='Fetching lead ID: '+lid;
 
   var pLead=ZOHO.CRM.API.getRecord({Entity:'Leads',RecordID:lid});
   var pActs=ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Activities',page:1,per_page:50});
@@ -326,6 +329,14 @@ ZOHO.embeddedApp.on('PageLoad',function(data){
 });
 
 ZOHO.embeddedApp.init();
+
+// If PageLoad never fires within 10s, show diagnostic
+setTimeout(function(){
+  if(!lid){
+    document.getElementById('LST').textContent='ERROR: PageLoad never fired. Check widget URL in CRM settings.';
+    document.querySelector('.loader').style.display='none';
+  }
+},10000);
 
 function renderLead(){
   var d=ld,fn=d.First_Name||'',ln=d.Last_Name||'';
