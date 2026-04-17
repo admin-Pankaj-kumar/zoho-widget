@@ -23,10 +23,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .acc-header:hover{background:#fafbfc}
 .acc-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#1a1f36}
 .acc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
-.tag-ro{background:#f1f5f9;color:#475569}
-.tag-edit{background:#eff6ff;color:#185FA5}
-.tag-green{background:#dcfce7;color:#15803d}
-.tag-amber{background:#fef3c7;color:#b45309}
+.tag-ro{background:#f1f5f9;color:#475569}.tag-edit{background:#eff6ff;color:#185FA5}
+.tag-green{background:#dcfce7;color:#15803d}.tag-amber{background:#fef3c7;color:#b45309}
 .acc-arrow{width:16px;height:16px;color:#94a3b8;transition:transform .2s;flex-shrink:0}
 .acc-arrow.open{transform:rotate(180deg)}
 .acc-body{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s ease}
@@ -38,36 +36,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .note-date{font-size:11px;color:#94a3b8;margin-bottom:3px}
 .note-text{font-size:12px;color:#374151;line-height:1.5;white-space:pre-wrap}
 .today-prefix{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#185FA5}
-.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:80px;transition:border .15s;line-height:1.6}
+.discussion-input{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:vertical;min-height:80px;line-height:1.6}
 .discussion-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
 .disc-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px}
 .char-count{font-size:11px;color:#94a3b8}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border:none}
-.btn-primary{background:#3b82f6;color:#fff}
-.btn-primary:hover:not(:disabled){background:#2563eb}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none}
+.btn-primary{background:#3b82f6;color:#fff}.btn-primary:hover:not(:disabled){background:#2563eb}
+.btn-green{background:#16a34a;color:#fff}.btn-green:hover:not(:disabled){background:#15803d}
 .btn-primary:disabled,.btn-green:disabled{opacity:.5;cursor:not-allowed}
-.btn-green{background:#16a34a;color:#fff}
-.btn-green:hover:not(:disabled){background:#15803d}
 .btn-ghost{background:none;border:0.5px solid #e2e8f0;color:#64748b;padding:7px 14px}
 .btn-ghost:hover{background:#f1f5f9}
 .spin-sm{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
 .btn-primary.loading .spin-sm,.btn-green.loading .spin-sm{display:block}
 .btn-primary.loading .lbl,.btn-green.loading .lbl{display:none}
-/* ACTIVITIES */
 .act-list{display:flex;flex-direction:column;gap:8px}
 .act-empty{font-size:12px;color:#94a3b8;font-style:italic}
 .act-item{border-radius:8px;border:0.5px solid #e2e8f0;background:#f8fafc;overflow:hidden;transition:opacity .3s}
 .act-item.overdue{border-left:3px solid #ef4444}
 .act-item.today{border-left:3px solid #f59e0b}
 .act-item.upcoming{border-left:3px solid #3b82f6}
-.act-main-row{display:flex;align-items:stretch;gap:0;padding:0}
+.act-main-row{display:flex;align-items:stretch}
 .act-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:10px 12px}
 .act-right{width:200px;flex-shrink:0;border-left:1px solid #e2e8f0;padding:10px;display:flex;align-items:center}
 .act-check{width:22px;height:22px;border-radius:50%;border:2px solid #16a34a;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
 .act-check:hover{background:#dcfce7}
 .act-check.active{background:#16a34a;border-color:#16a34a}
-.act-check svg{opacity:0;transition:opacity .15s}
-.act-check.active svg{opacity:1}
+.act-check svg{opacity:0}.act-check.active svg{opacity:1}
 .act-info{flex:1;min-width:0}
 .act-subject{font-size:12px;font-weight:600;color:#1a1f36}
 .act-meta{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap}
@@ -83,8 +77,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .act-panel.open{display:flex}
 .act-panel-label{font-size:11px;font-weight:600;color:#15803d}
 .act-panel-note{width:100%;border:0.5px solid #bbf7d0;border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;resize:none;height:60px;line-height:1.5}
-.act-panel-note:focus{border-color:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.1)}
-.act-panel-note::placeholder{color:#94a3b8}
+.act-panel-note:focus{border-color:#16a34a}
 .act-panel-btns{display:flex;justify-content:flex-end;gap:8px}
 .act-cancel{padding:6px 12px;background:#fff;border:0.5px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit}
 .act-done{padding:6px 14px;background:#16a34a;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
@@ -93,16 +86,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .act-done-spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
 .act-done.loading .act-done-spin{display:block}
 .act-done.loading .act-done-lbl{display:none}
-/* CREATE FORM */
 .tabs{display:flex;gap:6px;margin-bottom:12px}
-.tab{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid #e2e8f0;background:#f8fafc;color:#64748b;transition:all .15s}
+.tab{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid #e2e8f0;background:#f8fafc;color:#64748b}
 .tab.active{background:#1a1f36;color:#fff;border-color:#1a1f36}
 .form{display:none;flex-direction:column;gap:10px}
 .form.show{display:flex}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .field{display:flex;flex-direction:column;gap:4px}
 .flabel{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
-.finput,.fselect,.ftextarea{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none;transition:border .15s}
+.finput,.fselect,.ftextarea{width:100%;border:0.5px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:12px;font-family:inherit;color:#1a1f36;background:#fff;outline:none}
 .finput:focus,.fselect:focus,.ftextarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
 .fselect{cursor:pointer}
 .ftextarea{resize:vertical;min-height:64px;line-height:1.5}
@@ -113,18 +105,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </style>
 </head>
 <body>
-
 <div class="loading" id="loadingState">
   <div class="loader"></div>
-  <span id="loadingText">Initializing...</span>
+  <span id="loadingText">Initializing widget...</span>
 </div>
-
 <div class="wrap" id="mainWrap" style="display:none">
   <div class="lead-header">
     <div class="lead-info">
       <div class="avatar" id="avatar">?</div>
       <div>
-        <div class="lead-name" id="leadName">—</div>
+        <div class="lead-name" id="leadName">-</div>
         <div class="lead-meta" id="leadMeta"></div>
       </div>
     </div>
@@ -141,44 +131,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <option value="Not Qualified">Not Qualified</option>
     </select>
   </div>
-
   <div class="accordion">
     <div class="acc-header" onclick="toggleAcc('req')">
-      <div class="acc-title">📋 Requirement Details <span class="acc-tag tag-ro">Read Only</span></div>
+      <div class="acc-title">Requirement Details <span class="acc-tag tag-ro">Read Only</span></div>
       <svg class="acc-arrow" id="arrow-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="acc-body" id="body-req">
-      <div id="reqContent" class="readonly-empty">No requirement details available.</div>
+      <div id="reqContent" class="readonly-empty">No requirement details.</div>
     </div>
   </div>
-
   <div class="accordion">
     <div class="acc-header" onclick="toggleAcc('notes')">
-      <div class="acc-title">📝 Notes <span class="acc-tag tag-ro">Read Only</span> <span id="notesBadge" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600"></span></div>
+      <div class="acc-title">Notes <span class="acc-tag tag-ro">Read Only</span> <span id="notesBadge" style="display:none;background:#f1f5f9;color:#475569;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600"></span></div>
       <svg class="acc-arrow" id="arrow-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="acc-body" id="body-notes">
       <div id="notesContent" class="readonly-empty">Loading notes...</div>
     </div>
   </div>
-
   <div class="accordion">
     <div class="acc-header" onclick="toggleAcc('desc')">
-      <div class="acc-title">📄 Description <span class="acc-tag tag-ro">Read Only</span></div>
+      <div class="acc-title">Description <span class="acc-tag tag-ro">Read Only</span></div>
       <svg class="acc-arrow" id="arrow-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="acc-body" id="body-desc">
-      <div id="descContent" class="readonly-empty">No description available.</div>
+      <div id="descContent" class="readonly-empty">No description.</div>
     </div>
   </div>
-
   <div class="accordion">
     <div class="acc-header" onclick="toggleAcc('today')">
-      <div class="acc-title">✏️ Today's Discussion <span class="acc-tag tag-edit">Edit</span></div>
+      <div class="acc-title">Today's Discussion <span class="acc-tag tag-edit">Edit</span></div>
       <svg class="acc-arrow open" id="arrow-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="acc-body open" id="body-today">
-      <div style="margin-bottom:8px"><span class="today-prefix" id="todayPrefix">—</span> <span style="font-size:11px;color:#64748b">Type your discussion notes below</span></div>
+      <div style="margin-bottom:8px"><span class="today-prefix" id="todayPrefix">-</span> <span style="font-size:11px;color:#64748b">Type your notes below</span></div>
       <textarea class="discussion-input" id="discussionInput" placeholder="Enter today's discussion, next steps, or any important notes..." oninput="onInput()"></textarea>
       <div class="disc-footer">
         <span class="char-count" id="charCount">0 characters</span>
@@ -191,26 +177,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
     </div>
   </div>
-
   <div class="accordion">
     <div class="acc-header" onclick="toggleAcc('acts')">
-      <div class="acc-title">📅 Open Activities <span id="actsBadge" class="acc-tag tag-amber" style="display:none">0</span></div>
+      <div class="acc-title">Open Activities <span id="actsBadge" class="acc-tag tag-amber" style="display:none">0</span></div>
       <svg class="acc-arrow" id="arrow-acts" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="acc-body" id="body-acts">
       <div class="act-list" id="actList"><div class="act-empty">Loading...</div></div>
     </div>
   </div>
-
   <div class="accordion">
     <div class="acc-header" onclick="toggleAcc('create')">
-      <div class="acc-title">➕ Create Activity <span class="acc-tag tag-green">New</span></div>
+      <div class="acc-title">Create Activity <span class="acc-tag tag-green">New</span></div>
       <svg class="acc-arrow" id="arrow-create" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="acc-body" id="body-create">
       <div class="tabs">
-        <div class="tab active" id="tab-task" onclick="switchTab('task')">📋 Task</div>
-        <div class="tab" id="tab-call" onclick="switchTab('call')">📞 Call</div>
+        <div class="tab active" id="tab-task" onclick="switchTab('task')">Task</div>
+        <div class="tab" id="tab-call" onclick="switchTab('call')">Call</div>
       </div>
       <div class="form show" id="form-task">
         <div class="row">
@@ -252,7 +236,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
         <div class="field">
           <label class="flabel">Task Owner</label>
-          <select class="fselect" id="taskOwner"><option value="">— Assign to me —</option></select>
+          <select class="fselect" id="taskOwner"><option value="">-- Assign to me --</option></select>
         </div>
         <div class="field">
           <label class="flabel">Description</label>
@@ -261,7 +245,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="form-footer">
           <button class="btn btn-ghost" onclick="clearForm('task')">Clear</button>
           <button class="btn btn-green" id="taskBtn" onclick="createTask()">
-            <div class="spin-sm"></div><span class="lbl">✓ Add Task</span>
+            <div class="spin-sm"></div><span class="lbl">Add Task</span>
           </button>
         </div>
       </div>
@@ -304,35 +288,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="form-footer">
           <button class="btn btn-ghost" onclick="clearForm('call')">Clear</button>
           <button class="btn btn-green" id="callBtn" onclick="createCall()">
-            <div class="spin-sm"></div><span class="lbl">📞 Log Call</span>
+            <div class="spin-sm"></div><span class="lbl">Log Call</span>
           </button>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script src="https://live.zwidgets.com/js-sdk/1.0/ZohoEmbededAppSDK.min.js"></script>
 <script>
-// ── GLOBALS ───────────────────────────────────────────────────────────
-var leadId     = null;
-var leadData   = null;
-var openActs   = [];
-var openAccs   = { today: true };
-var todayStr   = '';
+var leadId = null, leadData = null, openActs = [], openAccs = { today: true }, todayStr = '';
 
-// ── HELPERS ───────────────────────────────────────────────────────────
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function stripHtml(html) {
   if (!html) return '';
   return html
     .replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<\/li>/gi,'\n')
-    .replace(/<\/div>/gi,'\n').replace(/<li[^>]*>/gi,'• ')
+    .replace(/<\/div>/gi,'\n').replace(/<li[^>]*>/gi,'- ')
     .replace(/<[^>]+>/g,'')
     .replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<')
     .replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/&#39;/gi,"'")
@@ -348,8 +322,7 @@ function errMsg(e) {
 
 function showToast(msg, type) {
   var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast '+(type||'ok')+' show';
+  t.textContent = msg; t.className = 'toast '+(type||'ok')+' show';
   setTimeout(function(){ t.className='toast'; }, 3500);
 }
 
@@ -369,8 +342,7 @@ function dueStatus(ds) {
   if (!ds) return 'no-date';
   var due=new Date(ds), now=new Date();
   var s=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  var e=new Date(s.getTime()+86400000);
-  return due<s?'overdue':due<e?'today':'upcoming';
+  return due<s?'overdue':due<new Date(s.getTime()+86400000)?'today':'upcoming';
 }
 
 function showMain() {
@@ -378,121 +350,93 @@ function showMain() {
   document.getElementById('mainWrap').style.display='flex';
 }
 
-// ── ACCORDION ─────────────────────────────────────────────────────────
 function toggleAcc(k) {
   openAccs[k]=!openAccs[k];
   var b=document.getElementById('body-'+k), a=document.getElementById('arrow-'+k);
-  if (openAccs[k]) { b.classList.add('open'); a.classList.add('open'); }
-  else { b.classList.remove('open'); a.classList.remove('open'); }
+  if(openAccs[k]){b.classList.add('open');a.classList.add('open');}
+  else{b.classList.remove('open');a.classList.remove('open');}
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────
-// All DOM manipulation MUST happen after PageLoad fires
 ZOHO.embeddedApp.on('PageLoad', function(data) {
-  try {
-    document.getElementById('loadingText').textContent = 'Loading lead...';
-    var raw = data.EntityId;
-    leadId  = String(Array.isArray(raw) ? raw[0] : raw);
-
-    // Set today date now (safe - DOM is ready)
-    var today = new Date();
-    todayStr  = fmtDate(today);
-    document.getElementById('todayPrefix').textContent = todayStr + ' -';
-
-    // Load lead record
-    ZOHO.CRM.API.getRecord({ Entity:'Leads', RecordID:leadId })
-      .then(function(res) {
-        if (res && res.data && res.data[0]) {
-          leadData = res.data[0];
-          renderLead();
-        }
-        showMain();
-        loadNotes();
-        loadActivities();
-        loadUsers();
-      })
-      .catch(function(e) {
-        console.error('getRecord error:', e);
-        showMain();
-        loadActivities();
-        loadUsers();
-      });
-  } catch(e) {
-    console.error('PageLoad error:', e);
-    showMain();
-  }
+  document.getElementById('loadingText').textContent='Loading lead...';
+  var raw=data.EntityId;
+  leadId=String(Array.isArray(raw)?raw[0]:raw);
+  var today=new Date();
+  todayStr=fmtDate(today);
+  document.getElementById('todayPrefix').textContent=todayStr+' -';
+  ZOHO.CRM.API.getRecord({Entity:'Leads',RecordID:leadId})
+    .then(function(res){
+      if(res&&res.data&&res.data[0]){leadData=res.data[0];renderLead();}
+      showMain();
+      loadNotes();
+      loadActivities();
+      loadUsers();
+    })
+    .catch(function(e){
+      console.error('getRecord error:',e);
+      showMain();
+      loadActivities();
+      loadUsers();
+    });
 });
-
 ZOHO.embeddedApp.init();
 
-// ── RENDER LEAD ───────────────────────────────────────────────────────
 function renderLead() {
-  var d = leadData;
+  var d=leadData;
   var fn=d.First_Name||'', ln=d.Last_Name||'';
   var name=(fn+' '+ln).trim()||'Unknown Lead';
-  var init=((fn[0]||'')+(ln[0]||'')).toUpperCase()||'?';
-  document.getElementById('avatar').textContent = init;
-  document.getElementById('leadName').textContent = name;
+  document.getElementById('avatar').textContent=((fn[0]||'')+(ln[0]||'')).toUpperCase()||'?';
+  document.getElementById('leadName').textContent=name;
   var meta=[];
   if(d.Mobile) meta.push(d.Mobile);
-  if(d.Email)  meta.push(d.Email);
+  if(d.Email) meta.push(d.Email);
   if(d.Company) meta.push(d.Company);
-  document.getElementById('leadMeta').textContent = meta.join(' · ');
-  document.getElementById('statusSelect').value = d.Lead_Status||'';
-  if(d.Requirement_Details) {
-    var r=document.getElementById('reqContent');
-    r.className='readonly-content'; r.textContent=d.Requirement_Details;
-  }
-  if(d.Description) {
-    var dc=document.getElementById('descContent');
-    dc.className='readonly-content'; dc.textContent=d.Description;
-  }
+  document.getElementById('leadMeta').textContent=meta.join(' - ');
+  document.getElementById('statusSelect').value=d.Lead_Status||'';
+  if(d.Requirement_Details){var r=document.getElementById('reqContent');r.className='readonly-content';r.textContent=d.Requirement_Details;}
+  if(d.Description){var dc=document.getElementById('descContent');dc.className='readonly-content';dc.textContent=d.Description;}
 }
 
-// ── NOTES ─────────────────────────────────────────────────────────────
 function loadNotes() {
-  ZOHO.CRM.API.getRelatedRecords({ Entity:'Leads', RecordID:leadId, RelatedList:'Notes', page:1, per_page:10 })
-    .then(function(res) {
+  ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:leadId,RelatedList:'Notes',page:1,per_page:10})
+    .then(function(res){
       var notes=(res&&res.data)?res.data:[];
       var el=document.getElementById('notesContent');
       var badge=document.getElementById('notesBadge');
-      if (!notes.length) {
-        el.innerHTML='<div class="readonly-empty">No notes found.</div>';
-      } else {
-        badge.textContent=notes.length; badge.style.display='';
+      if(!notes.length){el.innerHTML='<div class="readonly-empty">No notes found.</div>';}
+      else{
+        badge.textContent=notes.length;badge.style.display='';
         el.innerHTML=notes.map(function(n){
           var dt=n.Created_Time?new Date(n.Created_Time):null;
           var txt=stripHtml(n.Note_Content||n.Content||'');
           return '<div class="note-item">'+(dt?'<div class="note-date">'+esc(fmtDate(dt))+'</div>':'')+'<div class="note-text">'+esc(txt)+'</div></div>';
         }).join('');
       }
-    }).catch(function(e){ console.warn('loadNotes error:',e); });
+    }).catch(function(e){console.warn('loadNotes:',e);document.getElementById('notesContent').innerHTML='<div class="readonly-empty">Could not load notes.</div>';});
 }
 
-// ── ACTIVITIES ────────────────────────────────────────────────────────
 function loadActivities() {
-  ZOHO.CRM.API.getRelatedRecords({ Entity:'Leads', RecordID:leadId, RelatedList:'Activities', page:1, per_page:50 })
-    .then(function(res) {
+  ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:leadId,RelatedList:'Activities',page:1,per_page:50})
+    .then(function(res){
       var all=(res&&res.data)?res.data:[];
-      openActs=all.filter(function(t){ return (t.Status||'').toLowerCase()!=='completed'; });
+      openActs=all.filter(function(t){return (t.Status||'').toLowerCase()!=='completed';});
       renderActivities();
-    }).catch(function() {
-      ZOHO.CRM.API.searchRecord({ Entity:'Tasks', Type:'criteria', Query:'((Who_Id:equals:'+leadId+')and(Status:not_equal:Completed))' })
-        .then(function(r){ openActs=(r&&r.data)?r.data:[]; renderActivities(); })
-        .catch(function(){ openActs=[]; renderActivities(); });
+    }).catch(function(){
+      ZOHO.CRM.API.searchRecord({Entity:'Tasks',Type:'criteria',Query:'((Who_Id:equals:'+leadId+')and(Status:not_equal:Completed))'})
+        .then(function(r){openActs=(r&&r.data)?r.data:[];renderActivities();})
+        .catch(function(){openActs=[];renderActivities();});
     });
 }
 
 function renderActivities() {
   var el=document.getElementById('actList');
   var badge=document.getElementById('actsBadge');
-  if (!openActs.length) {
+  if(!openActs.length){
     badge.style.display='none';
-    el.innerHTML='<div class="act-empty">No open activities found.</div>';
-    return;
+    el.innerHTML='<div class="act-empty">No open activities found.</div>';return;
   }
-  badge.style.display='inline-block'; badge.textContent=openActs.length;
-  if (!openAccs['acts']) {
+  badge.style.display='inline-block';badge.textContent=openActs.length;
+  if(!openAccs['acts']){
     openAccs['acts']=true;
     document.getElementById('body-acts').classList.add('open');
     document.getElementById('arrow-acts').classList.add('open');
@@ -503,7 +447,7 @@ function renderActivities() {
     var st=dueStatus(due);
     var owner=t.Owner?t.Owner.name||'':'';
     var desc=stripHtml(t.Description||'');
-    var dueTxt=st==='overdue'?'⚠ Overdue: '+fmtDue(due):st==='today'?'📅 Due Today':st==='upcoming'?'🗓 '+fmtDue(due):'📌 No due date';
+    var dueTxt=st==='overdue'?'Overdue: '+fmtDue(due):st==='today'?'Due Today':st==='upcoming'?fmtDue(due):'No due date';
     return '<div class="act-item '+st+'" id="act-'+i+'">'+
       '<div class="act-main-row">'+
         '<div class="act-left">'+
@@ -513,7 +457,7 @@ function renderActivities() {
           '<div class="act-info">'+
             '<div class="act-subject">'+esc(subj)+'</div>'+
             '<div class="act-meta">'+
-              (owner?'<span class="act-owner">👤 '+esc(owner)+'</span>':'')+
+              (owner?'<span class="act-owner">'+esc(owner)+'</span>':'')+
               '<span class="act-badge '+st+'">'+dueTxt+'</span>'+
             '</div>'+
           '</div>'+
@@ -523,12 +467,12 @@ function renderActivities() {
         '</div>'+
       '</div>'+
       '<div class="act-panel" id="panel-'+i+'">'+
-        '<div class="act-panel-label">✏ Add a note before completing (optional)</div>'+
+        '<div class="act-panel-label">Add a note before completing (optional)</div>'+
         '<textarea class="act-panel-note" id="note-'+i+'" placeholder="What was done? Any next steps..."></textarea>'+
         '<div class="act-panel-btns">'+
           '<button class="act-cancel" onclick="cancelPanel('+i+')">Cancel</button>'+
           '<button class="act-done" id="donebtn-'+i+'" onclick="completeAct('+i+')">'+
-            '<div class="act-done-spin"></div><span class="act-done-lbl">✓ Mark Complete</span>'+
+            '<div class="act-done-spin"></div><span class="act-done-lbl">Mark Complete</span>'+
           '</button>'+
         '</div>'+
       '</div>'+
@@ -540,11 +484,9 @@ function togglePanel(i) {
   var panel=document.getElementById('panel-'+i);
   var chk=document.getElementById('chk-'+i);
   var isOpen=panel.classList.contains('open');
-  openActs.forEach(function(_,j){
-    if(j!==i){ var p=document.getElementById('panel-'+j), c=document.getElementById('chk-'+j); if(p){p.classList.remove('open');} if(c){c.classList.remove('active');} }
-  });
-  if(isOpen){ panel.classList.remove('open'); chk.classList.remove('active'); }
-  else { panel.classList.add('open'); chk.classList.add('active'); setTimeout(function(){ var ta=document.getElementById('note-'+i); if(ta)ta.focus(); },150); }
+  openActs.forEach(function(_,j){if(j!==i){var p=document.getElementById('panel-'+j);var c=document.getElementById('chk-'+j);if(p)p.classList.remove('open');if(c)c.classList.remove('active');}});
+  if(isOpen){panel.classList.remove('open');chk.classList.remove('active');}
+  else{panel.classList.add('open');chk.classList.add('active');setTimeout(function(){var ta=document.getElementById('note-'+i);if(ta)ta.focus();},150);}
 }
 
 function cancelPanel(i) {
@@ -554,142 +496,114 @@ function cancelPanel(i) {
 }
 
 function completeAct(i) {
-  var task=openActs[i]; if(!task) return;
+  var task=openActs[i];if(!task)return;
   var note=(document.getElementById('note-'+i).value||'').trim();
   var btn=document.getElementById('donebtn-'+i);
-  btn.classList.add('loading'); btn.disabled=true;
-  var data={ id:task.id, Status:'Completed' };
-  if(note) data.Description=(task.Description?task.Description+'\n\n':'')+'['+todayStr+'] '+note;
-  ZOHO.CRM.API.updateRecord({ Entity:'Tasks', APIData:data })
+  btn.classList.add('loading');btn.disabled=true;
+  var upd={id:task.id,Status:'Completed'};
+  if(note) upd.Description=(task.Description?task.Description+'\n\n':'')+'['+todayStr+'] '+note;
+  ZOHO.CRM.API.updateRecord({Entity:'Tasks',APIData:upd})
     .then(function(res){
       var ok=res&&res.data&&res.data[0]&&res.data[0].code==='SUCCESS';
-      if(ok){ showToast('Task completed! ✓','ok'); var item=document.getElementById('act-'+i); if(item){item.style.opacity='0';} setTimeout(loadActivities,400); }
-      else { var d=res&&res.data&&res.data[0]; showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,60)),'er'); btn.classList.remove('loading'); btn.disabled=false; }
-    }).catch(function(e){ showToast('Error: '+errMsg(e),'er'); btn.classList.remove('loading'); btn.disabled=false; });
+      if(ok){showToast('Task completed!','ok');var item=document.getElementById('act-'+i);if(item)item.style.opacity='0';setTimeout(loadActivities,400);}
+      else{var d=res&&res.data&&res.data[0];showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,60)),'er');btn.classList.remove('loading');btn.disabled=false;}
+    }).catch(function(e){showToast('Error: '+errMsg(e),'er');btn.classList.remove('loading');btn.disabled=false;});
 }
 
-// ── USERS ─────────────────────────────────────────────────────────────
 function loadUsers() {
-  ZOHO.CRM.API.getUsers({ Type:'ActiveUsers' })
+  ZOHO.CRM.API.getUsers({Type:'ActiveUsers'})
     .then(function(res){
       var users=[];
       if(res&&res.users&&Array.isArray(res.users)) users=res.users;
       else if(res&&res.data&&Array.isArray(res.data)) users=res.data;
       else if(Array.isArray(res)) users=res;
-      users=users.filter(function(u){ return !u.status||u.status==='active'; });
-      fillOwners(users);
-    }).catch(function(){
-      ZOHO.CRM.API.getUsers({ Type:'AllUsers' })
-        .then(function(res2){
-          var u2=[];
-          if(res2&&res2.users) u2=res2.users;
-          else if(Array.isArray(res2)) u2=res2;
-          fillOwners(u2.filter(function(u){ return !u.status||u.status==='active'; }));
-        }).catch(function(){});
-    });
+      users=users.filter(function(u){return !u.status||u.status==='active';});
+      if(users.length) fillOwners(users);
+      else return ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r2){var u2=[];if(r2&&r2.users)u2=r2.users;else if(Array.isArray(r2))u2=r2;fillOwners(u2.filter(function(u){return !u.status||u.status==='active';}));});
+    }).catch(function(){ZOHO.CRM.API.getUsers({Type:'AllUsers'}).then(function(r){var u=[];if(r&&r.users)u=r.users;else if(Array.isArray(r))u=r;fillOwners(u.filter(function(x){return !x.status||x.status==='active';}));}).catch(function(){});});
 }
 
 function fillOwners(users) {
   var sel=document.getElementById('taskOwner');
-  sel.innerHTML='<option value="">— Assign to me —</option>';
+  sel.innerHTML='<option value="">-- Assign to me --</option>';
   users.forEach(function(u){
     if(!u.id) return;
     var name=(u.full_name||'').trim()||(u.name||'').trim()||((u.first_name||'')+' '+(u.last_name||'')).trim()||u.email||String(u.id);
-    var opt=document.createElement('option');
-    opt.value=u.id; opt.textContent=name;
-    sel.appendChild(opt);
+    var opt=document.createElement('option');opt.value=u.id;opt.textContent=name;sel.appendChild(opt);
   });
 }
 
-// ── CREATE TASK ───────────────────────────────────────────────────────
-function onSubjectPick() {
-  var v=document.getElementById('taskSubjectPick').value;
-  if(v) document.getElementById('taskSubject').value=v;
-}
+function onSubjectPick(){var v=document.getElementById('taskSubjectPick').value;if(v)document.getElementById('taskSubject').value=v;}
 
 function createTask() {
   var subj=document.getElementById('taskSubject').value.trim();
-  if(!subj){ showToast('Please enter or select a Subject','er'); document.getElementById('taskSubject').focus(); return; }
+  if(!subj){showToast('Please enter or select a Subject','er');document.getElementById('taskSubject').focus();return;}
   var due=document.getElementById('taskDueDate').value;
-  if(!due){ showToast('Due Date is mandatory','er'); document.getElementById('taskDueDate').focus(); return; }
-  var btn=document.getElementById('taskBtn');
-  btn.classList.add('loading'); btn.disabled=true;
+  if(!due){showToast('Due Date is mandatory','er');document.getElementById('taskDueDate').focus();return;}
+  var btn=document.getElementById('taskBtn');btn.classList.add('loading');btn.disabled=true;
   var ownerId=document.getElementById('taskOwner').value;
   var desc=document.getElementById('taskDesc').value.trim();
-  var data={ Subject:subj, Status:document.getElementById('taskStatus').value||'Not Started', Priority:document.getElementById('taskPriority').value||'Normal', $se_module:'Leads', What_Id:{id:leadId}, Due_Date:due };
+  var data={Subject:subj,Status:document.getElementById('taskStatus').value||'Not Started',Priority:document.getElementById('taskPriority').value||'Normal',$se_module:'Leads',What_Id:{id:leadId},Due_Date:due};
   if(ownerId) data.Owner={id:ownerId};
   if(desc) data.Description=desc;
-  if(leadData){ if(leadData.Mobile||leadData.Phone) data.Lead_Contact_Phone=leadData.Mobile||leadData.Phone; if(leadData.Email) data.Lead_Contact_Email=leadData.Email; }
-  ZOHO.CRM.API.insertRecord({ Entity:'Tasks', APIData:data, Trigger:[] })
+  if(leadData){if(leadData.Mobile||leadData.Phone)data.Lead_Contact_Phone=leadData.Mobile||leadData.Phone;if(leadData.Email)data.Lead_Contact_Email=leadData.Email;}
+  ZOHO.CRM.API.insertRecord({Entity:'Tasks',APIData:data,Trigger:[]})
     .then(function(res){
-      btn.classList.remove('loading'); btn.disabled=false;
+      btn.classList.remove('loading');btn.disabled=false;
       var ok=res&&res.data&&res.data[0]&&res.data[0].code==='SUCCESS';
-      if(ok){ showToast('Task created successfully!','ok'); clearForm('task'); loadActivities(); }
-      else { var d=res&&res.data&&res.data[0]; showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er'); }
-    }).catch(function(e){ btn.classList.remove('loading'); btn.disabled=false; showToast('Error: '+errMsg(e),'er'); });
+      if(ok){showToast('Task created!','ok');clearForm('task');loadActivities();}
+      else{var d=res&&res.data&&res.data[0];showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}
+    }).catch(function(e){btn.classList.remove('loading');btn.disabled=false;showToast('Error: '+errMsg(e),'er');});
 }
 
-// ── CREATE CALL ───────────────────────────────────────────────────────
 function createCall() {
   var subj=document.getElementById('callSubject').value;
-  if(!subj){ showToast('Please select a Subject','er'); return; }
-  var btn=document.getElementById('callBtn');
-  btn.classList.add('loading'); btn.disabled=true;
+  if(!subj){showToast('Please select a Subject','er');return;}
+  var btn=document.getElementById('callBtn');btn.classList.add('loading');btn.disabled=true;
   var dt=document.getElementById('callDateTime').value;
   var dur=parseInt(document.getElementById('callDuration').value)||0;
   var desc=document.getElementById('callDesc').value.trim();
-  var data={ Subject:subj, Call_Type:document.getElementById('callDirection').value||'Outbound', Call_Start_Time:dt?new Date(dt).toISOString():new Date().toISOString(), $se_module:'Leads', What_Id:{id:leadId} };
-  if(dur>0){ var h=Math.floor(dur/60),m=dur%60; data.Call_Duration=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
+  var data={Subject:subj,Call_Type:document.getElementById('callDirection').value||'Outbound',Call_Start_Time:dt?new Date(dt).toISOString():new Date().toISOString(),$se_module:'Leads',What_Id:{id:leadId}};
+  if(dur>0){var h=Math.floor(dur/60),m=dur%60;data.Call_Duration=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
   if(desc) data.Description=desc;
-  ZOHO.CRM.API.insertRecord({ Entity:'Calls', APIData:data, Trigger:[] })
+  ZOHO.CRM.API.insertRecord({Entity:'Calls',APIData:data,Trigger:[]})
     .then(function(res){
-      btn.classList.remove('loading'); btn.disabled=false;
+      btn.classList.remove('loading');btn.disabled=false;
       var ok=res&&res.data&&res.data[0]&&res.data[0].code==='SUCCESS';
-      if(ok){ showToast('Call logged successfully!','ok'); clearForm('call'); }
-      else { var d=res&&res.data&&res.data[0]; showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er'); }
-    }).catch(function(e){ btn.classList.remove('loading'); btn.disabled=false; showToast('Error: '+errMsg(e),'er'); });
+      if(ok){showToast('Call logged!','ok');clearForm('call');}
+      else{var d=res&&res.data&&res.data[0];showToast('Error: '+(d&&d.message?d.message:JSON.stringify(d||{}).substring(0,80)),'er');}
+    }).catch(function(e){btn.classList.remove('loading');btn.disabled=false;showToast('Error: '+errMsg(e),'er');});
 }
 
-// ── DISCUSSION ────────────────────────────────────────────────────────
-function onInput() {
-  var v=document.getElementById('discussionInput').value;
-  document.getElementById('charCount').textContent=v.length+' character'+(v.length!==1?'s':'');
-}
-function clearDiscussion() { document.getElementById('discussionInput').value=''; onInput(); }
+function onInput(){var v=document.getElementById('discussionInput').value;document.getElementById('charCount').textContent=v.length+' character'+(v.length!==1?'s':'');}
+function clearDiscussion(){document.getElementById('discussionInput').value='';onInput();}
 
 function saveDiscussion() {
   var disc=document.getElementById('discussionInput').value.trim();
   var stat=document.getElementById('statusSelect').value;
-  if(!disc){ showToast("Please enter today's discussion notes",'er'); document.getElementById('discussionInput').focus(); return; }
-  var btn=document.getElementById('saveBtn');
-  btn.classList.add('loading'); btn.disabled=true;
+  if(!disc){showToast("Please enter today's discussion notes",'er');document.getElementById('discussionInput').focus();return;}
+  var btn=document.getElementById('saveBtn');btn.classList.add('loading');btn.disabled=true;
   var existing=leadData&&leadData.Description?leadData.Description:'';
   var newDesc=existing?existing+'\n'+todayStr+' - '+disc:todayStr+' - '+disc;
-  var payload={ id:leadId, Description:newDesc };
+  var payload={id:leadId,Description:newDesc};
   if(stat) payload.Lead_Status=stat;
-  ZOHO.CRM.API.updateRecord({ Entity:'Leads', APIData:payload })
+  ZOHO.CRM.API.updateRecord({Entity:'Leads',APIData:payload})
     .then(function(res){
-      btn.classList.remove('loading'); btn.disabled=false;
+      btn.classList.remove('loading');btn.disabled=false;
       if(res&&res.data&&res.data[0]&&res.data[0].code==='SUCCESS'){
-        if(leadData){ leadData.Description=newDesc; if(stat) leadData.Lead_Status=stat; }
-        var el=document.getElementById('descContent'); el.className='readonly-content'; el.textContent=newDesc;
-        clearDiscussion();
-        showToast('Saved successfully! ✓','ok');
-        setTimeout(function(){ try{ ZOHO.CRM.UI.Popup.closeReload(); }catch(e){} }, 1500);
-      } else { showToast('Save failed. Please try again.','er'); }
-    }).catch(function(){ btn.classList.remove('loading'); btn.disabled=false; showToast('Error saving. Please try again.','er'); });
+        if(leadData){leadData.Description=newDesc;if(stat)leadData.Lead_Status=stat;}
+        var el=document.getElementById('descContent');el.className='readonly-content';el.textContent=newDesc;
+        clearDiscussion();showToast('Saved successfully!','ok');
+        setTimeout(function(){try{ZOHO.CRM.UI.Popup.closeReload();}catch(e){}},1500);
+      }else{showToast('Save failed.','er');}
+    }).catch(function(){btn.classList.remove('loading');btn.disabled=false;showToast('Error saving.','er');});
 }
 
-// ── FORM HELPERS ──────────────────────────────────────────────────────
-function switchTab(t) {
-  ['task','call'].forEach(function(k){
-    document.getElementById('tab-'+k).className='tab'+(k===t?' active':'');
-    document.getElementById('form-'+k).className='form'+(k===t?' show':'');
-  });
-}
-function clearForm(t) {
-  if(t==='task'){ document.getElementById('taskSubjectPick').value=''; document.getElementById('taskSubject').value=''; document.getElementById('taskDueDate').value=''; document.getElementById('taskStatus').value='Not Started'; document.getElementById('taskPriority').value='Normal'; document.getElementById('taskOwner').value=''; document.getElementById('taskDesc').value=''; }
-  else { document.getElementById('callSubject').value=''; document.getElementById('callDateTime').value=''; document.getElementById('callDirection').value='Outbound'; document.getElementById('callDuration').value=''; document.getElementById('callDesc').value=''; }
+function switchTab(t){['task','call'].forEach(function(k){document.getElementById('tab-'+k).className='tab'+(k===t?' active':'');document.getElementById('form-'+k).className='form'+(k===t?' show':'');});}
+
+function clearForm(t){
+  if(t==='task'){document.getElementById('taskSubjectPick').value='';document.getElementById('taskSubject').value='';document.getElementById('taskDueDate').value='';document.getElementById('taskStatus').value='Not Started';document.getElementById('taskPriority').value='Normal';document.getElementById('taskOwner').value='';document.getElementById('taskDesc').value='';}
+  else{document.getElementById('callSubject').value='';document.getElementById('callDateTime').value='';document.getElementById('callDirection').value='Outbound';document.getElementById('callDuration').value='';document.getElementById('callDesc').value='';}
 }
 </script>
 </body>
