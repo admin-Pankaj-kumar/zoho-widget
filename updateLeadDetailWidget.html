@@ -109,7 +109,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="ab op" id="bd-st"><select class="ss" id="SS"><option value="">-None-</option><option value="New">New</option><option value="Contact in Future">Contact in Future</option><option value="Contacted">Contacted</option><option value="Junk Lead">Junk Lead</option><option value="Future Prospect">Future Prospect</option><option value="Not Contacted">Not Contacted</option><option value="Discovery Call">Discovery Call</option><option value="Not Interested">Not Interested</option><option value="Not Qualified">Not Qualified</option></select></div>
   </div>
   <div class="acc"><div class="ah" onclick="tog('req')"><div class="at">Requirement Details <span class="tg t-ro">Read Only</span></div><svg class="ar" id="ar-req" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ab" id="bd-req"><div id="RC" class="em">No requirement details.</div></div></div>
-  <div class="acc"><div class="ah" onclick="tog('notes')"><div class="at">Notes <span class="tg t-ro">Read Only</span><span id="NB" style="display:none;background:#f1f5f9;color:#475569;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:600"></span></div><svg class="ar" id="ar-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ab" id="bd-notes"><div id="NC" class="em">Loading...</div></div></div>
+  <div class="acc"><div class="ah" onclick="tog('notes')"><div class="at">Notes <span class="tg t-ed">Edit</span><span id="NB" style="display:none;background:#f1f5f9;color:#475569;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:600"></span></div><svg class="ar" id="ar-notes" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="ab" id="bd-notes">
+      <div class="fl" style="margin-bottom:8px"><label class="lb">Add Note</label>
+        <input type="text" class="fi" id="nT" placeholder="Title (optional)" style="margin-bottom:4px"/>
+        <textarea class="ft2" id="nC" placeholder="Write a note..."></textarea>
+        <div class="ff" style="margin-top:5px"><button class="btn bgh" onclick="clrNote()">Clear</button><button class="btn bg" id="nBtn" onclick="mkNote()"><div class="sp"></div><span class="lb">Add Note</span></button></div>
+      </div>
+      <div id="NC" class="em">Loading...</div>
+    </div>
+  </div>
   <div class="acc"><div class="ah" onclick="tog('desc')"><div class="at">Description <span class="tg t-ro">Read Only</span></div><svg class="ar" id="ar-desc" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ab" id="bd-desc"><div id="DC" class="em">No description.</div></div></div>
   <div class="acc">
     <div class="ah" onclick="tog('today')"><div class="at">Today's Discussion <span class="tg t-ed">Edit</span></div><svg class="ar op" id="ar-today" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -274,13 +283,23 @@ function refreshLead(){
   try{ZOHO.CRM.API.getRecord({Entity:'Leads',RecordID:lid}).then(function(r){if(r&&r.data&&r.data[0]){ld=r.data[0];renderLead();}}).catch(function(){});}catch(e){}
 }
 
+function actModule(t){
+  var a=t&&t.$activity_type;
+  if(a==='Calls'||t.Call_Type!==undefined||t.Call_Duration!==undefined||t.Call_Start_Time!==undefined)return 'Calls';
+  if(a==='Events'||t.Start_DateTime!==undefined||t.End_DateTime!==undefined)return 'Events';
+  return 'Tasks';
+}
+
 function doneAct(i){
   var t=acts[i];if(!t)return;
   var note=(document.getElementById('note-'+i).value||'').trim();
   var btn=document.getElementById('doneBtn-'+i);btn.classList.add('ld');btn.disabled=true;
-  var upd={id:t.id,Status:'Completed'};
+  var mod=actModule(t);
+  var upd={id:t.id};
+  if(mod==='Calls')upd.Outgoing_Call_Status='Completed';
+  else if(mod==='Tasks')upd.Status='Completed';
   if(note)upd.Description=(t.Description?safe(t.Description)+'\n\n':'')+'['+ts+'] '+note;
-  ZOHO.CRM.API.updateRecord({Entity:'Tasks',APIData:upd}).then(function(r){
+  ZOHO.CRM.API.updateRecord({Entity:mod,APIData:upd}).then(function(r){
     var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';
     if(!ok){var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:'failed'),'er');btn.classList.remove('ld');btn.disabled=false;return;}
     if(note){try{
@@ -290,7 +309,7 @@ function doneAct(i){
         if(r2&&r2.data&&r2.data[0]&&r2.data[0].code==='SUCCESS'){if(ld)ld.Description=newDesc;var dc=document.getElementById('DC');if(dc){dc.className='ro';dc.textContent=newDesc;}}
       }).catch(function(){});
     }catch(e){}}
-    toast('Task completed!','ok');
+    toast((mod==='Calls'?'Call':mod==='Events'?'Event':'Task')+' completed!','ok');
     var el=document.getElementById('act-'+i);if(el)el.style.opacity='0';
     setTimeout(refreshActs,400);
   }).catch(function(e){toast('Error: '+em(e),'er');btn.classList.remove('ld');btn.disabled=false;});
@@ -355,6 +374,36 @@ function saveDisc(){
       try{if(ZOHO.CRM.UI&&ZOHO.CRM.UI.Record&&ZOHO.CRM.UI.Record.refresh)ZOHO.CRM.UI.Record.refresh();}catch(e){}
     }else{toast('Save failed.','er');}
   }).catch(function(){btn.classList.remove('ld');btn.disabled=false;toast('Error saving.','er');});
+}
+
+function clrNote(){document.getElementById('nT').value='';document.getElementById('nC').value='';}
+
+function refreshNotes(){
+  try{
+    ZOHO.CRM.API.getRelatedRecords({Entity:'Leads',RecordID:lid,RelatedList:'Notes',page:1,per_page:10}).then(function(r){
+      var notes=(r&&r.data)?r.data:[];
+      var el=document.getElementById('NC'),badge=document.getElementById('NB');
+      if(!notes.length){el.className='em';el.innerHTML='No notes.';badge.style.display='none';return;}
+      badge.textContent=notes.length;badge.style.display='inline-block';
+      el.className='';
+      el.innerHTML=notes.map(function(n){var dt=n.Created_Time?new Date(n.Created_Time):null;var txt=stripHtml(n.Note_Content||n.Content||'');return '<div class="nt">'+(dt?'<div class="nd">'+esc(fd(dt))+'</div>':'')+'<div class="nx">'+esc(txt)+'</div></div>';}).join('');
+    }).catch(function(){});
+  }catch(e){}
+}
+
+function mkNote(){
+  var title=document.getElementById('nT').value.trim();
+  var content=document.getElementById('nC').value.trim();
+  if(!content){toast('Enter note content','er');document.getElementById('nC').focus();return;}
+  var btn=document.getElementById('nBtn');btn.classList.add('ld');btn.disabled=true;
+  var data={Note_Content:content,Parent_Id:lid,se_module:'Leads'};
+  if(title)data.Note_Title=title;
+  ZOHO.CRM.API.insertRecord({Entity:'Notes',APIData:data,Trigger:[]}).then(function(r){
+    btn.classList.remove('ld');btn.disabled=false;
+    var ok=r&&r.data&&r.data[0]&&r.data[0].code==='SUCCESS';
+    if(ok){toast('Note added!','ok');clrNote();refreshNotes();}
+    else{var d=r&&r.data&&r.data[0];toast('Error: '+(d&&d.message?d.message:'failed'),'er');}
+  }).catch(function(e){btn.classList.remove('ld');btn.disabled=false;toast('Error: '+em(e),'er');});
 }
 
 function swTab(t){['task','call'].forEach(function(k){document.getElementById('tb-'+k).className='tab'+(k===t?' on':'');document.getElementById('fm-'+k).className='fm'+(k===t?' sh':'');});}
