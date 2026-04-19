@@ -234,6 +234,17 @@ function dst(ds){
   var s=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   return due<s?'overdue':due<new Date(s.getTime()+86400000)?'today':'upcoming';
 }
+
+// Zoho CRM datetime expects local time with timezone offset, e.g. 2026-04-20T04:19:00+05:30
+// (NOT toISOString()'s UTC "Z" form, which Zoho rejects with INVALID_DATA).
+function fmtDT(d){
+  function p(n){return String(n).padStart(2,'0');}
+  var tz=-d.getTimezoneOffset(),sign=tz>=0?'+':'-',a=Math.abs(tz);
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+
+         p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())+
+         sign+p(Math.floor(a/60))+':'+p(a%60);
+}
+
 function showUI(){
   document.getElementById('LS').style.display='none';
   document.getElementById('MW').style.display='flex';
@@ -540,7 +551,7 @@ function mkCall(){
   var dt=document.getElementById('cDT').value;
   var dur=parseInt(document.getElementById('cDU').value)||0;
   var desc=document.getElementById('cDE').value.trim();
-  var data={Subject:subj,Call_Type:document.getElementById('cDR').value||'Outbound',Call_Start_Time:dt?new Date(dt).toISOString():new Date().toISOString(),$se_module:'Leads',What_Id:{id:lid}};
+  var data={Subject:subj,Call_Type:document.getElementById('cDR').value||'Outbound',Call_Start_Time:fmtDT(dt?new Date(dt):new Date()),$se_module:'Leads',What_Id:{id:lid}};
   if(dur>0){var h=Math.floor(dur/60),m=dur%60;data.Call_Duration=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
   if(desc)data.Description=desc;
   ZOHO.CRM.API.insertRecord({Entity:'Calls',APIData:data,Trigger:[]})
