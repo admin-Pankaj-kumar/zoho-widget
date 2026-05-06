@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Add Multiple Units</title>
+<script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f7f8fa;
+    color: #2c2e34;
+    font-size: 13px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e3e5eb;
+  }
+  .header h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  .meta {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .meta strong { color: #2c2e34; }
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  button {
+    padding: 7px 14px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  button:hover { background: #f3f4f6; }
+  button.primary {
+    background: #1976d2;
+    color: #fff;
+    border-color: #1976d2;
+  }
+  button.primary:hover { background: #1565c0; }
+  button.danger {
+    background: #fff;
+    color: #d32f2f;
+    border-color: #fca5a5;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  button.danger:hover { background: #fee; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .table-wrap {
+    background: #fff;
+    border: 1px solid #e3e5eb;
+    border-radius: 4px;
+    overflow: auto;
+    max-height: 60vh;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  thead {
+    background: #f9fafb;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  th, td {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px solid #e3e5eb;
+    white-space: nowrap;
+  }
+  th {
+    font-weight: 600;
+    color: #4b5563;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  td input, td select {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    font-size: 12px;
+    background: transparent;
+  }
+  td input:focus, td select:focus {
+    outline: none;
+    border-color: #1976d2;
+    background: #fff;
+  }
+  td input:hover, td select:hover {
+    border-color: #d1d5db;
+    background: #fff;
+  }
+  td.required input:invalid { border-color: #fca5a5; }
+  .col-num { width: 40px; text-align: center; color: #9ca3af; }
+  .col-action { width: 50px; text-align: center; }
+  .status-bar {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: none;
+  }
+  .status-bar.success { background: #d1fae5; color: #065f46; display: block; }
+  .status-bar.error { background: #fee2e2; color: #991b1b; display: block; }
+  .status-bar.info { background: #dbeafe; color: #1e40af; display: block; }
+  .footer {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .row-count { font-size: 12px; color: #6b7280; }
+  .input-narrow { width: 70px !important; }
+  .input-medium { width: 90px !important; }
+  .spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2>Add multiple units</h2>
+  <div class="meta">
+    <span>Building: <strong id="bldName">—</strong></span>
+    <span>Project: <strong id="prjName">—</strong></span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <button onclick="addRow()">+ Add row</button>
+  <button onclick="addRows(5)">+ Add 5 rows</button>
+  <button onclick="duplicateLast()">Duplicate last</button>
+  <button onclick="clearAll()">Clear all</button>
+  <span style="flex:1"></span>
+  <span class="row-count"><span id="rowCount">0</span> row(s)</span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="col-num">#</th>
+        <th>Unit name *</th>
+        <th>Floor *</th>
+        <th>Floor No</th>
+        <th>Unit type</th>
+        <th>Status</th>
+        <th>BHK</th>
+        <th>Carpet area</th>
+        <th>Buildup area</th>
+        <th>Price (₹)</th>
+        <th>Facing</th>
+        <th>Balcony</th>
+        <th>Wash</th>
+        <th class="col-action"></th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+
+<div class="footer">
+  <div id="status" class="status-bar"></div>
+  <div>
+    <button onclick="closeWidget()">Cancel</button>
+    <button class="primary" id="saveBtn" onclick="saveAll()">Save units</button>
+  </div>
+</div>
+
+<script>
+let BUILDING_ID = null;
+let PROJECT_ID = null;
+let FLOORS = [];
+
+const FLOOR_NO_OPTIONS = Array.from({length: 30}, (_, i) => String(i + 1));
+const UNIT_TYPES = ['Residential Flat','Commercial Space','Plot','Villa','Resale','Other'];
+const STATUSES = ['New','Available','Booked','Sold'];
+const FACINGS = ['East','West','North','South'];
+
+function showStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.className = 'status-bar ' + type;
+  el.textContent = msg;
+}
+
+function newRow(seed = {}) {
+  return {
+    Name: seed.Name || '',
+    Floor: seed.Floor || (FLOORS[0]?.id || ''),
+    Floor_No: seed.Floor_No || '1',
+    Unit_Type: seed.Unit_Type || 'Residential Flat',
+    Unit_Status: seed.Unit_Status || 'New',
+    BHK: seed.BHK || '',
+    Carpet_Area: seed.Carpet_Area || '',
+    Buildup_Area: seed.Buildup_Area || '',
+    Flat_Price: seed.Flat_Price || '',
+    Facing_Type: seed.Facing_Type || 'East',
+    No_of_Balcony: seed.No_of_Balcony || '',
+    No_of_Washrooms: seed.No_of_Washrooms || ''
+  };
+}
+
+let rows = [];
+
+function render() {
+  const tbody = document.getElementById('rows');
+  tbody.innerHTML = '';
+  rows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="col-num">${i + 1}</td>
+      <td class="required"><input value="${r.Name}" oninput="upd(${i},'Name',this.value)" placeholder="e.g. PK-101" required/></td>
+      <td><select onchange="upd(${i},'Floor',this.value)">
+        ${FLOORS.map(f => `<option value="${f.id}" ${f.id===r.Floor?'selected':''}>${f.Name}</option>`).join('')}
+      </select></td>
+      <td><select class="input-narrow" onchange="upd(${i},'Floor_No',this.value)">
+        ${FLOOR_NO_OPTIONS.map(n => `<option ${n===r.Floor_No?'selected':''}>${n}</option>`).join('')}
+      </select></td>
+      <td><select onchange="upd(${i},'Unit_Type',this.value)">
+        ${UNIT_TYPES.map(t => `<option ${t===r.Unit_Type?'selected':''}>${t}</option>`).join('')}
+      </select></td>
+      <td><select class="input-medium" onchange="upd(${i},'Unit_Status',this.value)">
+        ${STATUSES.map(s => `<option ${s===r.Unit_Status?'selected':''}>${s}</option>`).join('')}
+      </select></td>
+      <td><input class="input-narrow" type="number" value="${r.BHK}" oninput="upd(${i},'BHK',this.value)"/></td>
+      <td><input class="input-medium" type="number" value="${r.Carpet_Area}" oninput="upd(${i},'Carpet_Area',this.value)"/></td>
+      <td><input class="input-medium" type="number" value="${r.Buildup_Area}" oninput="upd(${i},'Buildup_Area',this.value)"/></td>
+      <td><input class="input-medium" type="number" value="${r.Flat_Price}" oninput="upd(${i},'Flat_Price',this.value)"/></td>
+      <td><select class="input-narrow" onchange="upd(${i},'Facing_Type',this.value)">
+        ${FACINGS.map(f => `<option ${f===r.Facing_Type?'selected':''}>${f}</option>`).join('')}
+      </select></td>
+      <td><input class="input-narrow" type="number" value="${r.No_of_Balcony}" oninput="upd(${i},'No_of_Balcony',this.value)"/></td>
+      <td><input class="input-narrow" type="number" value="${r.No_of_Washrooms}" oninput="upd(${i},'No_of_Washrooms',this.value)"/></td>
+      <td class="col-action"><button class="danger" onclick="removeRow(${i})">×</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('rowCount').textContent = rows.length;
+}
+
+function upd(i, key, val) { rows[i][key] = val; }
+function addRow() { rows.push(newRow()); render(); }
+function addRows(n) { for (let i = 0; i < n; i++) rows.push(newRow()); render(); }
+function duplicateLast() {
+  if (rows.length === 0) return addRow();
+  rows.push(newRow({...rows[rows.length-1], Name: ''}));
+  render();
+}
+function removeRow(i) { rows.splice(i, 1); render(); }
+function clearAll() {
+  if (confirm('Clear all rows?')) { rows = []; render(); }
+}
+
+function closeWidget() {
+  ZOHO.CRM.UI.Popup.close().then(() => {});
+}
+
+async function saveAll() {
+  // Validation
+  const invalid = rows.filter(r => !r.Name || !r.Floor);
+  if (invalid.length > 0) {
+    showStatus(`${invalid.length} row(s) missing required fields (Unit name and Floor).`, 'error');
+    return;
+  }
+  if (rows.length === 0) {
+    showStatus('Add at least one row.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Saving...';
+  showStatus(`Creating ${rows.length} unit(s)...`, 'info');
+
+  // Build records
+  const records = rows.map(r => {
+    const rec = {
+      Name: r.Name,
+      Building_Name: BUILDING_ID,
+      Floor: r.Floor,
+      Floor_No: r.Floor_No,
+      Unit_Type: r.Unit_Type,
+      Unit_Status: r.Unit_Status,
+      Facing_Type: r.Facing_Type
+    };
+    if (r.BHK) rec.BHK = parseInt(r.BHK);
+    if (r.Carpet_Area) rec.Carpet_Area = parseInt(r.Carpet_Area);
+    if (r.Buildup_Area) rec.Buildup_Area = parseInt(r.Buildup_Area);
+    if (r.Flat_Price) rec.Flat_Price = parseFloat(r.Flat_Price);
+    if (r.No_of_Balcony) rec.No_of_Balcony = parseInt(r.No_of_Balcony);
+    if (r.No_of_Washrooms) rec.No_of_Washrooms = parseInt(r.No_of_Washrooms);
+    return rec;
+  });
+
+  // Zoho insert API accepts up to 100 records per call
+  try {
+    const config = { Entity: 'Flat', APIData: records, Trigger: ['workflow'] };
+    const resp = await ZOHO.CRM.API.insertRecord(config);
+    const successCount = resp.data.filter(d => d.code === 'SUCCESS').length;
+    const errorCount = resp.data.length - successCount;
+
+    if (errorCount === 0) {
+      showStatus(`✓ Successfully created ${successCount} unit(s).`, 'success');
+      setTimeout(() => {
+        ZOHO.CRM.UI.Popup.closeReload();
+      }, 1200);
+    } else {
+      const errors = resp.data
+        .map((d, i) => d.code !== 'SUCCESS' ? `Row ${i+1}: ${d.message}` : null)
+        .filter(Boolean)
+        .join('; ');
+      showStatus(`Created ${successCount}, failed ${errorCount}. ${errors}`, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Save units';
+    }
+  } catch (e) {
+    showStatus('Error: ' + (e.message || JSON.stringify(e)), 'error');
+    btn.disabled = false;
+    btn.textContent = 'Save units';
+  }
+}
+
+// Boot
+ZOHO.embeddedApp.on('PageLoad', async function(data) {
+  BUILDING_ID = data.EntityId[0];
+
+  // Fetch building info
+  const bldResp = await ZOHO.CRM.API.getRecord({ Entity: 'Building', RecordID: BUILDING_ID });
+  const bld = bldResp.data[0];
+  document.getElementById('bldName').textContent = bld.Name || '—';
+
+  if (bld.Project) {
+    PROJECT_ID = bld.Project.id;
+    document.getElementById('prjName').textContent = bld.Project.name || '—';
+  }
+
+  // Fetch floors belonging to this building (via search)
+  try {
+    const floorsResp = await ZOHO.CRM.API.searchRecord({
+      Entity: 'Floor',
+      Type: 'criteria',
+      Query: `(Building:equals:${BUILDING_ID})`
+    });
+    FLOORS = (floorsResp.data || []).map(f => ({ id: f.id, Name: f.Name }));
+  } catch (e) {
+    FLOORS = [];
+  }
+
+  if (FLOORS.length === 0) {
+    showStatus('No floors found for this building. Please create floors first.', 'error');
+    document.getElementById('saveBtn').disabled = true;
+    return;
+  }
+
+  // Start with 3 empty rows
+  addRows(3);
+});
+
+ZOHO.embeddedApp.init();
+</script>
+</body>
+</html>
