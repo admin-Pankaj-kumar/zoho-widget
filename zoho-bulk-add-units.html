@@ -6,197 +6,596 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Add Multiple Units</title>
 <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background: #f7f8fa;
-    color: #2c2e34;
-    font-size: 13px;
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-2: #f4f4f5;
+    --border: #e4e4e7;
+    --border-strong: #d4d4d8;
+    --text: #18181b;
+    --text-muted: #71717a;
+    --text-subtle: #a1a1aa;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --accent-light: #eef2ff;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
   }
-  .header {
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 24px;
+    min-height: 100vh;
+  }
+
+  /* Top hero card */
+  .hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #e3e5eb;
-  }
-  .header h2 { margin: 0; font-size: 16px; font-weight: 600; }
-  .meta {
-    display: flex;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
     gap: 16px;
-    font-size: 12px;
-    color: #6b7280;
   }
-  .meta strong { color: #2c2e34; }
+
+  .hero-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .hero-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+
+  .hero h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 2px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 12px;
+  }
+
+  .stat-pill {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stat-pill .label {
+    color: rgba(255,255,255,0.6);
+    font-weight: 400;
+  }
+
+  .stat-pill .value {
+    font-weight: 600;
+  }
+
+  /* Toolbar */
   .toolbar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    margin-bottom: 16px;
     display: flex;
     gap: 8px;
     align-items: center;
-    margin-bottom: 12px;
     flex-wrap: wrap;
+    box-shadow: var(--shadow-sm);
   }
+
+  .btn-group {
+    display: flex;
+    gap: 6px;
+  }
+
   button {
-    padding: 7px 14px;
-    border: 1px solid #d1d5db;
-    background: #fff;
-    border-radius: 4px;
-    cursor: pointer;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
     font-size: 13px;
     font-weight: 500;
-    transition: all 0.15s;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  button:hover { background: #f3f4f6; }
+
+  button:hover {
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+  }
+
   button.primary {
-    background: #1976d2;
-    color: #fff;
-    border-color: #1976d2;
+    background: var(--text);
+    color: white;
+    border-color: var(--text);
   }
-  button.primary:hover { background: #1565c0; }
-  button.danger {
-    background: #fff;
-    color: #d32f2f;
-    border-color: #fca5a5;
-    padding: 4px 8px;
-    font-size: 11px;
+
+  button.primary:hover {
+    background: #27272a;
   }
-  button.danger:hover { background: #fee; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  .table-wrap {
-    background: #fff;
-    border: 1px solid #e3e5eb;
-    border-radius: 4px;
-    overflow: auto;
-    max-height: 60vh;
+
+  button.accent {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
   }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
+
+  button.accent:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
   }
-  thead {
-    background: #f9fafb;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-  th, td {
-    padding: 6px 8px;
-    text-align: left;
-    border-bottom: 1px solid #e3e5eb;
-    white-space: nowrap;
-  }
-  th {
-    font-weight: 600;
-    color: #4b5563;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-  }
-  td input, td select {
-    width: 100%;
-    padding: 4px 6px;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    font-size: 12px;
+
+  button.ghost {
     background: transparent;
+    border-color: transparent;
   }
-  td input:focus, td select:focus {
-    outline: none;
-    border-color: #1976d2;
-    background: #fff;
+
+  button.ghost:hover {
+    background: var(--surface-2);
   }
-  td input:hover, td select:hover {
-    border-color: #d1d5db;
-    background: #fff;
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
-  td.required input:invalid { border-color: #fca5a5; }
-  .col-num { width: 40px; text-align: center; color: #9ca3af; }
-  .col-action { width: 50px; text-align: center; }
-  .status-bar {
-    margin-top: 12px;
-    padding: 10px 12px;
-    border-radius: 4px;
+
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon-btn:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+    border-color: transparent;
+  }
+
+  .toolbar-spacer { flex: 1; }
+
+  .row-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: 12px;
-    display: none;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 500;
   }
-  .status-bar.success { background: #d1fae5; color: #065f46; display: block; }
-  .status-bar.error { background: #fee2e2; color: #991b1b; display: block; }
-  .status-bar.info { background: #dbeafe; color: #1e40af; display: block; }
-  .footer {
-    margin-top: 16px;
+
+  .row-counter .num {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Cards container */
+  .units-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .unit-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+  }
+
+  .unit-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
+
+  .unit-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 14px;
   }
-  .row-count { font-size: 12px; color: #6b7280; }
-  .input-narrow { width: 70px !important; }
-  .input-medium { width: 90px !important; }
+
+  .unit-number {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .unit-number .badge {
+    background: var(--accent-light);
+    color: var(--accent);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .unit-fields {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .field.span-2 { grid-column: span 2; }
+
+  .field label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .field label .req {
+    color: var(--danger);
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  input, select {
+    font-family: inherit;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface);
+    transition: all 0.15s ease;
+  }
+
+  input:hover, select:hover {
+    border-color: var(--border-strong);
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  input::placeholder {
+    color: var(--text-subtle);
+  }
+
+  input.required-empty {
+    border-color: var(--danger);
+    background: var(--danger-light);
+  }
+
+  /* Empty state */
+  .empty-state {
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .empty-state .icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .empty-state h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .empty-state p {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  /* Status messages */
+  .status-banner {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .status-banner.show { display: flex; }
+
+  .status-banner.success {
+    background: var(--success-light);
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+  }
+
+  .status-banner.error {
+    background: var(--danger-light);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+
+  .status-banner.info {
+    background: var(--accent-light);
+    color: #3730a3;
+    border: 1px solid #a5b4fc;
+  }
+
+  .status-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .status-banner.success .status-icon { background: var(--success); color: white; }
+  .status-banner.error .status-icon { background: var(--danger); color: white; }
+  .status-banner.info .status-icon { background: var(--accent); color: white; }
+
+  /* Footer action bar */
+  .action-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    bottom: 0;
+  }
+
+  .action-bar-info {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .action-bar-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Spinner */
   .spinner {
     display: inline-block;
-    width: 12px;
-    height: 12px;
-    border: 2px solid #fff;
-    border-top-color: transparent;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-right: 6px;
-    vertical-align: middle;
+    animation: spin 0.7s linear infinite;
   }
+
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Status pills for unit_status field */
+  .status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+
+  .status-tag.new { background: var(--accent-light); color: var(--accent); }
+  .status-tag.available { background: #fef3c7; color: #92400e; }
+  .status-tag.booked { background: #fce7f3; color: #9f1239; }
+  .status-tag.sold { background: var(--success-light); color: #065f46; }
+
+  /* Animations */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .unit-card {
+    animation: slideIn 0.25s ease;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .unit-fields { grid-template-columns: repeat(2, 1fr); }
+    .field.span-2 { grid-column: span 2; }
+  }
+
+  /* Floor color indicator */
+  .floor-indicator {
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+    position: absolute;
+    left: 0;
+    top: 16px;
+    bottom: 16px;
+    background: var(--accent);
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h2>Add multiple units</h2>
-  <div class="meta">
-    <span>Building: <strong id="bldName">—</strong></span>
-    <span>Project: <strong id="prjName">—</strong></span>
+<!-- Hero header -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-title">
+      <div class="hero-icon">🏢</div>
+      <div>
+        <h1>Add multiple units</h1>
+        <div class="hero-subtitle">Bulk-create units for this building in one go</div>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-pill">
+        <span class="label">Building</span>
+        <span class="value" id="bldName">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="label">Project</span>
+        <span class="value" id="prjName">—</span>
+      </div>
+      <div class="stat-pill">
+        <span class="label">Floors</span>
+        <span class="value" id="floorCount">0</span>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- Toolbar -->
 <div class="toolbar">
-  <button onclick="addRow()">+ Add row</button>
-  <button onclick="addRows(5)">+ Add 5 rows</button>
-  <button onclick="duplicateLast()">Duplicate last</button>
-  <button onclick="clearAll()">Clear all</button>
-  <span style="flex:1"></span>
-  <span class="row-count"><span id="rowCount">0</span> row(s)</span>
+  <div class="btn-group">
+    <button onclick="addRow()">
+      <span style="font-size:14px;line-height:1">+</span> Add unit
+    </button>
+    <button onclick="addRows(5)">+ Add 5</button>
+    <button onclick="duplicateLast()">⎘ Duplicate last</button>
+  </div>
+  <div class="toolbar-spacer"></div>
+  <div class="row-counter">
+    <span class="num" id="rowCount">0</span> unit(s) ready to save
+  </div>
+  <button class="ghost" onclick="clearAll()" style="color:var(--danger)">Clear all</button>
 </div>
 
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th class="col-num">#</th>
-        <th>Unit name *</th>
-        <th>Floor *</th>
-        <th>Floor No</th>
-        <th>Unit type</th>
-        <th>Status</th>
-        <th>BHK</th>
-        <th>Carpet area</th>
-        <th>Buildup area</th>
-        <th>Price (₹)</th>
-        <th>Facing</th>
-        <th>Balcony</th>
-        <th>Wash</th>
-        <th class="col-action"></th>
-      </tr>
-    </thead>
-    <tbody id="rows"></tbody>
-  </table>
+<!-- Status banner -->
+<div id="status" class="status-banner">
+  <div class="status-icon"></div>
+  <div id="statusText"></div>
 </div>
 
-<div class="footer">
-  <div id="status" class="status-bar"></div>
-  <div>
+<!-- Units container -->
+<div id="units" class="units-container"></div>
+
+<!-- Empty state (shown when no rows) -->
+<div id="emptyState" class="empty-state" style="display:none">
+  <div class="icon">📋</div>
+  <h3>No units added yet</h3>
+  <p>Click "Add unit" above to start adding units to this building</p>
+  <button class="accent" onclick="addRows(3)">+ Add 3 units to start</button>
+</div>
+
+<!-- Action bar -->
+<div class="action-bar">
+  <div class="action-bar-info">
+    <span id="actionInfo">Required: Unit name and Floor</span>
+  </div>
+  <div class="action-bar-buttons">
     <button onclick="closeWidget()">Cancel</button>
-    <button class="primary" id="saveBtn" onclick="saveAll()">Save units</button>
+    <button class="accent" id="saveBtn" onclick="saveAll()">
+      <span id="saveText">Save units</span>
+    </button>
   </div>
 </div>
 
@@ -210,10 +609,19 @@ const UNIT_TYPES = ['Residential Flat','Commercial Space','Plot','Villa','Resale
 const STATUSES = ['New','Available','Booked','Sold'];
 const FACINGS = ['East','West','North','South'];
 
+let rows = [];
+
 function showStatus(msg, type) {
   const el = document.getElementById('status');
-  el.className = 'status-bar ' + type;
-  el.textContent = msg;
+  const txt = document.getElementById('statusText');
+  el.className = 'status-banner show ' + type;
+  txt.textContent = msg;
+  const icon = el.querySelector('.status-icon');
+  icon.textContent = type === 'success' ? '✓' : type === 'error' ? '!' : 'i';
+}
+
+function hideStatus() {
+  document.getElementById('status').className = 'status-banner';
 }
 
 function newRow(seed = {}) {
@@ -233,55 +641,116 @@ function newRow(seed = {}) {
   };
 }
 
-let rows = [];
-
 function render() {
-  const tbody = document.getElementById('rows');
-  tbody.innerHTML = '';
+  const container = document.getElementById('units');
+  const emptyState = document.getElementById('emptyState');
+
+  if (rows.length === 0) {
+    container.innerHTML = '';
+    emptyState.style.display = 'block';
+    document.getElementById('rowCount').textContent = '0';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  container.innerHTML = '';
+
   rows.forEach((r, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="col-num">${i + 1}</td>
-      <td class="required"><input value="${r.Name}" oninput="upd(${i},'Name',this.value)" placeholder="e.g. PK-101" required/></td>
-      <td><select onchange="upd(${i},'Floor',this.value)">
-        ${FLOORS.map(f => `<option value="${f.id}" ${f.id===r.Floor?'selected':''}>${f.Name}</option>`).join('')}
-      </select></td>
-      <td><select class="input-narrow" onchange="upd(${i},'Floor_No',this.value)">
-        ${FLOOR_NO_OPTIONS.map(n => `<option ${n===r.Floor_No?'selected':''}>${n}</option>`).join('')}
-      </select></td>
-      <td><select onchange="upd(${i},'Unit_Type',this.value)">
-        ${UNIT_TYPES.map(t => `<option ${t===r.Unit_Type?'selected':''}>${t}</option>`).join('')}
-      </select></td>
-      <td><select class="input-medium" onchange="upd(${i},'Unit_Status',this.value)">
-        ${STATUSES.map(s => `<option ${s===r.Unit_Status?'selected':''}>${s}</option>`).join('')}
-      </select></td>
-      <td><input class="input-narrow" type="number" value="${r.BHK}" oninput="upd(${i},'BHK',this.value)"/></td>
-      <td><input class="input-medium" type="number" value="${r.Carpet_Area}" oninput="upd(${i},'Carpet_Area',this.value)"/></td>
-      <td><input class="input-medium" type="number" value="${r.Buildup_Area}" oninput="upd(${i},'Buildup_Area',this.value)"/></td>
-      <td><input class="input-medium" type="number" value="${r.Flat_Price}" oninput="upd(${i},'Flat_Price',this.value)"/></td>
-      <td><select class="input-narrow" onchange="upd(${i},'Facing_Type',this.value)">
-        ${FACINGS.map(f => `<option ${f===r.Facing_Type?'selected':''}>${f}</option>`).join('')}
-      </select></td>
-      <td><input class="input-narrow" type="number" value="${r.No_of_Balcony}" oninput="upd(${i},'No_of_Balcony',this.value)"/></td>
-      <td><input class="input-narrow" type="number" value="${r.No_of_Washrooms}" oninput="upd(${i},'No_of_Washrooms',this.value)"/></td>
-      <td class="col-action"><button class="danger" onclick="removeRow(${i})">×</button></td>
+    const card = document.createElement('div');
+    card.className = 'unit-card';
+    card.innerHTML = `
+      <div class="floor-indicator"></div>
+      <div class="unit-card-header">
+        <div class="unit-number">
+          <span class="badge">${i + 1}</span>
+          <span>Unit ${i + 1}</span>
+        </div>
+        <button class="icon-btn" onclick="removeRow(${i})" title="Remove unit">✕</button>
+      </div>
+      <div class="unit-fields">
+        <div class="field span-2">
+          <label>Unit name <span class="req">*</span></label>
+          <input value="${escapeHtml(r.Name)}" oninput="upd(${i},'Name',this.value)" placeholder="e.g. PK-101" />
+        </div>
+        <div class="field">
+          <label>Floor <span class="req">*</span></label>
+          <select onchange="upd(${i},'Floor',this.value)">
+            ${FLOORS.map(f => `<option value="${f.id}" ${f.id===r.Floor?'selected':''}>${escapeHtml(f.Name)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Floor No</label>
+          <select onchange="upd(${i},'Floor_No',this.value)">
+            ${FLOOR_NO_OPTIONS.map(n => `<option ${n===r.Floor_No?'selected':''}>${n}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Unit type</label>
+          <select onchange="upd(${i},'Unit_Type',this.value)">
+            ${UNIT_TYPES.map(t => `<option ${t===r.Unit_Type?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select onchange="upd(${i},'Unit_Status',this.value)">
+            ${STATUSES.map(s => `<option ${s===r.Unit_Status?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>BHK</label>
+          <input type="number" value="${r.BHK}" oninput="upd(${i},'BHK',this.value)" placeholder="2" />
+        </div>
+        <div class="field">
+          <label>Facing</label>
+          <select onchange="upd(${i},'Facing_Type',this.value)">
+            ${FACINGS.map(f => `<option ${f===r.Facing_Type?'selected':''}>${f}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Carpet area (sqft)</label>
+          <input type="number" value="${r.Carpet_Area}" oninput="upd(${i},'Carpet_Area',this.value)" placeholder="950" />
+        </div>
+        <div class="field">
+          <label>Buildup area (sqft)</label>
+          <input type="number" value="${r.Buildup_Area}" oninput="upd(${i},'Buildup_Area',this.value)" placeholder="1150" />
+        </div>
+        <div class="field">
+          <label>Price (₹)</label>
+          <input type="number" value="${r.Flat_Price}" oninput="upd(${i},'Flat_Price',this.value)" placeholder="6500000" />
+        </div>
+        <div class="field">
+          <label>Balcony</label>
+          <input type="number" value="${r.No_of_Balcony}" oninput="upd(${i},'No_of_Balcony',this.value)" placeholder="1" />
+        </div>
+        <div class="field">
+          <label>Washrooms</label>
+          <input type="number" value="${r.No_of_Washrooms}" oninput="upd(${i},'No_of_Washrooms',this.value)" placeholder="2" />
+        </div>
+      </div>
     `;
-    tbody.appendChild(tr);
+    container.appendChild(card);
   });
+
   document.getElementById('rowCount').textContent = rows.length;
 }
 
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 function upd(i, key, val) { rows[i][key] = val; }
-function addRow() { rows.push(newRow()); render(); }
-function addRows(n) { for (let i = 0; i < n; i++) rows.push(newRow()); render(); }
+function addRow() { rows.push(newRow()); render(); hideStatus(); }
+function addRows(n) { for (let i = 0; i < n; i++) rows.push(newRow()); render(); hideStatus(); }
 function duplicateLast() {
   if (rows.length === 0) return addRow();
-  rows.push(newRow({...rows[rows.length-1], Name: ''}));
+  const last = rows[rows.length-1];
+  rows.push(newRow({...last, Name: ''}));
   render();
 }
 function removeRow(i) { rows.splice(i, 1); render(); }
 function clearAll() {
-  if (confirm('Clear all rows?')) { rows = []; render(); }
+  if (rows.length === 0) return;
+  if (confirm(`Clear all ${rows.length} unit(s)?`)) { rows = []; render(); hideStatus(); }
 }
 
 function closeWidget() {
@@ -289,23 +758,22 @@ function closeWidget() {
 }
 
 async function saveAll() {
-  // Validation
   const invalid = rows.filter(r => !r.Name || !r.Floor);
   if (invalid.length > 0) {
-    showStatus(`${invalid.length} row(s) missing required fields (Unit name and Floor).`, 'error');
+    showStatus(`${invalid.length} unit(s) missing required fields. Please fill in Unit name and Floor.`, 'error');
     return;
   }
   if (rows.length === 0) {
-    showStatus('Add at least one row.', 'error');
+    showStatus('Add at least one unit to save.', 'error');
     return;
   }
 
   const btn = document.getElementById('saveBtn');
+  const txt = document.getElementById('saveText');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Saving...';
+  txt.innerHTML = '<span class="spinner"></span> Saving ' + rows.length + ' unit(s)...';
   showStatus(`Creating ${rows.length} unit(s)...`, 'info');
 
-  // Build records
   const records = rows.map(r => {
     const rec = {
       Name: r.Name,
@@ -325,7 +793,6 @@ async function saveAll() {
     return rec;
   });
 
-  // Zoho insert API accepts up to 100 records per call
   try {
     const config = { Entity: 'Flat', APIData: records, Trigger: ['workflow'] };
     const resp = await ZOHO.CRM.API.insertRecord(config);
@@ -333,23 +800,23 @@ async function saveAll() {
     const errorCount = resp.data.length - successCount;
 
     if (errorCount === 0) {
-      showStatus(`✓ Successfully created ${successCount} unit(s).`, 'success');
+      showStatus(`Successfully created ${successCount} unit(s). Reloading page...`, 'success');
       setTimeout(() => {
         ZOHO.CRM.UI.Popup.closeReload();
-      }, 1200);
+      }, 1400);
     } else {
       const errors = resp.data
-        .map((d, i) => d.code !== 'SUCCESS' ? `Row ${i+1}: ${d.message}` : null)
+        .map((d, i) => d.code !== 'SUCCESS' ? `Unit ${i+1}: ${d.message}` : null)
         .filter(Boolean)
-        .join('; ');
+        .join(' • ');
       showStatus(`Created ${successCount}, failed ${errorCount}. ${errors}`, 'error');
       btn.disabled = false;
-      btn.textContent = 'Save units';
+      txt.textContent = 'Save units';
     }
   } catch (e) {
     showStatus('Error: ' + (e.message || JSON.stringify(e)), 'error');
     btn.disabled = false;
-    btn.textContent = 'Save units';
+    txt.textContent = 'Save units';
   }
 }
 
@@ -357,35 +824,33 @@ async function saveAll() {
 ZOHO.embeddedApp.on('PageLoad', async function(data) {
   BUILDING_ID = data.EntityId[0];
 
-  // Fetch building info
-  const bldResp = await ZOHO.CRM.API.getRecord({ Entity: 'Building', RecordID: BUILDING_ID });
-  const bld = bldResp.data[0];
-  document.getElementById('bldName').textContent = bld.Name || '—';
-
-  if (bld.Project) {
-    PROJECT_ID = bld.Project.id;
-    document.getElementById('prjName').textContent = bld.Project.name || '—';
-  }
-
-  // Fetch floors belonging to this building (via search)
   try {
+    const bldResp = await ZOHO.CRM.API.getRecord({ Entity: 'Building', RecordID: BUILDING_ID });
+    const bld = bldResp.data[0];
+    document.getElementById('bldName').textContent = bld.Name || '—';
+
+    if (bld.Project) {
+      PROJECT_ID = bld.Project.id;
+      document.getElementById('prjName').textContent = bld.Project.name || '—';
+    }
+
     const floorsResp = await ZOHO.CRM.API.searchRecord({
       Entity: 'Floor',
       Type: 'criteria',
       Query: `(Building:equals:${BUILDING_ID})`
     });
     FLOORS = (floorsResp.data || []).map(f => ({ id: f.id, Name: f.Name }));
+    document.getElementById('floorCount').textContent = FLOORS.length;
   } catch (e) {
     FLOORS = [];
   }
 
   if (FLOORS.length === 0) {
-    showStatus('No floors found for this building. Please create floors first.', 'error');
+    showStatus('No floors found for this building. Please create floors first before adding units.', 'error');
     document.getElementById('saveBtn').disabled = true;
     return;
   }
 
-  // Start with 3 empty rows
   addRows(3);
 });
 
